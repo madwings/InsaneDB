@@ -1462,6 +1462,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function insert_ignore_batch($table = '', $set = NULL, $escape = NULL)
 	{
+		if ( ! method_exists($this, '_insert_ignore_batch')) 
+		{
+			return FALSE;
+		}
+		
 		if ($set !== NULL)
 		{
 			$this->set_insert_batch($set, '', $escape);
@@ -1510,23 +1515,6 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	protected function _insert_batch($table, $keys, $values)
 	{
 		return 'INSERT INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert batch statement
-	 *
-	 * Generates a platform-specific insert string from the supplied data.
-	 *
-	 * @param	string	$table	Table name
-	 * @param	array	$keys	INSERT keys
-	 * @param	array	$values	INSERT values
-	 * @return	string
-	 */
-	protected function _insert_ignore_batch($table, $keys, $values)
-	{
-		return 'INSERT IGNORE INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
 	
 	// --------------------------------------------------------------------

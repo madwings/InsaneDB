@@ -49,9 +49,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['mstrslve'] TRUE/FALSE - Whether to use a master/slave mode
 |	['db_deflt'] 'master'/'slave' - Default database in master/slave mode when autoinit is used
 |	['dbdriver'] The database driver. e.g.: mysqli.
-|			Currently supported:
-|				 cubrid, ibase, mssql, mysql, mysqli, oci8,
-|				 odbc, pdo, postgre, sqlite, sqlite3, sqlsrv
+|				 Currently supported:
+|				 	cubrid, ibase, mssql, mysql, mysqli, oci8,
+|				 	odbc, pdo, postgre, sqlite, sqlite3, sqlsrv
 |	['dbprefix'] You can add an optional prefix, which will be added
 |				 to the table name when using the  Query Builder class
 |	['pconnect'] TRUE/FALSE - Whether to use a persistent connection
@@ -94,27 +94,28 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => '',
-	'password' => '',
-	'database' => '',
-	'mstrslve' => FALSE,
-	'db_deflt' => '',
-	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
-	'pconnect' => TRUE,
-	'db_debug' => TRUE,
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'autoinit' => TRUE,
-	'encrypt'  => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
+	'hostname'  => 'localhost',
+	'username'  => '',
+	'password'  => '',
+	'database'  => '',
+	'mstrslve'  => FALSE,
+	'db_deflt'  => '',
+	'dbdriver'  => 'pdo',
+	'subdriver' => 'mysql',
+	'dbprefix'  => '',
+	'pconnect'  => FALSE,
+	'db_debug'  => FALSE,
+	'cache_on'  => FALSE,
+	'cachedir'  => '',
+	'char_set'  => 'utf8mb4',
+	'dbcollat'  => 'utf8mb4_bin',
+	'swap_pre'  => '',
+	'autoinit'  => TRUE,
+	'encrypt'   => FALSE,
+	'compress'  => FALSE,
+	'stricton'  => FALSE,
+	'failover'  => array(),
+	'save_queries' => FALSE
 );
 
 $db['master_slave'] = array(
@@ -131,24 +132,25 @@ $db['master_slave'] = array(
 			'password' => ''
 		)
 	),
-	'database' => '',
-	'mstrslve' => TRUE,
-	'db_deflt' => 'slave',
-	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
-	'pconnect' => FALSE,
-	'db_debug' => TRUE,
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'autoinit' => TRUE,
-	'encrypt'  => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
+	'database'  => '',
+	'mstrslve'  => TRUE,
+	'db_deflt'  => 'slave',
+	'dbdriver'  => 'pdo',
+	'subdriver' => 'mysql',
+	'dbprefix'  => '',
+	'pconnect'  => FALSE,
+	'db_debug'  => FALSE,
+	'cache_on'  => FALSE,
+	'cachedir'  => '',
+	'char_set'  => 'utf8mb4',
+	'dbcollat'  => 'utf8mb4_bin',
+	'swap_pre'  => '',
+	'autoinit'  => TRUE,
+	'encrypt'   => FALSE,
+	'compress'  => FALSE,
+	'stricton'  => FALSE,
+	'failover'  => array(),
+	'save_queries' => FALSE
 );
 
 /* End of file database.php */

@@ -256,7 +256,24 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 
 		return implode(', ', $this->qb_from);
 	}
+	
+	// --------------------------------------------------------------------
 
+	/**
+	 * Insert batch statement
+	 *
+	 * Generates a platform-specific insert string from the supplied data.
+	 *
+	 * @param	string	$table	Table name
+	 * @param	array	$keys	INSERT keys
+	 * @param	array	$values	INSERT values
+	 * @return	string
+	 */
+	protected function _insert_ignore_batch($table, $keys, $values)
+	{
+		return 'INSERT IGNORE INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
+	}
+	
 }
 
 /* End of file pdo_mysql_driver.php */

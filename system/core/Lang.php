@@ -113,19 +113,6 @@ class CI_Lang {
 				$found = TRUE;
 			}
 		}
-		else
-		{
-			foreach (get_instance()->load->get_package_paths(TRUE) as $package_path)
-			{
-				$package_path .= 'language/'.$idiom.'/'.$langfile;
-				if ($basepath !== $package_path && file_exists($package_path))
-				{
-					include($package_path);
-					$found = TRUE;
-					break;
-				}
-			}
-		}
 
 		if ($found !== TRUE)
 		{
