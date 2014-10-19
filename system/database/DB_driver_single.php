@@ -351,7 +351,8 @@ abstract class CI_DB_driver_single {
 	 * @var	string
 	 */
 	protected $_count_string = 'SELECT COUNT(*) AS ';
-
+	
+	protected $_conn_retries = 1;
 	// --------------------------------------------------------------------
 
 	/**
@@ -428,7 +429,7 @@ abstract class CI_DB_driver_single {
 			if ( ! $this->conn_id)
 			{
 				log_message('error', 'Unable to connect to the database');
-
+				
 				if ($this->db_debug)
 				{
 					$this->display_error('db_unable_to_connect');
@@ -459,16 +460,13 @@ abstract class CI_DB_driver_single {
 	/**
 	 * Reconnect
 	 *
-	 * Keep / reestablish the db connection if no queries have been
-	 * sent for a length of time exceeding the server's idle timeout.
-	 *
-	 * This is just a dummy method to allow drivers without such
-	 * functionality to not declare it, while others will override it.
+	 * Force driver to reconnect. This is alias to close function.
 	 *
 	 * @return      void
 	 */
 	public function reconnect()
 	{
+		$this->close();
 	}
 
 	// --------------------------------------------------------------------
@@ -747,12 +745,37 @@ abstract class CI_DB_driver_single {
 	 */
 	public function simple_query($sql)
 	{
-		if ( ! $this->conn_id)
+		for($i = 0; $i <= $this->_conn_retries; $i++)
 		{
-			$this->initialize();
-		}
+			if ( ! $this->conn_id)
+			{
+				$this->initialize();
+			}
 
-		return $this->_execute($sql);
+			$result = $this->_execute($sql);
+			
+			// If query failed due to lost connection to server retry connecting before exit
+			if ($result !== FALSE) 
+			{
+				break;
+			}
+			else
+			{
+				$error = $this->conn_id->errorInfo();
+				// SQLSTATE codes for lost connection
+				if ($error[0] === '2006' || $error[0] === '2013')
+				{
+					$this->close();
+				}
+				else
+				{
+					//handle_error();
+					break;
+				}
+			}
+		}
+		
+		return $result;
 	}
 
 	// --------------------------------------------------------------------

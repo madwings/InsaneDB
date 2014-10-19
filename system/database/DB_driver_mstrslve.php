@@ -231,11 +231,6 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 			log_message('error', 'slave ' . $sql);
 		}
 		
-		if ( ! $this->conn_id)
-		{
-			$this->initialize();
-		}
-		
 		// Clear database force if not explicitly set not to
 		if ($this->db_force_clr === TRUE)
 		{
@@ -255,8 +250,35 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 	public function simple_query($sql)
 	{
 		$this->_config_master_slave($sql);
-
-		return $this->_execute($sql);
+		for($i = 0; $i <= $this->_conn_retries; $i++)
+		{			
+			if ( ! $this->conn_id)
+			{
+				$this->initialize();
+			}
+			$result = $this->_execute($sql);
+			// If query failed due to lost connection to server retry connecting before exit
+			if ($result !== FALSE) 
+			{
+				break;
+			}
+			else
+			{
+				$error = $this->conn_id->errorInfo();
+				// SQLSTATE codes for lost connection
+				if ($error[0] === '2006' || $error[0] === '2013')
+				{
+					$this->close();
+				}
+				else
+				{
+					//handle_error();
+					break;
+				}
+			}
+		}
+		
+		return $result;
 	}
 
 	// --------------------------------------------------------------------
