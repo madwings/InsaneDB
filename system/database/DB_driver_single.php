@@ -987,7 +987,7 @@ abstract class CI_DB_driver_single {
 	 * Calculate the aggregate query elapsed time
 	 *
 	 * @param	int	The number of decimal places
-	 * @return	int
+	 * @return	string
 	 */
 	public function elapsed_time($decimals = 6)
 	{
@@ -1057,7 +1057,7 @@ abstract class CI_DB_driver_single {
 	/**
 	 * Escape String
 	 *
-	 * @param	string	$str
+	 * @param	string|string[]	$str
 	 * @param	bool	$like	Whether or not the string will be used in a LIKE condition
 	 * @return	string
 	 */
@@ -1126,7 +1126,7 @@ abstract class CI_DB_driver_single {
 	 * position is the primary key
 	 *
 	 * @param	string	the table name
-	 * @return	string
+	 * @return	mixed
 	 */
 	public function primary($table = '')
 	{
@@ -1169,7 +1169,7 @@ abstract class CI_DB_driver_single {
 	 * Returns an array of table names
 	 *
 	 * @param	string	$constrain_by_prefix = FALSE
-	 * @return	array
+	 * @return	mixed
 	 */
 	public function list_tables($constrain_by_prefix = FALSE)
 	{
@@ -1237,7 +1237,7 @@ abstract class CI_DB_driver_single {
 	 * Fetch Field Names
 	 *
 	 * @param	string	the table name
-	 * @return	array
+	 * @return	mixed
 	 */
 	public function list_fields($table = '')
 	{
@@ -1484,7 +1484,7 @@ abstract class CI_DB_driver_single {
 	 */
 	protected function _has_operator($str)
 	{
-		return (bool) preg_match('/(<|>|!|=|\sIS\s|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($str));
+		return (bool) preg_match('/(<|>|!|=|\sIS NULL|\sIS NOT NULL|\sEXISTS|\sBETWEEN|\sLIKE|\sIN\s*\(|\s)/i', trim($str));
 	}
 
 	// --------------------------------------------------------------------
@@ -1508,7 +1508,8 @@ abstract class CI_DB_driver_single {
 				'\s*(?:<|>|!)?=\s*',		// =, <=, >=, !=
 				'\s*<>?\s*',			// <, <>
 				'\s*>\s*',			// >
-				'\s+IS(?:\sNOT)?(?:\sNULL)?',	// IS[ NOT] NULL
+				'\s+IS NULL',			// IS NULL
+				'\s+IS NOT NULL',		// IS NOT NULL
 				'\s+EXISTS\s*\([^\)]+\)',	// EXISTS(sql)
 				'\s+NOT EXISTS\s*\([^\)]+\)',	// NOT EXISTS(sql)
 				'\s+BETWEEN\s+\S+\s+AND\s+\S+',	// BETWEEN value AND value
