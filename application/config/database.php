@@ -110,7 +110,6 @@ $db['default'] = array(
 	'password'  => '',
 	'database'  => '',
 	'mstrslve'  => FALSE,
-	'db_deflt'  => '',
 	'dbdriver'  => 'pdo',
 	'subdriver' => 'mysql',
 	'dbprefix'  => '',
@@ -126,7 +125,8 @@ $db['default'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE
+	'save_queries' => FALSE,
+	'qb_batch_limit' => 100
 );
 
 $db['master_slave'] = array(
@@ -161,7 +161,8 @@ $db['master_slave'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE
+	'save_queries' => FALSE,
+	'qb_batch_limit' => 100
 );
 
 /* End of file database.php */

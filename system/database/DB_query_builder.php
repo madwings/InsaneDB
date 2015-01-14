@@ -255,6 +255,13 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @var	array
 	 */
 	protected $qb_cache_no_escape			= array();
+	
+	/**
+	 * QB Limit For Batch Queries
+	 *
+	 * @var	int
+	 */
+	public $qb_batch_limit					= 100;
 
 	// --------------------------------------------------------------------
 
@@ -1449,9 +1456,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		// Batch this baby
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += 100)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $this->qb_batch_limit)
 		{
-			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, 100)));
+			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $this->qb_batch_limit)));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1501,9 +1508,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		// Batch this baby
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += 100)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $this->qb_batch_limit)
 		{
-			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, 100)));
+			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $this->qb_batch_limit)));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1909,9 +1916,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		// Batch this baby
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += 100)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $this->qb_batch_limit)
 		{
-			$this->query($this->_update_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), array_slice($this->qb_set, $i, 100), $this->protect_identifiers($index)));
+			$this->query($this->_update_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), array_slice($this->qb_set, $i, $this->qb_batch_limit), $this->protect_identifiers($index)));
 			$affected_rows += $this->affected_rows();
 			$this->qb_where = array();
 		}
