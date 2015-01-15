@@ -125,8 +125,7 @@ $db['default'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE,
-	'qb_batch_limit' => 100
+	'save_queries' => FALSE
 );
 
 $db['master_slave'] = array(
@@ -161,8 +160,7 @@ $db['master_slave'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE,
-	'qb_batch_limit' => 100
+	'save_queries' => FALSE
 );
 
 /* End of file database.php */
