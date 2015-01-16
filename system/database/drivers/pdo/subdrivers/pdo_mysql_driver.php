@@ -280,6 +280,31 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 		return 'INSERT IGNORE INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
 	
+		// --------------------------------------------------------------------
+
+	/**
+	 * If query faild due to lost connection to server, initiate reconnection
+	 *
+	 * Returns TRUE if pending reconnection otherwise FALSE
+	 *
+	 * @param	array	$error	database error
+	 * @return	bool
+	 */
+	protected function _handle_reconnection($error)
+	{
+		// MySQL specific errors for lost connection
+		if ($error[1] === 2006 || $error[1] === 2013)
+		{
+			$this->close();
+			$result = TRUE;
+		}
+		else
+		{
+			$result = FALSE;
+		}
+		
+		return $result;
+	}
 }
 
 /* End of file pdo_mysql_driver.php */

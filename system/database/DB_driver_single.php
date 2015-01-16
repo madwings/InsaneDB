@@ -787,14 +787,10 @@ abstract class CI_DB_driver_single {
 			else
 			{
 				$error = $this->conn_id->errorInfo();
-				// SQLSTATE codes for lost connection
-				if ($error[0] === '2006' || $error[0] === '2013')
+				// Handle error, and decide on reconnection
+				$reconnect = $this->_handle_reconnection($error);
+				if ($reconnect !== TRUE)
 				{
-					$this->close();
-				}
-				else
-				{
-					//handle_error();
 					break;
 				}
 			}
@@ -1675,7 +1671,7 @@ abstract class CI_DB_driver_single {
 	{
 		$conn_id = FALSE;
 	}
-
+	
 	// --------------------------------------------------------------------
 
 	/**

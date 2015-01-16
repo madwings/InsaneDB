@@ -106,9 +106,9 @@ $query_builder = TRUE;
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname'  => 'localhost',
-	'username'  => '',
-	'password'  => '',
-	'database'  => '',
+	'username'  => 'root',
+	'password'  => 'r5t25z10',
+	'database'  => 'test_read',
 	'mstrslve'  => FALSE,
 	'dbdriver'  => 'pdo',
 	'subdriver' => 'mysql',
@@ -125,8 +125,7 @@ $db['default'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE,
-	'qb_batch_limit' => 100
+	'save_queries' => FALSE
 );
 
 $db['master_slave'] = array(
@@ -161,8 +160,7 @@ $db['master_slave'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE,
-	'qb_batch_limit' => 100
+	'save_queries' => FALSE
 );
 
 /* End of file database.php */
