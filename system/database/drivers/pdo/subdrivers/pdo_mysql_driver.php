@@ -290,7 +290,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 * @param	array	$error	database error
 	 * @return	bool
 	 */
-	protected function _handle_reconnection($error)
+	protected function _handle_reconnect($error)
 	{
 		// MySQL specific errors for lost connection
 		if ($error[1] === 2006 || $error[1] === 2013)

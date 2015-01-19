@@ -788,7 +788,7 @@ abstract class CI_DB_driver_single {
 			{
 				$error = $this->conn_id->errorInfo();
 				// Handle error, and decide on reconnection
-				$reconnect = $this->_handle_reconnection($error);
+				$reconnect = $this->_handle_reconnect($error);
 				if ($reconnect !== TRUE)
 				{
 					break;
