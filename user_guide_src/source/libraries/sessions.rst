@@ -47,7 +47,7 @@ Once loaded, the Sessions library object will be available using::
 
 	$this->session
 
-.. important:: Because the :doc:`Loader Class <../loader>` is instantiated
+.. important:: Because the :doc:`Loader Class </libraries/loader>` is instantiated
 	by CodeIgniter's base controller, make sure to call
 	``parent::__construct()`` before trying to load a library from
 	inside a controller constructor.
@@ -378,7 +378,7 @@ by default: 'session_id', 'ip_address', 'user_agent', 'last_activity'.
 This was due to the specifics of how sessions worked, but is now no longer
 necessary with our new implementation. However, it may happen that your
 application relied on these values, so here are alternative methods of
-accessing them::
+accessing them:
 
   - session_id: ``session_id()``
   - ip_address: ``$_SERVER['REMOTE_ADDR']``
@@ -400,7 +400,7 @@ You'll find the following Session related preferences in your
 Preference               Default         Options                                  Description
 ======================== =============== ======================================== ============================================================================================
 **sess_driver**          files           files/database/redis/memcached/*custom*  The session storage driver to use.
-**sess_cookie_name**     ci_session      [A-Za-z_-] characters only               The name used for the session cookie.
+**sess_cookie_name**     ci_session      [A-Za-z\_-] characters only              The name used for the session cookie.
 **sess_expiration**      7200 (2 hours)  Time in seconds (integer)                The number of seconds you would like the session to last.
                                                                                   If you would like a non-expiring session (until browser is closed) set the value to zero: 0
 **sess_save_path**       NULL            None                                     Specifies the storage location, depends on the driver being used.
@@ -878,7 +878,7 @@ Class Reference
 	.. method:: keep_flashdata($key)
 
 		:param	mixed	$key: Flashdata key to keep, or an array of multiple keys
-		:returns	TRUE on success, FALSE on failure
+		:returns:	TRUE on success, FALSE on failure
 		:rtype:	bool
 
 		Retains the specified session data key(s) as "flashdata"
