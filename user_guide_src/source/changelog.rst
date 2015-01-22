@@ -58,6 +58,7 @@ Release Date: Not Released
    -  Added support for turning newline standardization on/off via ``$config['standardize_newlines']`` and set it to FALSE by default.
    -  Added configuration setting ``$config['composer_autoload']`` to enable loading of a `Composer <https://getcomposer.org/>`_ auto-loader.
    -  Removed the automatic conversion of 'programmatic characters' to HTML entities from the :doc:`URI Library <libraries/uri>`.
+   -  Changed log messages that say a class or file was loaded to "info" level instead of "debug", so that they don't pollute log files when ``$config['log_threshold']`` is set to 2 (debug).
 
 -  Helpers
 
@@ -103,7 +104,7 @@ Release Date: Not Released
    -  :doc:`Form Helper <helpers/form_helper>` changes include:
 
       - :func:`form_dropdown()` will now also take an array for unity with other form helpers.
-      - :func:`form_prep()`'s second argument now only accepts a boolean value, which determines whether the value is escaped for a <textarea> or a regular <input> element.
+      - :func:`form_prep()` is now DEPRECATED and only acts as an alias for :doc:`common function <general/common_functions>` :func:`html_escape()`.
 
    -  :doc:`Security Helper <helpers/security_helper>` changes include:
 
@@ -395,9 +396,10 @@ Release Date: Not Released
       -  Added support for the anchor "rel" attribute.
       -  Added support for setting custom attributes.
       -  Added support for language translations of the *first_link*, *next_link*, *prev_link* and *last_link* values.
-      -  Added ``$config['reuse_query_string']`` to allow automatic repopulation of query string arguments, combined with normal URI segments.
-      -  Removed the default ``&nbsp;`` from a number of the configuration variables.
       -  Added support for ``$config['num_links'] = 0`` configuration.
+      -  Added ``$config['reuse_query_string']`` to allow automatic repopulation of query string arguments, combined with normal URI segments.
+      -  Added ``$config['use_global_url_suffix']`` to allow overriding the library 'suffix' value with that of the global ``$config['url_suffix']`` setting.
+      -  Removed the default ``&nbsp;`` from a number of the configuration variables.
 
    -  :doc:`Profiler Library <general/profiling>` changes include:
 
@@ -553,6 +555,7 @@ Release Date: Not Released
 
       -  Added a ``$config['log_file_permissions']`` setting.
       -  Changed the library constructor to try to create the **log_path** directory if it doesn't exist.
+      -  Added support for microseconds ("u" date format character) in ``$config['log_date_format']``.
 
    -  Added `compatibility layers <general/compatibility_functions>` for:
 

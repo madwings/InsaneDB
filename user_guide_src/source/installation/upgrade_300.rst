@@ -123,6 +123,7 @@ that you should make:
 
     The table structure has changed a bit, and more specifically:
 
+      - ``session_id`` field is renamed to ``id``
       - ``user_agent`` field is dropped
       - ``user_data`` field is renamed to ``data`` and under MySQL is now of type BLOB
       - ``last_activity`` field is renamed to ``timestamp``
@@ -526,6 +527,18 @@ scheduled for removal in CodeIgniter 3.1+.
 
 .. note:: This function is still available, but you're strongly encouraged to remove its usage sooner
 	rather than later.
+
+Form helper form_prep()
+=======================
+
+:doc:`Form Helper <../helpers/form_helper>` function :func:`form_prep()`
+is now just an alias for :doc:`common function </general/common_functions>`
+:func:`html_escape()`. It is deprecated and will be removed in the future.
+
+Please use :func:`html_escape()` instead.
+
+.. note:: This function is still available, but you're strongly encouraged
+	to remove its usage sooner rather than later.
 
 Email helper functions
 ======================
