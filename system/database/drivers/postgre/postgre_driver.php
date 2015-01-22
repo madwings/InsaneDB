@@ -642,6 +642,3 @@ class CI_DB_postgre_driver extends CI_DB {
 	}
 
 }
-
-/* End of file postgre_driver.php */
-/* Location: ./system/database/drivers/postgre/postgre_driver.php */

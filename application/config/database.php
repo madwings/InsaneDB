@@ -161,6 +161,3 @@ $db['master_slave'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
-
-/* End of file database.php */
-/* Location: ./application/config/database.php */

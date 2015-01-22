@@ -418,6 +418,3 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 	}
 
 }
-
-/* End of file DB_driver_mstrslve.php */
-/* Location: ./system/database/DB_driver_mstrslve.php */

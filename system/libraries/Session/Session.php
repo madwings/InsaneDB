@@ -174,7 +174,7 @@ class CI_Session {
 
 		$this->_ci_init_vars();
 
-		log_message('debug', "Session: Class initialized using '".$this->_driver."' driver.");
+		log_message('info', "Session: Class initialized using '".$this->_driver."' driver.");
 	}
 
 	// ------------------------------------------------------------------------
@@ -893,6 +893,3 @@ class CI_Session {
 	}
 
 }
-
-/* End of file Session.php */
-/* Location: ./system/libraries/Session/Session.php */

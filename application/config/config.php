@@ -336,7 +336,7 @@ $config['cache_query_string'] = FALSE;
 | Encryption Key
 |--------------------------------------------------------------------------
 |
-| If you use the Encryption class, you must set the an encryption key.
+| If you use the Encryption class, you must set an encryption key.
 | See the user guide for more info.
 |
 | http://codeigniter.com/user_guide/libraries/encryption.html
@@ -521,7 +521,3 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
-
-
-/* End of file config.php */
-/* Location: ./application/config/config.php */
