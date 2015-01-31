@@ -1666,7 +1666,7 @@ abstract class CI_DB_driver_single {
 	/**
 	 * Close DB Connection
 	 *
-	 * This method would be overriden by most of the drivers.
+	 * This method would be overridden by most of the drivers.
 	 *
 	 * @param	resource
 	 * @return	void
