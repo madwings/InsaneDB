@@ -845,7 +845,7 @@ abstract class CI_DB_driver_single {
 	{
 		if ( ! $this->trans_enabled)
 		{
-			return FALSE;
+			return;
 		}
 
 		// When transactions are nested we only begin/commit/rollback the outermost ones
@@ -1666,7 +1666,7 @@ abstract class CI_DB_driver_single {
 	/**
 	 * Close DB Connection
 	 *
-	 * This method would be overriden by most of the drivers.
+	 * This method would be overridden by most of the drivers.
 	 *
 	 * @param	resource
 	 * @return	void

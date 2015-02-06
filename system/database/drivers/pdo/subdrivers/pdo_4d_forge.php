@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		http://codeigniter.com/user_guide/database/
  */
-class CI_DB_pdo_4d_forge extends CI_DB_4d_forge {
+class CI_DB_pdo_4d_forge extends CI_DB_pdo_forge {
 
 	/**
 	 * CREATE DATABASE statement
@@ -164,7 +164,7 @@ class CI_DB_pdo_4d_forge extends CI_DB_4d_forge {
 				$attributes['TYPE'] = 'INT';
 				return;
 			case 'BIGINT':
-				$attribites['TYPE'] = 'INT64';
+				$attributes['TYPE'] = 'INT64';
 				return;
 			default: return;
 		}
