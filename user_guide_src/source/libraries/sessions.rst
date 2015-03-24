@@ -363,7 +363,7 @@ To read a tempdata variable, again you can just access it through the
 
 .. important:: The ``userdata()`` method will NOT return tempdata items.
 
-Or if you want to be sure that you're reading "flashdata" (and not any
+Or if you want to be sure that you're reading "tempdata" (and not any
 other kind), you can also use the ``tempdata()`` method::
 
 	$this->session->tempdata('item');
@@ -569,9 +569,10 @@ However, there are some conditions that must be met:
 
   - Only your **default** database connection (or the one that you access
     as ``$this->db`` from your controllers) can be used.
-  - You can NOT use a persistent connection.
   - You must have the :doc:`Query Builder </database/query_builder>`
     enabled.
+  - You can NOT use a persistent connection.
+  - You can NOT use a connection with the *cache_on* setting enabled.
 
 In order to use the 'database' session driver, you must also create this
 table that we already mentioned and then set it as your
@@ -632,8 +633,7 @@ Redis Driver
 
 .. note:: Since Redis doesn't have a locking mechanism exposed, locks for
 	this driver are emulated by a separate value that is kept for up
-	to 5 seconds. You may experience issues if your page loads take
-	longer than that!
+	to 300 seconds.
 
 Redis is a storage engine typically used for caching and popular because
 of its high performance, which is also probably your reason to use the
@@ -670,8 +670,7 @@ Memcached Driver
 
 .. note:: Since Memcache doesn't have a locking mechanism exposed, locks
 	for this driver are emulated by a separate value that is kept for
-	up to 5 seconds. You may experience issues if your page loads take
-	longer than that!
+	up to 300 seconds.
 
 The 'memcached' driver is very similar to the 'redis' one in all of its
 properties, except perhaps for availability, because PHP's `Memcached
@@ -838,7 +837,7 @@ Class Reference
 		.. note:: This method is DEPRECATED. Use ``userdata()``
 			with no parameters instead.
 
-	.. php:method:: &get_usedata()
+	.. php:method:: &get_userdata()
 
 		:returns:	A reference to ``$_SESSION``
 		:rtype:	array
