@@ -476,13 +476,14 @@ abstract class CI_DB_driver_single {
 	/**
 	 * Reconnect
 	 *
-	 * Force driver to reconnect. This is alias to close function.
+	 * Reestablish the db connection.
 	 *
 	 * @return      void
 	 */
 	public function reconnect()
 	{
 		$this->close();
+		$this->initialize();
 	}
 
 	// --------------------------------------------------------------------
@@ -771,7 +772,7 @@ abstract class CI_DB_driver_single {
 			$result = $this->_execute($sql);
 			
 			// If query failed due to lost connection to server retry connecting before exit
-			if ($result !== FALSE) 
+			if ($result !== FALSE || ! method_exists($this, '_handle_reconnect')) 
 			{
 				break;
 			}
@@ -779,8 +780,7 @@ abstract class CI_DB_driver_single {
 			{
 				$error = $this->conn_id->errorInfo();
 				// Handle error, and decide on reconnection
-				$reconnect = $this->_handle_reconnect($error);
-				if ($reconnect !== TRUE)
+				if ( ! $this->_handle_reconnect($error))
 				{
 					break;
 				}
