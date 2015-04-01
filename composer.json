@@ -1,9 +1,9 @@
 {
-	"description" : "The CodeIgniter framework",
-	"name" : "codeigniter/framework",
+	"description" : "The InsaneDB library",
+	"name" : "insanedb/library",
 	"license": "MIT",
 	"require": {
-		"php": ">=5.2.4"
+		"php": ">=5.4"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "1.1.*"
