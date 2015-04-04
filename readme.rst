@@ -34,11 +34,3 @@ License
 
 Please see the `license
 agreement <https://github.com/madwings/InsaneDB/blob/master/license.txt>`_.
-
-***************
-Acknowledgement
-***************
-
-The InsaneDB team would like to thank EllisLab, all the
-contributors to the CodeIgniter project and you, the InsaneDB user.
-
