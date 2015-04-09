@@ -1,90 +1,92 @@
 <?php
 /**
- * CodeIgniter
+ * InsaneDB
  *
- * An open source application development framework for PHP 5.2.4 or newer
+ * PHP Database Library forked from CodeIgniter 3
  *
- * NOTICE OF LICENSE
+ * This content is released under the MIT License (MIT)
  *
- * Licensed under the Open Software License version 3.0
+ * Copyright (c) 2015, Stiliyan Ivanov
  *
- * This source file is subject to the Open Software License (OSL 3.0) that is
- * bundled with this package in the files license.txt / license.rst.  It is
- * also available through the world wide web at this URL:
- * http://opensource.org/licenses/OSL-3.0
- * If you did not receive a copy of the license and are unable to obtain it
- * through the world wide web, please send an email to
- * licensing@ellislab.com so we can send you a copy immediately.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * @package		CodeIgniter
- * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
- * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
- * @link		http://codeigniter.com
- * @since		Version 1.0
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package	InsaneDB
+ * @author	Stiliyan Ivanov
+ * @copyright	Copyright (c) 2015, Stiliyan Ivanov (https://github.com/madwings/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
+ * @link	https://github.com/madwings/InsaneDB
+ * @since	Version 1.0
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Database Driver Class for master/slave mode
+ * Database Driver Class for write/read mode
  *
- * This is the platform-independent master/slave mode DB implementation class.
+ * This is the platform-independent write/read mode DB implementation class.
  * It extends base DB implementation class. This class will not be called directly. 
  * Rather, the adapter class for the specific database will extend and instantiate it.
  *
- * @package		CodeIgniter
+ * @package		InsaneDB
  * @subpackage	Drivers
  * @category	Database
  * @author		Stiliyan Ivanov
- * @link		http://codeigniter.com/user_guide/database/
  */
-abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
+abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 
 	/**
-	 * Databases credentials in master/slave mode
+	 * Databases credentials in write/read mode
 	 *
 	 * @var	array
 	 */
 	public $cred;
 	
 	/**
-	 * Master/slave mode flag
+	 * Default database in write/read mode when autoinit is used
 	 *
-	 * @var	bool
+	 * @var	string 'write'/'read'
 	 */
-	public $mstrslve          	= TRUE;
+	public $db_deflt       		= 'read';
 	
 	/**
-	 * Default database in master/slave mode when autoinit is used
-	 *
-	 * @var	string 'master'/'slave'
-	 */
-	public $db_deflt       		= 'slave';
-	
-	/**
-	 * Connection ID master
+	 * Connection ID write
 	 *
 	 * @var	object|resource
 	 */
-	public $conn_id_master		= FALSE;
+	public $conn_id_write		= FALSE;
 	
 	/**
-	 * Connection ID slave
+	 * Connection ID read
 	 *
 	 * @var	object|resource
 	 */
-	public $conn_id_slave		= FALSE;
+	public $conn_id_read		= FALSE;
 	
 	/**
-	 * Force usage of particular database in master/slave mode
+	 * Force usage of particular database in write/read mode
 	 *
 	 * @var	string|null
 	 */
 	protected $db_force   	    = NULL;
 	
 	/**
-	 * Whether to clear forced usage of particular database in master/slave mode
+	 * Whether to clear forced usage of particular database in write/read mode
 	 * after each query
 	 *
 	 * @var	bool
@@ -92,30 +94,46 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 	protected $db_force_clr     = TRUE;
 	
 	/**
-	 * Active database in master/slave mode
+	 * Active database in write/read mode
 	 *
 	 * @var	string|null
 	 */
 	protected $dbactive      	= NULL;
+	
+	// --------------------------------------------------------------------
 
+	/**
+	 * Class constructor
+	 *
+	 * @param	array	$params
+	 * @return	void
+	 */
+	public function __construct($params)
+	{
+		parent::__construct();
+		$this->mstrslve = TRUE;
+
+		log_message('info', 'Database Read Write Driver Class Initialized');
+	}
+	
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Initialize database credentials when in master/slave setup
+	 * Initialize database credentials when in write/read setup
 	 *
 	 * @return	void
 	 */
 	private function _set_cred() 
 	{
-		// Handle autoinit in master/slave mode
+		// Handle autoinit in write/read mode
 		if ($this->dbactive === NULL) 
 		{
 			$this->dbactive = $this->db_deflt;
 		}
 		
-		if (is_array($this->cred[$this->dbactive]))
+		if (is_array($this->{$this->dbactive}))
 		{
-			foreach ($this->cred[$this->dbactive] as $key => $val)
+			foreach ($this->{$this->dbactive} as $key => $val)
 			{
 				$this->$key = $val;
 			}
@@ -197,38 +215,38 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Configure db params for master/slave setup
+	 * Configure db params for write/read setup
 	 *
 	 * @param	string	the sql query
 	 * @return	void
 	 */
-	private function _config_master_slave($sql = '') 
+	private function _config_write_read($sql = '') 
 	{	
-		if ($this->db_force === 'master' OR ($this->db_force === NULL AND $this->is_write_type($sql) === TRUE))
+		if ($this->db_force === 'write' OR ($this->db_force === NULL AND $this->is_write_type($sql) === TRUE))
 		{
-			if ($this->dbactive === 'slave') 
+			if ($this->dbactive === 'read') 
 			{
-				if(gettype($this->conn_id_slave) !== gettype($this->conn_id))
+				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
 				{
-					$this->conn_id_slave = $this->conn_id;
+					$this->conn_id_read = $this->conn_id;
 				}
-				$this->conn_id = &$this->conn_id_master;
+				$this->conn_id = &$this->conn_id_write;
 			}
-			$this->dbactive = 'master';
-			log_message('error', 'master ' . $sql);
+			$this->dbactive = 'write';
+			log_message('error', 'write ' . $sql);
 		}
 		else
 		{
-			if ($this->dbactive === 'master')
+			if ($this->dbactive === 'write')
 			{
-				if(gettype($this->conn_id_slave) !== gettype($this->conn_id))
+				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
 				{
-					$this->conn_id_master = $this->conn_id;
+					$this->conn_id_write = $this->conn_id;
 				}
-				$this->conn_id = &$this->conn_id_slave;
+				$this->conn_id = &$this->conn_id_read;
 			}
-			$this->dbactive = 'slave';
-			log_message('error', 'slave ' . $sql);
+			$this->dbactive = 'read';
+			log_message('error', 'read ' . $sql);
 		}
 		
 		// Clear database force if not explicitly set not to
@@ -236,49 +254,6 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 		{
 			$this->db_force = NULL;
 		}
-	}
-	
-	/**
-	 * Simple Query
-	 * This is a simplified version of the query() function. Internally
-	 * we only use it when running transaction commands since they do
-	 * not require all the features of the main query() function.
-	 *
-	 * @param	string	the sql query
-	 * @return	mixed
-	 */
-	public function simple_query($sql)
-	{
-		$this->_config_master_slave($sql);
-		for($i = 0; $i <= $this->_conn_retries; $i++)
-		{			
-			if ( ! $this->conn_id)
-			{
-				$this->initialize();
-			}
-			$result = $this->_execute($sql);
-			// If query failed due to lost connection to server retry connecting before exit
-			if ($result !== FALSE) 
-			{
-				break;
-			}
-			else
-			{
-				$error = $this->conn_id->errorInfo();
-				// SQLSTATE codes for lost connection
-				if ($error[0] === '2006' || $error[0] === '2013')
-				{
-					$this->close();
-				}
-				else
-				{
-					//handle_error();
-					break;
-				}
-			}
-		}
-		
-		return $result;
 	}
 
 	// --------------------------------------------------------------------
@@ -303,7 +278,7 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 			return;
 		}
 		
-		$this->db_force('master', FALSE);
+		$this->db_force('write', FALSE);
 		$this->trans_begin($test_mode);
 		$this->_trans_depth += 1;
 	}
@@ -359,23 +334,23 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Force using specific database in master/slave mode
+	 * Force using specific database in write/read connections
 	 *
 	 * @param	string which database to use
 	 * @param	boolean toggle auto/manual database selection after the first query
 	 * @return	void
 	 */
-	public function db_force($database = 'master', $db_force_clr = TRUE)
+	public function db_force($database = 'write', $db_force_clr = TRUE)
 	{
 		$this->db_force = $database;
 		$this->db_force_clr = $db_force_clr;
-		$this->_config_master_slave();
+		$this->_config_write_read();
 	}
 
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Clear force master
+	 * Clear force
 	 *
 	 * @return	void
 	 */
@@ -390,31 +365,49 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_single {
 	/**
 	 * Close DB Connection
 	 *
+	 * If no value is passed to the param, it closes all connections
+	 *
+	 * @param	string	$conn	'active'|'write'|'read'
+	 *
 	 * @return	void
 	 */
-	public function close()
+	public function close($conn = NULL)
 	{
-		$closed = 0;
-		if (is_resource($this->conn_id_master) OR is_object($this->conn_id_master))
+		if ($conn === NULL)
 		{
-			$this->_close($this->conn_id_master);
-			$closed++;
+			$closed = 0;
+			if (is_resource($this->conn_id_write) OR is_object($this->conn_id_write))
+			{
+				$this->_close($this->conn_id_write);
+				++$closed;
+			}
+			$this->conn_id_write = FALSE;
+			
+			if (is_resource($this->conn_id_read) OR is_object($this->conn_id_read))
+			{
+				$this->_close($this->conn_id_read);
+				++$closed;
+			}
+			$this->conn_id_read = FALSE;
+			
+			// If write and read were closed, conn_id should not be closed
+			if ($closed !== 2 AND (is_resource($this->conn_id) OR is_object($this->conn_id)))
+			{
+				$this->_close($this->conn_id);
+			}
+			$this->conn_id = FALSE;
 		}
-		$this->conn_id_master = FALSE;
-		
-		if (is_resource($this->conn_id_slave) OR is_object($this->conn_id_slave))
+		else if ($conn === 'active')
 		{
-			$this->_close($this->conn_id_slave);
-			$closed++;
+			$this->_close($this->{"conn_id_{$this->dbactive}"});
 		}
-		$this->conn_id_slave = FALSE;
-		
-		// If master and slave were closed, conn_id should not be closed
-		if ($closed !== 2 AND (is_resource($this->conn_id) OR is_object($this->conn_id)))
+		else if ($conn === 'write')
 		{
-			$this->_close($this->conn_id);
+			$this->_close($this->conn_id_write);
 		}
-		$this->conn_id = FALSE;
+		else if ($conn === 'read')
+		{
+			$this->_close($this->conn_id_read);
+		}
 	}
-
 }

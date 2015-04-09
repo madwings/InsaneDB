@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		http://codeigniter.com/user_guide/database/
  */
-abstract class CI_DB_driver_single {
+abstract class CI_DB_driver_core {
 
 	/**
 	 * Data Source Name / Connect string
@@ -86,13 +86,13 @@ abstract class CI_DB_driver_single {
 	 * @var	string
 	 */
 	public $database;
-
+	
 	/**
 	 * Database driver
 	 *
 	 * @var	string
 	 */
-	public $dbdriver		= 'mysqli';
+	public $dbdriver		= 'pdo';
 
 	/**
 	 * Sub-driver
@@ -114,14 +114,14 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	string
 	 */
-	public $char_set		= 'utf8';
+	public $char_set		= 'utf8mb4';
 
 	/**
 	 * Collation
 	 *
 	 * @var	string
 	 */
-	public $dbcollat		= 'utf8_general_ci';
+	public $dbcollat		= 'utf8mb4_bin';
 
 	/**
 	 * Encryption flag/data
@@ -204,7 +204,7 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	bool
 	 */
-	public $save_queries		= TRUE;
+	public $save_queries	= TRUE;
 
 	/**
 	 * Queries list
@@ -237,21 +237,21 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	bool
 	 */
-	public $trans_enabled		= TRUE;
+	public $trans_enabled	= TRUE;
 
 	/**
 	 * Strict transaction mode flag
 	 *
 	 * @var	bool
 	 */
-	public $trans_strict		= TRUE;
+	public $trans_strict	= TRUE;
 
 	/**
 	 * Transaction depth level
 	 *
 	 * @var	int
 	 */
-	protected $_trans_depth		= 0;
+	protected $_trans_depth	= 0;
 
 	/**
 	 * Transaction status flag
@@ -276,14 +276,14 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	bool
 	 */
-	public $cache_on		= FALSE;
+	public $cache_on			= FALSE;
 
 	/**
 	 * Cache directory path
 	 *
 	 * @var	bool
 	 */
-	public $cachedir		= '';
+	public $cachedir			= '';
 
 	/**
 	 * Cache auto-delete flag
@@ -321,14 +321,14 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	string
 	 */
-	protected $_escape_char = '"';
+	protected $_escape_char 	= '"';
 
 	/**
 	 * ESCAPE statement string
 	 *
 	 * @var	string
 	 */
-	protected $_like_escape_str = " ESCAPE '%s' ";
+	protected $_like_escape_str	= " ESCAPE '%s' ";
 
 	/**
 	 * ESCAPE character
@@ -342,7 +342,7 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	array
 	 */
-	protected $_random_keyword = array('RAND()', 'RAND(%d)');
+	protected $_random_keyword	= array('RAND()', 'RAND(%d)');
 
 	/**
 	 * COUNT string
@@ -352,9 +352,17 @@ abstract class CI_DB_driver_single {
 	 *
 	 * @var	string
 	 */
-	protected $_count_string = 'SELECT COUNT(*) AS ';
+	protected $_count_string 	= 'SELECT COUNT(*) AS ';
 	
-	protected $_conn_retries = 1;
+	protected $_conn_retries 	= 1;
+	
+	/**
+	 * write/read mode flag
+	 *
+	 * @var	bool
+	 */
+	protected $mstrslve			= FALSE;
+	
 	// --------------------------------------------------------------------
 
 	/**
@@ -373,7 +381,7 @@ abstract class CI_DB_driver_single {
 			}
 		}
 
-		log_message('info', 'Database Driver Class Initialized');
+		log_message('info', 'Database Core Driver Class Initialized');
 	}
 
 	// --------------------------------------------------------------------
@@ -762,6 +770,11 @@ abstract class CI_DB_driver_single {
 	 */
 	public function simple_query($sql)
 	{
+		if ($this->mstrslve)
+		{
+			$this->_config_write_read($sql);
+		}
+		
 		for($i = 0; $i <= $this->_conn_retries; $i++)
 		{
 			if ( ! $this->conn_id)

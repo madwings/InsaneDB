@@ -19,14 +19,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['username'] The username used to connect to the database
 |	['password'] The password used to connect to the database
 |	['database'] The name of the database you want to connect to
-|	['cred'] 	 Database credentials in master/slave mode
-|				 Two sections: master, slave
-|	['mstrslve'] TRUE/FALSE - Whether to use a master/slave mode
-|	['db_deflt'] 'master'/'slave' - Default database in master/slave mode when autoinit is used
-|	['dbdriver'] The database driver. e.g.: mysqli.
-|				 Currently supported:
-|				 	cubrid, ibase, mssql, mysql, mysqli, oci8,
-|				 	odbc, pdo, postgre, sqlite, sqlite3, sqlsrv
+|	['read'] 	 Database credentials for read connection in write/read mode
+|	['write'] 	 Database credentials for write connection in write/read mode
+|	['db_deflt'] 'write'/'read' - Default database in write/read mode when autoinit is used
+|	['dbdriver'] The database driver. Only 'pdo' supported:
+|	['subdriver'] The actual database driver used by the pdo base class.
 |	['dbprefix'] You can add an optional prefix, which will be added
 |				 to the table name when using the  Query Builder class
 |	['pconnect'] TRUE/FALSE - Whether to use a persistent connection
@@ -35,13 +32,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['cachedir'] The path to the folder where cache files should be stored
 |	['char_set'] The character set used in communicating with the database
 |	['dbcollat'] The character collation used in communicating with the database
-|				 NOTE: For MySQL and MySQLi databases, this setting is only used
-| 				 as a backup if your server is running PHP < 5.2.3 or MySQL < 5.0.7
-|				 (and in table creation queries made with DB Forge).
-| 				 There is an incompatibility in PHP with mysql_real_escape_string() which
-| 				 can make your site vulnerable to SQL injection if you are using a
-| 				 multi-byte character set and are running versions lower than these.
-| 				 Sites using Latin-1 or UTF-8 database character set and collation are unaffected.
 |	['swap_pre'] A default table prefix that should be swapped with the dbprefix
 |	['encrypt']  Whether or not to use an encrypted connection.
 |	['compress'] Whether or not to use client compression (MySQL only)
@@ -72,7 +62,6 @@ $db['default'] = array(
 	'username'  => '',
 	'password'  => '',
 	'database'  => '',
-	'mstrslve'  => FALSE,
 	'dbdriver'  => 'pdo',
 	'subdriver' => 'mysql',
 	'dbprefix'  => '',
@@ -90,23 +79,18 @@ $db['default'] = array(
 	'save_queries' => FALSE
 );
 
-$db['master_slave'] = array(
+$db['write_read'] = array(
 	'dsn'	=> '',
-	'cred'  => array(
-		'master' => array(
-			'hostname' => 'localhost',
-			'username' => '',
-			'password' => ''
-		),
-		'slave' => array(
-			'hostname' => 'localhost',
-			'username' => '',
-			'password' => ''
-		)
+	'read' => array(
+		'hostname' => 'localhost'
 	),
+	'write' => array(
+		'hostname' => 'localhost'
+	),
+	'username' => '',
+	'password' => ''
 	'database'  => '',
-	'mstrslve'  => TRUE,
-	'db_deflt'  => 'slave',
+	'db_deflt'  => 'read',
 	'dbdriver'  => 'pdo',
 	'subdriver' => 'mysql',
 	'dbprefix'  => '',

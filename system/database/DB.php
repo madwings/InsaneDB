@@ -164,7 +164,7 @@ function &DB($params = '', $query_builder_override = NULL)
 		$query_builder = $active_record;
 	}
 
-	require_once(BASEPATH.'database/DB_driver_single.php');
+	require_once(BASEPATH.'database/DB_driver_core.php');
 	if ( ! empty($params['mstrslve']))
 	{
 		require_once(BASEPATH.'database/DB_driver_mstrslve.php');
@@ -172,7 +172,7 @@ function &DB($params = '', $query_builder_override = NULL)
 	}
 	else
 	{
-		abstract class CI_DB_driver extends CI_DB_driver_single { }
+		abstract class CI_DB_driver extends CI_DB_driver_core { }
 	}
 	
 	if ( ! isset($query_builder) OR $query_builder === TRUE)
