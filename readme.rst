@@ -11,7 +11,9 @@ as a drop in replacement for the original CodeIgniter library.
 Release Information
 *******************
 
-This repo contains in-development code.
+| This repo contains in-development code.  
+| The library is still in alpha mode. No official release yet.  
+| Use at your own risk.  
 
 **************************
 Changelog and New Features
