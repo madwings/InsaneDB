@@ -88,7 +88,7 @@ $db['write_read'] = array(
 		'hostname' => 'localhost'
 	),
 	'username' => '',
-	'password' => ''
+	'password' => '',
 	'database'  => '',
 	'db_deflt'  => 'read',
 	'dbdriver'  => 'pdo',

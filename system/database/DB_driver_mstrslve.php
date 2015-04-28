@@ -110,7 +110,7 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 	 */
 	public function __construct($params)
 	{
-		parent::__construct();
+		parent::__construct($params);
 		$this->mstrslve = TRUE;
 
 		log_message('info', 'Database Read Write Driver Class Initialized');
@@ -138,6 +138,7 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 				$this->$key = $val;
 			}
 		}
+		$this->_build_dsn();
 	}
 	
 	// --------------------------------------------------------------------
@@ -220,7 +221,7 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 	 * @param	string	the sql query
 	 * @return	void
 	 */
-	private function _config_write_read($sql = '') 
+	protected function _config_write_read($sql = '') 
 	{	
 		if ($this->db_force === 'write' OR ($this->db_force === NULL AND $this->is_write_type($sql) === TRUE))
 		{

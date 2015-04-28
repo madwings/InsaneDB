@@ -77,7 +77,7 @@ function DB()
 	}
 
 	require_once(BASEPATH.'database/DB_driver_core.php');
-	if ( ! empty($params['read'] && ! empty($params['write']))
+	if ( ! empty($params['read']) && ! empty($params['write']))
 	{
 		require_once(BASEPATH.'database/DB_driver_mstrslve.php');
 		abstract class CI_DB_driver extends CI_DB_driver_mstrslve { }
@@ -134,11 +134,7 @@ function DB()
 		}
 	}
 
-	if ($DB->autoinit === TRUE)
-	{
-		$DB->initialize();
-	}
-
+	$DB->initialize();
 	return $DB;
 }
 
