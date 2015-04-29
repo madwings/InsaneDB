@@ -103,13 +103,13 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Build DSN
+	 * Build the DSN
 	 *
 	 * @return	void
 	 */
 	protected function _build_dsn() 
 	{
-		if (empty($this->dsn) || $this->mstrslve)
+		if (empty($this->dsn) || $this->read_write)
 		{
 			$this->dsn = 'mysql:host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 

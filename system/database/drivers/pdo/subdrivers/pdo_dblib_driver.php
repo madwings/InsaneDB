@@ -81,7 +81,7 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Class constructor
+		* Class constructor
 	 *
 	 * Builds the DSN if not already set.
 	 *
@@ -91,8 +91,17 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	public function __construct($params)
 	{
 		parent::__construct($params);
-
-		if (empty($this->dsn))
+		$this->_build_dsn();
+	}
+	
+	/**
+	 * Build the DSN
+	 *
+	 * @return	void
+	 */
+	protected function _build_dsn() 
+	{
+		if (empty($this->dsn) || $this->read_write)
 		{
 			$this->dsn = $params['subdriver'].':host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 

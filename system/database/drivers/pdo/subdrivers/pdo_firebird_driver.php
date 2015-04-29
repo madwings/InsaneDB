@@ -81,8 +81,19 @@ class CI_DB_pdo_firebird_driver extends CI_DB_pdo_driver {
 	public function __construct($params)
 	{
 		parent::__construct($params);
-
-		if (empty($this->dsn))
+		$this->_build_dsn();
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Build the DSN
+	 *
+	 * @return	void
+	 */
+	protected function _build_dsn() 
+	{
+		if (empty($this->dsn) || $this->read_write)
 		{
 			$this->dsn = 'firebird:';
 
@@ -94,7 +105,7 @@ class CI_DB_pdo_firebird_driver extends CI_DB_pdo_driver {
 			{
 				$this->dsn .= 'dbname='.$this->hostname;
 			}
-
+			
 			empty($this->char_set) OR $this->dsn .= ';charset='.$this->char_set;
 			empty($this->role) OR $this->dsn .= ';role='.$this->role;
 		}

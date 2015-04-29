@@ -79,8 +79,8 @@ function DB()
 	require_once(BASEPATH.'database/DB_driver_core.php');
 	if ( ! empty($params['read']) && ! empty($params['write']))
 	{
-		require_once(BASEPATH.'database/DB_driver_mstrslve.php');
-		abstract class CI_DB_driver extends CI_DB_driver_mstrslve { }
+		require_once(BASEPATH.'database/DB_driver_read_write.php');
+		abstract class CI_DB_driver extends CI_DB_driver_read_write { }
 	}
 	else
 	{

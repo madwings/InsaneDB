@@ -357,11 +357,11 @@ abstract class CI_DB_driver_core {
 	protected $_conn_retries 	= 1;
 	
 	/**
-	 * write/read mode flag
+	 * read/write mode flag
 	 *
 	 * @var	bool
 	 */
-	protected $mstrslve			= FALSE;
+	protected $read_write			= FALSE;
 	
 	// --------------------------------------------------------------------
 
@@ -403,7 +403,13 @@ abstract class CI_DB_driver_core {
 		{
 			return TRUE;
 		}
-
+		
+		// If in read/write mode set right credentials first
+		if ($this->read_write)
+		{
+			$this->_set_cred();
+		}
+		
 		// ----------------------------------------------------------------
 
 		// Connect to the database and set the connection ID
@@ -770,7 +776,7 @@ abstract class CI_DB_driver_core {
 	 */
 	public function simple_query($sql)
 	{
-		if ($this->mstrslve)
+		if ($this->read_write)
 		{
 			$this->_config_write_read($sql);
 		}

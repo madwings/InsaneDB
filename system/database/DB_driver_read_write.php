@@ -48,7 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category	Database
  * @author		Stiliyan Ivanov
  */
-abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
+abstract class CI_DB_driver_read_write extends CI_DB_driver_core {
 
 	/**
 	 * Databases credentials in write/read mode
@@ -111,7 +111,7 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 	public function __construct($params)
 	{
 		parent::__construct($params);
-		$this->mstrslve = TRUE;
+		$this->read_write = TRUE;
 
 		log_message('info', 'Database Read Write Driver Class Initialized');
 	}
@@ -123,7 +123,7 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 	 *
 	 * @return	void
 	 */
-	private function _set_cred() 
+	protected function _set_cred() 
 	{
 		// Handle autoinit in write/read mode
 		if ($this->dbactive === NULL) 
@@ -139,78 +139,6 @@ abstract class CI_DB_driver_mstrslve extends CI_DB_driver_core {
 			}
 		}
 		$this->_build_dsn();
-	}
-	
-	// --------------------------------------------------------------------
-	
-	/**
-	 * Initialize Database Settings
-	 *
-	 * @return	bool
-	 */
-	public function initialize()
-	{
-		/* If an established connection is available, then there's
-		 * no need to connect and select the database.
-		 *
-		 * Depending on the database driver, conn_id can be either
-		 * boolean TRUE, a resource or an object.
-		 */
-		if ($this->conn_id)
-		{
-			return TRUE;
-		}
-
-		// ----------------------------------------------------------------
-		
-		// Set credentials first
-		$this->_set_cred();
-		
-		// Connect to the database and set the connection ID
-		$this->conn_id = $this->db_connect($this->pconnect);
-
-		// No connection resource? Check if there is a failover else throw an error
-		if ( ! $this->conn_id)
-		{
-			// Check if there is a failover set
-			if ( ! empty($this->failover) && is_array($this->failover))
-			{
-				// Go over all the failovers
-				foreach ($this->failover as $failover)
-				{
-					// Replace the current settings with those of the failover
-					foreach ($failover as $key => $val)
-					{
-						$this->$key = $val;
-					}
-
-					// Try to connect
-					$this->conn_id = $this->db_connect($this->pconnect);
-
-					// If a connection is made break the foreach loop
-					if ($this->conn_id)
-					{
-						break;
-					}
-				}
-			}
-
-			// We still don't have a connection?
-			if ( ! $this->conn_id)
-			{
-				log_message('error', 'Unable to connect to the database');
-
-				if ($this->db_debug)
-				{
-					$this->display_error('db_unable_to_connect');
-				}
-
-				return FALSE;
-			}
-		}
-
-		// Now we set the character set and that's all
-		return $this->db_set_charset($this->char_set);
 	}
 
 	// --------------------------------------------------------------------

@@ -81,8 +81,17 @@ class CI_DB_pdo_informix_driver extends CI_DB_pdo_driver {
 	public function __construct($params)
 	{
 		parent::__construct($params);
+		$this->_build_dsn();
+	}
 
-		if (empty($this->dsn))
+	/**
+	 * Build the DSN
+	 *
+	 * @return	void
+	 */
+	protected function _build_dsn() 
+	{
+		if (empty($this->dsn) || $this->read_write)
 		{
 			$this->dsn = 'informix:';
 
@@ -126,7 +135,7 @@ class CI_DB_pdo_informix_driver extends CI_DB_pdo_driver {
 				.'; EnableScrollableCursors=1';
 		}
 	}
-
+	
 	// --------------------------------------------------------------------
 
 	/**

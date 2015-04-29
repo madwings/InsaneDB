@@ -91,8 +91,17 @@ class CI_DB_pdo_sqlsrv_driver extends CI_DB_pdo_driver {
 	public function __construct($params)
 	{
 		parent::__construct($params);
+		$this->_build_dsn();
+	}
 
-		if (empty($this->dsn))
+	/**
+	 * Build the DSN
+	 *
+	 * @return	void
+	 */
+	protected function _build_dsn() 
+	{
+		if (empty($this->dsn) || $this->read_write)
 		{
 			$this->dsn = 'sqlsrv:Server='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 
@@ -139,7 +148,7 @@ class CI_DB_pdo_sqlsrv_driver extends CI_DB_pdo_driver {
 			$this->_quoted_identifier = (bool) $match[1];
 		}
 	}
-
+	
 	// --------------------------------------------------------------------
 
 	/**
