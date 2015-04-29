@@ -11,6 +11,10 @@ Release Date: Not Released
 
    -  Added DoS mitigation to :php:func:`hash_pbkdf2()` :doc:`compatibility function <general/compatibility_functions>`.
 
+- Database
+
+   -  Added ``list_fields()`` support for SQLite ('sqlite3' and 'pdo_sqlite' drivers).
+
 Bug fixes for 3.0.1
 -------------------
 
@@ -21,6 +25,7 @@ Bug fixes for 3.0.1
 -  Fixed a bug (#3771) - :doc:`Form Validation Library <libraries/form_validation>` was looking for a 'form_validation_' prefix when trying to translate field name labels.
 -  Fixed a bug (#3787) - :doc:`FTP Library <libraries/ftp>` method ``delete_dir()`` failed when the target has subdirectories.
 -  Fixed a bug (#3801) - :doc:`Output Library <libraries/output>` method ``_display_cache()`` incorrectly looked for the last modified time of a directory instead of the cache file.
+-  Fixed a bug (#3816) - :doc:`Form Validation Library <libraries/form_validation>` treated empty string values as non-existing ones.
 
 Version 3.0.0
 =============
