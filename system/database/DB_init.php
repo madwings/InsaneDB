@@ -45,8 +45,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @param 	string|string[]	$params
  * @param 	bool		$query_builder_override
  *				Determines if query builder should be used or not
+ *
+ * return	object	$db	Database object
  */
-function &DB($params = '', $query_builder_override = NULL)
+function DB($params = '', $query_builder_override = NULL)
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && strpos($params, '://') === FALSE)
@@ -190,4 +192,38 @@ function &DB($params = '', $query_builder_override = NULL)
 
 	$DB->initialize();
 	return $DB;
+}
+
+/**
+ * Load the Database Forge Class
+ *
+ * @category	Database
+ * @author	Stiliyan Ivanov
+ *
+ * @param	object	$db	Database object
+ *
+ * return	object	$db	Database Forge object
+ */
+function DB_forge($db)
+{
+	require_once(BASEPATH.'database/DB_forge.php');
+	require_once(BASEPATH.'database/drivers/pdo/pdo_forge.php');
+
+	if ( ! empty($db->subdriver))
+	{
+		$driver_path = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$db->subdriver.'_forge.php';
+		if (file_exists($driver_path))
+		{
+			require_once($driver_path);
+			$class = 'CI_DB_pdo_'.$db->subdriver.'_forge';
+		}
+	}
+	else
+	{
+		$class = 'CI_DB_pdo_forge';
+	}
+
+	$dbforge = new $class($db);
+
+	return $dbforge;
 }
