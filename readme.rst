@@ -1,3 +1,4 @@
+### Travis Status
 [![Build Status](https://travis-ci.org/madwings/InsaneDB.svg?branch=develop)](https://travis-ci.org/madwings/InsaneDB)
 
 ###################
