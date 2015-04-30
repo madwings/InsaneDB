@@ -79,7 +79,7 @@ $db['default'] = array(
 	'save_queries' => FALSE
 );
 
-$db['write_read'] = array(
+$db['read_write'] = array(
 	'dsn'	=> '',
 	'read' => array(
 		'hostname' => 'localhost'

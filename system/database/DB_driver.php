@@ -157,7 +157,21 @@ abstract class CI_DB_driver {
 	 * @var	object|resource
 	 */
 	public $conn_id			= FALSE;
-
+	
+	/**
+	 * Connection ID write
+	 *
+	 * @var	object|resource
+	 */
+	public $conn_id_write		= FALSE;
+	
+	/**
+	 * Connection ID read
+	 *
+	 * @var	object|resource
+	 */
+	public $conn_id_read		= FALSE;
+	
 	/**
 	 * Result ID
 	 *
@@ -369,20 +383,6 @@ abstract class CI_DB_driver {
 	 * @var	string 'read'/'write'
 	 */
 	public $db_deflt       		= 'read';
-	
-	/**
-	 * Connection ID write
-	 *
-	 * @var	object|resource
-	 */
-	public $conn_id_write		= FALSE;
-	
-	/**
-	 * Connection ID read
-	 *
-	 * @var	object|resource
-	 */
-	public $conn_id_read		= FALSE;
 	
 	/**
 	 * Force usage of particular database in read/write mode
