@@ -43,7 +43,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author	Stiliyan Ivanov
  *
  */
-function DB()
+function DB($active_group_override = NULL)
 {
 	// Is the config file in the environment folder?
 	if ( ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/database.php')
@@ -58,7 +58,12 @@ function DB()
 	{
 		show_error('No database connection settings were found in the database config file.');
 	}
-
+	
+	if ($active_group_override !== NULL)
+	{
+		$active_group = $active_group_override;
+	}
+	
 	if ( ! isset($active_group))
 	{
 		show_error('You have not specified a database connection group via $active_group in your config/database.php file.');
@@ -137,6 +142,3 @@ function DB()
 	$DB->initialize();
 	return $DB;
 }
-
-/* End of file DB_init.php */
-/* Location: ./system/database/DB_init.php */

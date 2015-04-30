@@ -37,7 +37,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Database Driver Class for write/read mode
+ * Database Driver Class for read/write mode
  *
  * This is the platform-independent write/read mode DB implementation class.
  * It extends base DB implementation class. This class will not be called directly. 
@@ -49,13 +49,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		Stiliyan Ivanov
  */
 abstract class CI_DB_driver_read_write extends CI_DB_driver_core {
-
-	/**
-	 * Databases credentials in write/read mode
-	 *
-	 * @var	array
-	 */
-	public $cred;
 	
 	/**
 	 * Default database in write/read mode when autoinit is used
@@ -144,12 +137,12 @@ abstract class CI_DB_driver_read_write extends CI_DB_driver_core {
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Configure db params for write/read setup
+	 * Configure db params for read/write setup
 	 *
 	 * @param	string	the sql query
 	 * @return	void
 	 */
-	protected function _config_write_read($sql = '') 
+	protected function _config_read_write($sql = '') 
 	{	
 		if ($this->db_force === 'write' OR ($this->db_force === NULL AND $this->is_write_type($sql) === TRUE))
 		{
@@ -183,81 +176,6 @@ abstract class CI_DB_driver_read_write extends CI_DB_driver_core {
 		{
 			$this->db_force = NULL;
 		}
-	}
-
-	// --------------------------------------------------------------------
-	
-	/**
-	 * Start Transaction
-	 *
-	 * @param	bool	$test_mode = FALSE
-	 * @return	void
-	 */
-	public function trans_start($test_mode = FALSE)
-	{
-		if ( ! $this->trans_enabled)
-		{
-			return FALSE;
-		}
-
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ($this->_trans_depth > 0)
-		{
-			$this->_trans_depth += 1;
-			return;
-		}
-		
-		$this->db_force('write', FALSE);
-		$this->trans_begin($test_mode);
-		$this->_trans_depth += 1;
-	}
-
-	// --------------------------------------------------------------------
-	
-	/**
-	 * Complete Transaction
-	 *
-	 * @return	bool
-	 */
-	public function trans_complete()
-	{
-		if ( ! $this->trans_enabled)
-		{
-			return FALSE;
-		}
-
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ($this->_trans_depth > 1)
-		{
-			$this->_trans_depth -= 1;
-			return TRUE;
-		}
-		else
-		{
-			$this->_trans_depth = 0;
-		}
-
-		// The query() function will set this flag to FALSE in the event that a query failed
-		if ($this->_trans_status === FALSE OR $this->_trans_failure === TRUE)
-		{
-			$this->trans_rollback();
-
-			// If we are NOT running in strict mode, we will reset
-			// the _trans_status flag so that subsequent groups of transactions
-			// will be permitted.
-			if ($this->trans_strict === FALSE)
-			{
-				$this->_trans_status = TRUE;
-			}
-
-			log_message('debug', 'DB Transaction Failure');
-			$this->db_force_clear();
-			return FALSE;
-		}
-
-		$this->trans_commit();
-		$this->db_force_clear();
-		return TRUE;
 	}
 
 	// --------------------------------------------------------------------

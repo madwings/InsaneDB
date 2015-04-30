@@ -15,25 +15,4 @@ class DB_driver_test extends CI_TestCase {
 	{
 		return new Mock_Database_Drivers_PDO($config);
 	}
-
-	protected function mysql($config)
-	{
-		return new Mock_Database_Drivers_Mysql($config);
-	}
-
-	protected function mysqli($config)
-	{
-		return new Mock_Database_Drivers_Mysqli($config);
-	}
-
-	protected function sqlite($config)
-	{
-		return new Mock_Database_Drivers_Sqlite($config);
-	}
-
-	protected function pgsql($config)
-	{
-		return new Mock_Database_Drivers_Postgre($config);
-	}
-
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * CodeIgniter
+ * InsaneDB
  *
  * An open source application development framework for PHP
  *
@@ -778,7 +778,7 @@ abstract class CI_DB_driver_core {
 	{
 		if ($this->read_write)
 		{
-			$this->_config_write_read($sql);
+			$this->_config_read_write($sql);
 		}
 		
 		for($i = 0; $i <= $this->_conn_retries; $i++)
@@ -860,7 +860,11 @@ abstract class CI_DB_driver_core {
 			$this->_trans_depth += 1;
 			return;
 		}
-
+		
+		if ($this->read_write)
+		{
+			$this->db_force('write', FALSE);
+		}
 		$this->trans_begin($test_mode);
 		$this->_trans_depth += 1;
 	}
@@ -904,10 +908,20 @@ abstract class CI_DB_driver_core {
 			}
 
 			log_message('debug', 'DB Transaction Failure');
+			if ($this->read_write)
+			{
+				$this->db_force_clear();
+			}
+			
 			return FALSE;
 		}
 
 		$this->trans_commit();
+		if ($this->read_write)
+		{
+			$this->db_force_clear();
+		}
+		
 		return TRUE;
 	}
 
