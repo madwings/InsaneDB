@@ -21,9 +21,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['database'] The name of the database you want to connect to
 |	['read'] 	 Database credentials for read connection in write/read mode
 |	['write'] 	 Database credentials for write connection in write/read mode
-|	['db_deflt'] 'write'/'read' - Default database in write/read mode when autoinit is used
-|	['dbdriver'] The database driver. Only 'pdo' supported:
-|	['subdriver'] The actual database driver used by the pdo base class.
+|	['db_deflt'] 'read'/'write' - Default database in read/write mode
+|	['driver'] 	 The actual database driver used by the pdo base class.
 |	['dbprefix'] You can add an optional prefix, which will be added
 |				 to the table name when using the  Query Builder class
 |	['pconnect'] TRUE/FALSE - Whether to use a persistent connection
@@ -62,8 +61,7 @@ $db['default'] = array(
 	'username'  => '',
 	'password'  => '',
 	'database'  => '',
-	'dbdriver'  => 'pdo',
-	'subdriver' => 'mysql',
+	'driver' 	=> 'mysql',
 	'dbprefix'  => '',
 	'pconnect'  => FALSE,
 	'db_debug'  => FALSE,
@@ -81,18 +79,17 @@ $db['default'] = array(
 
 $db['read_write'] = array(
 	'dsn'	=> '',
-	'read' => array(
+	'read' 	=> array(
 		'hostname' => 'localhost'
 	),
 	'write' => array(
 		'hostname' => 'localhost'
 	),
-	'username' => '',
-	'password' => '',
+	'username' 	=> '',
+	'password' 	=> '',
 	'database'  => '',
 	'db_deflt'  => 'read',
-	'dbdriver'  => 'pdo',
-	'subdriver' => 'mysql',
+	'driver' 	=> 'mysql',
 	'dbprefix'  => '',
 	'pconnect'  => FALSE,
 	'db_debug'  => FALSE,

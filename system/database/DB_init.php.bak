@@ -1,12 +1,12 @@
 <?php
 /**
- * CodeIgniter
+ * InsaneDB
  *
- * An open source application development framework for PHP
+ * PHP Database Library forked from CodeIgniter 3
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2015, British Columbia Institute of Technology
+ * Copyright (c) 2015, Stiliyan Ivanov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
+ * @package	InsaneDB
+ * @author	Stiliyan Ivanov
+ * @copyright	Copyright (c) 2015, Stiliyan Ivanov (https://github.com/madwings/)
  * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	http://codeigniter.com
- * @since	Version 1.0.0
+ * @link	https://github.com/madwings/InsaneDB
+ * @since	Version 1.0
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -41,8 +40,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Initialize the database
  *
  * @category	Database
- * @author	EllisLab Dev Team
- * @link	http://codeigniter.com/user_guide/database/
+ * @author	Stiliyan Ivanov
  *
  * @param 	string|string[]	$params
  * @param 	bool		$query_builder_override
@@ -61,26 +59,6 @@ function &DB($params = '', $query_builder_override = NULL)
 		}
 
 		include($file_path);
-
-		// Make packages contain database config files,
-		// given that the controller instance already exists
-		if (class_exists('CI_Controller', FALSE))
-		{
-			foreach (get_instance()->load->get_package_paths() as $path)
-			{
-				if ($path !== APPPATH)
-				{
-					if (file_exists($file_path = $path.'config/'.ENVIRONMENT.'/database.php'))
-					{
-						include($file_path);
-					}
-					elseif (file_exists($file_path = $path.'config/database.php'))
-					{
-						include($file_path);
-					}
-				}
-			}
-		}
 
 		if ( ! isset($db) OR count($db) === 0)
 		{
@@ -142,7 +120,7 @@ function &DB($params = '', $query_builder_override = NULL)
 			}
 		}
 	}
-
+	
 	// No DB specified yet? Beat them senseless...
 	if (empty($params['driver']))
 	{
@@ -152,20 +130,6 @@ function &DB($params = '', $query_builder_override = NULL)
 	{
 		$params['subdriver'] = $params['driver'];
 		unset($params['driver']);
-	}
-	// Load the DB classes. Note: Since the query builder class is optional
-	// we need to dynamically create a class that extends proper parent class
-	// based on whether we're using the query builder class or not.
-	if ($query_builder_override !== NULL)
-	{
-		$query_builder = $query_builder_override;
-	}
-	// Backwards compatibility work-around for keeping the
-	// $active_record config variable working. Should be
-	// removed in v3.1
-	elseif ( ! isset($query_builder) && isset($active_record))
-	{
-		$query_builder = $active_record;
 	}
 
 	require_once(BASEPATH.'database/DB_driver.php');
