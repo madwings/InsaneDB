@@ -1,6 +1,6 @@
 <?php
 
-class Mock_Database_DB_Driver extends CI_DB_driver_core {
+class Mock_Database_DB_Driver extends CI_DB_driver {
 
 	/**
 	 * @var object The actual Driver

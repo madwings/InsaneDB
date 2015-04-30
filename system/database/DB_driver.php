@@ -50,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		http://codeigniter.com/user_guide/database/
  */
-abstract class CI_DB_driver_core {
+abstract class CI_DB_driver {
 
 	/**
 	 * Data Source Name / Connect string
@@ -363,6 +363,49 @@ abstract class CI_DB_driver_core {
 	 */
 	protected $read_write			= FALSE;
 	
+	/**
+	 * Default database in read/write mode when autoinit is used
+	 *
+	 * @var	string 'read'/'write'
+	 */
+	public $db_deflt       		= 'read';
+	
+	/**
+	 * Connection ID write
+	 *
+	 * @var	object|resource
+	 */
+	public $conn_id_write		= FALSE;
+	
+	/**
+	 * Connection ID read
+	 *
+	 * @var	object|resource
+	 */
+	public $conn_id_read		= FALSE;
+	
+	/**
+	 * Force usage of particular database in read/write mode
+	 *
+	 * @var	string|null
+	 */
+	private $db_force   	    = NULL;
+	
+	/**
+	 * Whether to clear forced usage of particular database in read/write mode
+	 * after each query
+	 *
+	 * @var	bool
+	 */
+	private $db_force_clr     = TRUE;
+	
+	/**
+	 * Active database in read/write mode
+	 *
+	 * @var	string|null
+	 */
+	private $dbactive      	= NULL;
+	
 	// --------------------------------------------------------------------
 
 	/**
@@ -375,13 +418,18 @@ abstract class CI_DB_driver_core {
 	{
 		if (is_array($params))
 		{
+			if ( ! empty($params['read']) && ! empty($params['write']))
+			{
+				$this->read_write = TRUE;
+			}
+			
 			foreach ($params as $key => $val)
 			{
 				$this->$key = $val;
 			}
 		}
 
-		log_message('info', 'Database Core Driver Class Initialized');
+		log_message('info', 'Database Driver Class Initialized');
 	}
 
 	// --------------------------------------------------------------------
@@ -781,7 +829,7 @@ abstract class CI_DB_driver_core {
 			$this->_config_read_write($sql);
 		}
 		
-		for($i = 0; $i <= $this->_conn_retries; $i++)
+		for($i = 0; $i <= $this->_conn_retries; ++$i)
 		{
 			if ( ! $this->conn_id)
 			{
@@ -791,7 +839,7 @@ abstract class CI_DB_driver_core {
 			$result = $this->_execute($sql);
 			
 			// If query failed due to lost connection to server retry connecting before exit
-			if ($result !== FALSE || ! method_exists($this, '_handle_reconnect')) 
+			if ($result !== FALSE OR ! method_exists($this, '_handle_reconnect')) 
 			{
 				break;
 			}
@@ -1670,9 +1718,30 @@ abstract class CI_DB_driver_core {
 	/**
 	 * Close DB Connection
 	 *
+	 * @param	mixed	$conn	'active'|'write'|'read'	used in read/write mode
+	 *
 	 * @return	void
 	 */
-	public function close()
+	public function close($conn = NULL)
+	{
+		if ($this->read_write)
+		{
+			$this->_close_read_write($conn);
+		}
+		else
+		{
+			$this->_close_single();
+		}
+	}
+	
+	// --------------------------------------------------------------------
+
+	/**
+	 * Close DB Connection
+	 *
+	 * @return	void
+	 */
+	private function _close_single()
 	{
 		if ($this->conn_id)
 		{
@@ -1680,7 +1749,58 @@ abstract class CI_DB_driver_core {
 			$this->conn_id = FALSE;
 		}
 	}
+	
+	// --------------------------------------------------------------------
 
+	/**
+	 * Close DB Connection in read/write mode
+	 *
+	 * If no value is passed to the param, it closes all connections
+	 *
+	 * @param	mixed	$conn	NULL|'active'|'write'|'read'
+	 *
+	 * @return	void
+	 */
+	private function _close_read_write($conn)
+	{
+		if ($conn === NULL)
+		{
+			$closed = 0;
+			if (is_resource($this->conn_id_write) OR is_object($this->conn_id_write))
+			{
+				$this->_close($this->conn_id_write);
+				++$closed;
+			}
+			$this->conn_id_write = FALSE;
+			
+			if (is_resource($this->conn_id_read) OR is_object($this->conn_id_read))
+			{
+				$this->_close($this->conn_id_read);
+				++$closed;
+			}
+			$this->conn_id_read = FALSE;
+			
+			// If write and read were closed, conn_id should not be closed
+			if ($closed !== 2 AND (is_resource($this->conn_id) OR is_object($this->conn_id)))
+			{
+				$this->_close($this->conn_id);
+			}
+			$this->conn_id = FALSE;
+		}
+		else if ($conn === 'active')
+		{
+			$this->_close($this->{"conn_id_{$this->dbactive}"});
+		}
+		else if ($conn === 'write')
+		{
+			$this->_close($this->conn_id_write);
+		}
+		else if ($conn === 'read')
+		{
+			$this->_close($this->conn_id_read);
+		}
+	}
+	
 	// --------------------------------------------------------------------
 
 	/**
@@ -1960,6 +2080,104 @@ abstract class CI_DB_driver_core {
     {
         return NULL;
     }
+	
+		// --------------------------------------------------------------------
+	
+	/**
+	 * Initialize database credentials when in write/read setup
+	 *
+	 * @return	void
+	 */
+	private function _set_cred() 
+	{
+		// Handle autoinit in write/read mode
+		if ($this->dbactive === NULL) 
+		{
+			$this->dbactive = $this->db_deflt;
+		}
+		
+		if (is_array($this->{$this->dbactive}))
+		{
+			foreach ($this->{$this->dbactive} as $key => $val)
+			{
+				$this->$key = $val;
+			}
+		}
+		$this->_build_dsn();
+	}
 
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Configure db params for read/write setup
+	 *
+	 * @param	string	the sql query
+	 * @return	void
+	 */
+	private function _config_read_write($sql = '') 
+	{	
+		if ($this->db_force === 'write' OR ($this->db_force === NULL AND $this->is_write_type($sql) === TRUE))
+		{
+			if ($this->dbactive === 'read') 
+			{
+				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
+				{
+					$this->conn_id_read = $this->conn_id;
+				}
+				$this->conn_id = &$this->conn_id_write;
+			}
+			$this->dbactive = 'write';
+			log_message('error', 'write ' . $sql);
+		}
+		else
+		{
+			if ($this->dbactive === 'write')
+			{
+				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
+				{
+					$this->conn_id_write = $this->conn_id;
+				}
+				$this->conn_id = &$this->conn_id_read;
+			}
+			$this->dbactive = 'read';
+			log_message('error', 'read ' . $sql);
+		}
+		
+		// Clear database force if not explicitly set not to
+		if ($this->db_force_clr === TRUE)
+		{
+			$this->db_force = NULL;
+		}
+	}
+
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Force using specific database in write/read connections
+	 *
+	 * @param	string which database to use
+	 * @param	boolean toggle auto/manual database selection after the first query
+	 * @return	void
+	 */
+	public function db_force($database = 'write', $db_force_clr = TRUE)
+	{
+		$this->db_force = $database;
+		$this->db_force_clr = $db_force_clr;
+		$this->_config_write_read();
+	}
+
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Clear force
+	 *
+	 * @return	void
+	 */
+	public function db_force_clear()
+	{
+		$this->db_force = NULL;
+		$this->db_force_clr = TRUE;
+	}
+	
 	// --------------------------------------------------------------------
 }

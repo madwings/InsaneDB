@@ -81,16 +81,7 @@ function DB($active_group_override = NULL)
 		show_error('You have not selected a database type to connect to.');
 	}
 
-	require_once(BASEPATH.'database/DB_driver_core.php');
-	if ( ! empty($params['read']) && ! empty($params['write']))
-	{
-		require_once(BASEPATH.'database/DB_driver_read_write.php');
-		abstract class CI_DB_driver extends CI_DB_driver_read_write { }
-	}
-	else
-	{
-		abstract class CI_DB_driver extends CI_DB_driver_core { }
-	}
+	require_once(BASEPATH.'database/DB_driver.php');
 	
 	if ( ! isset($query_builder) OR $query_builder === TRUE)
 	{
