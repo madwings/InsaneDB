@@ -1,5 +1,10 @@
 .. image:: https://travis-ci.org/madwings/InsaneDB.svg?branch=develop
     :target: https://travis-ci.org/madwings/InsaneDB
+###################
+	WARNING! 
+###################
+
+Currently in active development. DO NOT use this library until version 1.0 is released!  
 
 ###################
 What is InsaneDB
