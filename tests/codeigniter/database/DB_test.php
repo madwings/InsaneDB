@@ -37,7 +37,7 @@ class DB_test extends CI_TestCase {
 		$db = Mock_Database_DB::DB($connection->set_dsn(DB_DRIVER), TRUE);
 
 		$this->assertTrue($db instanceof CI_DB);
-		$this->assertTrue($db instanceof CI_DB_Driver);
+		$this->assertTrue($db instanceof CI_DB_driver_core);
 	}
 
 	// ------------------------------------------------------------------------
@@ -54,7 +54,7 @@ class DB_test extends CI_TestCase {
 		$db = Mock_Database_DB::DB($connection->set_dsn(DB_DRIVER.'_failover'), TRUE);
 
 		$this->assertTrue($db instanceof CI_DB);
-		$this->assertTrue($db instanceof CI_DB_Driver);
+		$this->assertTrue($db instanceof CI_DB_driver_core);
 	}
 */
 
