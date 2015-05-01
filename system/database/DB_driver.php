@@ -378,13 +378,6 @@ abstract class CI_DB_driver {
 	protected $read_write			= FALSE;
 	
 	/**
-	 * Default database in read/write mode when autoinit is used
-	 *
-	 * @var	string 'read'/'write'
-	 */
-	public $db_deflt       		= 'read';
-	
-	/**
 	 * Force usage of particular database in read/write mode
 	 *
 	 * @var	string|null
@@ -402,9 +395,9 @@ abstract class CI_DB_driver {
 	/**
 	 * Active database in read/write mode
 	 *
-	 * @var	string|null
+	 * @var	string
 	 */
-	private $dbactive      	= NULL;
+	private $dbactive      	= 'read';
 	
 	// --------------------------------------------------------------------
 
@@ -2084,18 +2077,12 @@ abstract class CI_DB_driver {
 		// --------------------------------------------------------------------
 	
 	/**
-	 * Initialize database credentials when in write/read setup
+	 * Initialize database credentials when in read/write mode
 	 *
 	 * @return	void
 	 */
 	private function _set_cred() 
-	{
-		// Handle autoinit in write/read mode
-		if ($this->dbactive === NULL) 
-		{
-			$this->dbactive = $this->db_deflt;
-		}
-		
+	{		
 		if (is_array($this->{$this->dbactive}))
 		{
 			foreach ($this->{$this->dbactive} as $key => $val)
@@ -2153,7 +2140,7 @@ abstract class CI_DB_driver {
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Force using specific database in write/read connections
+	 * Force using specific database in read/write mode
 	 *
 	 * @param	string which database to use
 	 * @param	boolean toggle auto/manual database selection after the first query

@@ -109,7 +109,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _build_dsn() 
 	{
-		if (empty($this->dsn) || $this->read_write)
+		if (empty($this->dsn) OR $this->read_write)
 		{
 			$this->dsn = 'mysql:host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 
@@ -297,6 +297,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 * @param	string	$table	Table name
 	 * @param	array	$keys	INSERT keys
 	 * @param	array	$values	INSERT values
+	 *
 	 * @return	string
 	 */
 	protected function _insert_ignore_batch($table, $keys, $values)
@@ -304,7 +305,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 		return 'INSERT IGNORE INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
 	
-		// --------------------------------------------------------------------
+	// --------------------------------------------------------------------
 
 	/**
 	 * If query faild due to lost connection to server, initiate reconnection
@@ -312,12 +313,13 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 * Returns TRUE if pending reconnection otherwise FALSE
 	 *
 	 * @param	array	$error	database error
+	 * 
 	 * @return	bool
 	 */
 	protected function _handle_reconnect($error)
 	{
 		// MySQL specific errors for lost connection
-		if ($error[1] === 2006 || $error[1] === 2013)
+		if ($error[1] === 2006 OR $error[1] === 2013)
 		{
 			$this->close();
 			$result = TRUE;

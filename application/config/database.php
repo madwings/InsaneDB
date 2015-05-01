@@ -19,9 +19,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['username'] The username used to connect to the database
 |	['password'] The password used to connect to the database
 |	['database'] The name of the database you want to connect to
-|	['read'] 	 Database credentials for read connection in write/read mode
-|	['write'] 	 Database credentials for write connection in write/read mode
-|	['db_deflt'] 'read'/'write' - Default database in read/write mode
+|	['read'] 	 Database credentials for read connection in read/write mode
+|	['write'] 	 Database credentials for write connection in read/write mode
 |	['driver'] 	 The actual database driver used by the pdo base class.
 |	['dbprefix'] You can add an optional prefix, which will be added
 |				 to the table name when using the  Query Builder class
@@ -88,7 +87,6 @@ $db['read_write'] = array(
 	'username' 	=> '',
 	'password' 	=> '',
 	'database'  => '',
-	'db_deflt'  => 'read',
 	'driver' 	=> 'mysql',
 	'dbprefix'  => '',
 	'pconnect'  => FALSE,

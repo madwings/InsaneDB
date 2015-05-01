@@ -91,7 +91,7 @@ class CI_DB_pdo_4d_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _build_dsn() 
 	{
-		if (empty($this->dsn) || $this->read_write)
+		if (empty($this->dsn) OR $this->read_write)
 		{
 			$this->dsn = '4D:host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 

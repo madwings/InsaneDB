@@ -91,7 +91,7 @@ class CI_DB_pdo_sqlite_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _build_dsn() 
 	{
-		if (empty($this->dsn) || $this->read_write)
+		if (empty($this->dsn) OR $this->read_write)
 		{
 			$this->dsn = 'sqlite:';
 

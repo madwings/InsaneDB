@@ -9,8 +9,7 @@ return array(
 		'username' => 'postgres',
 		'password' => '',
 		'database' => 'ci_test',
-		'dbdriver' => 'pdo',
-		'subdriver' => 'pgsql'
+		'driver' => 'pgsql'
 	),
 
 	// Database configuration with failover
@@ -20,8 +19,7 @@ return array(
 		'username' => 'not_travis',
 		'password' => 'wrong password',
 		'database' => 'not_ci_test',
-		'dbdriver' => 'pdo',
-		'subdriver' => 'pgsql',
+		'driver' => 'pgsql',
 		'failover' => array(
 			array(
 				'dsn' => 'pgsql:host=localhost;port=5432;dbname=ci_test;',
@@ -29,8 +27,7 @@ return array(
 				'username' => 'postgres',
 				'password' => '',
 				'database' => 'ci_test',
-				'dbdriver' => 'pdo',
-				'subdriver' => 'pgsql'
+				'driver' => 'pgsql'
 			)
 		)
 	)

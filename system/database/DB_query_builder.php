@@ -1436,6 +1436,8 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	$table	Table to insert into
 	 * @param	array	$set 	An associative array of insert values
 	 * @param	bool	$escape	Whether to escape values and identifiers
+	 * @param	int		$batch_limit	number of rows to insert per batch 
+	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
 	public function insert_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL)

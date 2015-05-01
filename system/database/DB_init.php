@@ -194,6 +194,8 @@ function DB($params = '', $query_builder_override = NULL)
 	return $DB;
 }
 
+// ------------------------------------------------------------------------
+
 /**
  * Load the Database Forge Class
  *

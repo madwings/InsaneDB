@@ -9,8 +9,7 @@ return array(
 		'username' => 'travis',
 		'password' => '',
 		'database' => 'ci_test',
-		'dbdriver' => 'pdo',
-		'subdriver' => 'mysql'
+		'driver' => 'mysql'
 	),
 
 	// Database configuration with failover
@@ -20,8 +19,7 @@ return array(
 		'username' => 'not_travis',
 		'password' => 'wrong password',
 		'database' => 'not_ci_test',
-		'dbdriver' => 'pdo',
-		'subdriver' => 'mysql',
+		'driver' => 'mysql',
 		'failover' => array(
 			array(
 				'dsn' => 'mysql:host=localhost;dbname=ci_test',
@@ -29,8 +27,7 @@ return array(
 				'username' => 'travis',
 				'password' => '',
 				'database' => 'ci_test',
-				'dbdriver' => 'pdo',
-				'subdriver' => 'mysql'
+				'driver' => 'mysql'
 			)
 		)
 	)

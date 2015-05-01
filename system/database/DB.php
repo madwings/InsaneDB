@@ -169,7 +169,7 @@ function &DB($params = '', $query_builder_override = NULL)
 	}
 
 	require_once(BASEPATH.'database/DB_driver.php');
-	
+
 	if ( ! isset($query_builder) OR $query_builder === TRUE)
 	{
 		require_once(BASEPATH.'database/DB_query_builder.php');
