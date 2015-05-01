@@ -178,6 +178,11 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	protected function _execute($sql)
 	{
+		if ($this->read_write && $this->conn_active === 'write')
+		{
+			$this->last_write = time();
+		}
+		
 		return $this->conn_id->query($sql);
 	}
 

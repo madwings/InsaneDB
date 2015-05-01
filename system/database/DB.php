@@ -197,26 +197,19 @@ function &DB($params = '', $query_builder_override = NULL)
 	// Load the DB driver
 	$driver_file = BASEPATH.'database/drivers/pdo/pdo_driver.php';
 
-	file_exists($driver_file) OR show_error('Invalid DB driver');
 	require_once($driver_file);
 
-	// Instantiate the DB adapter
-	$driver = 'CI_DB_pdo_driver';
-	$DB = new $driver($params);
-
-	// Check for a subdriver
-	if ( ! empty($DB->subdriver))
+	$driver_file = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$params['subdriver'].'_driver.php';
+	file_exists($driver_file) OR show_error('Invalid DB driver');
+	if ($params['subdriver'] === 'undefined')
 	{
-		$driver_file = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$DB->subdriver.'_driver.php';
-
-		if (file_exists($driver_file))
-		{
-			require_once($driver_file);
-			$driver = 'CI_DB_pdo_'.$DB->subdriver.'_driver';
-			$DB = new $driver($params);
-		}
+		show_error('Invalid DB driver');
 	}
-
+	// Instantiate the DB adapter
+	require_once($driver_file);
+	$driver = 'CI_DB_pdo_'.$params['subdriver'].'_driver';
+	$DB = new $driver($params);
+	
 	$DB->initialize();
 	return $DB;
 }

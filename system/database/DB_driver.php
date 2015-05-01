@@ -90,6 +90,8 @@ abstract class CI_DB_driver {
 	/**
 	 * Database driver
 	 *
+	 * Kept for backward compatibility with CodeIgniter
+	 *
 	 * @var	string
 	 */
 	public $dbdriver		= 'pdo';
@@ -171,6 +173,22 @@ abstract class CI_DB_driver {
 	 * @var	object|resource
 	 */
 	public $conn_id_read		= FALSE;
+	
+	/**
+	 * How many seconds after the last write query to delay 
+	 * reads from the read connection. In the delay period all 
+	 * read queries will go to the write connection
+	 *
+	 * @var	int
+	 */
+	public $read_delay			= 0;
+	
+	/**
+	 * Timestamp of last write query
+	 *
+	 * @var	int
+	 */
+	protected $last_write			= NULL;
 	
 	/**
 	 * Result ID
@@ -378,26 +396,26 @@ abstract class CI_DB_driver {
 	protected $read_write			= FALSE;
 	
 	/**
-	 * Force usage of particular database in read/write mode
+	 * Force usage of particular connection in read/write mode
 	 *
 	 * @var	string|null
 	 */
-	private $db_force   	    = NULL;
+	private $conn_force   	    = NULL;
 	
 	/**
-	 * Whether to clear forced usage of particular database in read/write mode
+	 * Whether to clear forced usage of particular connection in read/write mode
 	 * after each query
 	 *
 	 * @var	bool
 	 */
-	private $db_force_clr     = TRUE;
+	private $conn_force_clr     = TRUE;
 	
 	/**
-	 * Active database in read/write mode
+	 * Active connection in read/write mode
 	 *
 	 * @var	string
 	 */
-	private $dbactive      	= 'read';
+	protected $conn_active      	= 'read';
 	
 	// --------------------------------------------------------------------
 
@@ -904,7 +922,7 @@ abstract class CI_DB_driver {
 		
 		if ($this->read_write)
 		{
-			$this->db_force('write', FALSE);
+			$this->conn_force('write', FALSE);
 		}
 		$this->trans_begin($test_mode);
 		$this->_trans_depth += 1;
@@ -951,7 +969,7 @@ abstract class CI_DB_driver {
 			log_message('debug', 'DB Transaction Failure');
 			if ($this->read_write)
 			{
-				$this->db_force_clear();
+				$this->conn_force_clear();
 			}
 			
 			return FALSE;
@@ -960,7 +978,7 @@ abstract class CI_DB_driver {
 		$this->trans_commit();
 		if ($this->read_write)
 		{
-			$this->db_force_clear();
+			$this->conn_force_clear();
 		}
 		
 		return TRUE;
@@ -1782,7 +1800,7 @@ abstract class CI_DB_driver {
 		}
 		else if ($conn === 'active')
 		{
-			$this->_close($this->{"conn_id_{$this->dbactive}"});
+			$this->_close($this->{"conn_id_{$this->conn_active}"});
 		}
 		else if ($conn === 'write')
 		{
@@ -2083,9 +2101,9 @@ abstract class CI_DB_driver {
 	 */
 	private function _set_cred() 
 	{		
-		if (is_array($this->{$this->dbactive}))
+		if (is_array($this->{$this->conn_active}))
 		{
-			foreach ($this->{$this->dbactive} as $key => $val)
+			foreach ($this->{$this->conn_active} as $key => $val)
 			{
 				$this->$key = $val;
 			}
@@ -2103,9 +2121,13 @@ abstract class CI_DB_driver {
 	 */
 	private function _config_read_write($sql = '') 
 	{	
-		if ($this->db_force === 'write' OR ($this->db_force === NULL AND $this->is_write_type($sql) === TRUE))
+		
+		if ($this->conn_force === 'write' 
+			OR ($this->last_write !== NULL AND time() - $this->last_write < $this->read_delay)
+			OR ($this->conn_force === NULL AND $this->is_write_type($sql) === TRUE)
+			)
 		{
-			if ($this->dbactive === 'read') 
+			if ($this->conn_active === 'read') 
 			{
 				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
 				{
@@ -2113,12 +2135,11 @@ abstract class CI_DB_driver {
 				}
 				$this->conn_id = &$this->conn_id_write;
 			}
-			$this->dbactive = 'write';
-			log_message('error', 'write ' . $sql);
+			$this->conn_active = 'write';
 		}
 		else
 		{
-			if ($this->dbactive === 'write')
+			if ($this->conn_active === 'write')
 			{
 				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
 				{
@@ -2126,44 +2147,44 @@ abstract class CI_DB_driver {
 				}
 				$this->conn_id = &$this->conn_id_read;
 			}
-			$this->dbactive = 'read';
-			log_message('error', 'read ' . $sql);
+			$this->conn_active = 'read';
 		}
 		
 		// Clear database force if not explicitly set not to
-		if ($this->db_force_clr === TRUE)
+		if ($this->conn_force_clr === TRUE)
 		{
-			$this->db_force = NULL;
+			$this->conn_force = NULL;
 		}
 	}
 
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Force using specific database in read/write mode
+	 * Force using specific connection in read/write mode
 	 *
-	 * @param	string which database to use
-	 * @param	boolean toggle auto/manual database selection after the first query
+	 * @param	string which connection to use
+	 * @param	boolean toggle auto/manual connection selection after the first query
+	 *
 	 * @return	void
 	 */
-	public function db_force($database = 'write', $db_force_clr = TRUE)
+	public function conn_force($conn = 'write', $conn_force_clr = TRUE)
 	{
-		$this->db_force = $database;
-		$this->db_force_clr = $db_force_clr;
+		$this->conn_force = $conn;
+		$this->conn_force_clr = $conn_force_clr;
 		$this->_config_write_read();
 	}
 
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Clear force
+	 * Clear force for using specific connection in read/write mode
 	 *
 	 * @return	void
 	 */
-	public function db_force_clear()
+	public function conn_force_clear()
 	{
-		$this->db_force = NULL;
-		$this->db_force_clr = TRUE;
+		$this->conn_force = NULL;
+		$this->conn_force_clr = TRUE;
 	}
 	
 	// --------------------------------------------------------------------

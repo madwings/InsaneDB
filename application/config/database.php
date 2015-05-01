@@ -43,6 +43,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | 				CodeIgniter will store the SQL statement for debugging purposes.
 | 				However, this may cause high memory usage, especially if you run
 | 				a lot of SQL queries ... disable this to avoid that problem.
+|	['read_delay'] How many seconds after the last write query to delay reads from read connection. 
+|				   In the delay period all read queries will go to the write connection. Only used
+|				   in read/write mode.
 |
 | The $active_group variable lets you choose which connection group to
 | make active.  By default there is only one group (the 'default' group).
@@ -73,7 +76,7 @@ $db['default'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE
+	'save_queries'	=> FALSE
 );
 
 $db['read_write'] = array(
@@ -100,5 +103,6 @@ $db['read_write'] = array(
 	'compress'  => FALSE,
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE
+	'save_queries'	=> FALSE,
+	'read_delay'	=> 0
 );
