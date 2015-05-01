@@ -124,7 +124,7 @@ function &DB($params = '', $query_builder_override = NULL)
 			'username'	=> isset($dsn['user']) ? rawurldecode($dsn['user']) : '',
 			'password'	=> isset($dsn['pass']) ? rawurldecode($dsn['pass']) : '',
 			'database'	=> isset($dsn['path']) ? rawurldecode(substr($dsn['path'], 1)) : ''
-			);
+		);
 
 		// Were additional config items set?
 		if (isset($dsn['query']))
@@ -144,7 +144,7 @@ function &DB($params = '', $query_builder_override = NULL)
 	}
 
 	// No DB specified yet? Beat them senseless...
-	include(BASEPATH.'database/config/main.php');
+	include(BASEPATH.'database/DB_config.php');
 	if (empty($params['driver']) OR ! in_array($params['driver'], $config['drivers'], TRUE))
 	{
 		show_error('Invalid DB driver');

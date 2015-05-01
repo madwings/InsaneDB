@@ -124,7 +124,7 @@ function DB($params = '', $query_builder_override = NULL)
 	}
 
 	// No DB specified yet? Beat them senseless...
-	include(BASEPATH.'database/config/main.php');
+	include(BASEPATH.'database/DB_config.php');
 	if (empty($params['driver']) OR ! in_array($params['driver'], $config['drivers'], TRUE))
 	{
 		show_error('Invalid DB driver');
