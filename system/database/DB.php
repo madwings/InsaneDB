@@ -144,8 +144,7 @@ function &DB($params = '', $query_builder_override = NULL)
 	}
 
 	// No DB specified yet? Beat them senseless...
-	include(BASEPATH.'database/DB_config.php');
-	if (empty($params['driver']) OR ! in_array($params['driver'], $config['drivers'], TRUE))
+	if (empty($params['driver']) OR ! in_array($params['driver'], array('4d', 'cubrid', 'dblib', 'firebird', 'ibm', 'informix', 'mysql', 'oci', 'odbc', 'pgsql', 'sqlite', 'sqlsrv'), TRUE))
 	{
 		show_error('Invalid DB driver');
 	}

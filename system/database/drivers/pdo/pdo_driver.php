@@ -78,8 +78,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	public function __construct($params)
 	{
-		include(BASEPATH.'database/DB_config.php');
-		if ( ! in_array($this->subdriver, $config['drivers'], TRUE))
+		if ( ! in_array($this->subdriver, array('4d', 'cubrid', 'dblib', 'firebird', 'ibm', 'informix', 'mysql', 'oci', 'odbc', 'pgsql', 'sqlite', 'sqlsrv'), TRUE))
 		{
 			log_message('error', 'PDO: Invalid or non-existent subdriver');
 
