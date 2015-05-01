@@ -41,9 +41,9 @@ class Mock_Database_DB {
 			throw new InvalidArgumentException('Group '.$group.' not exists');
 		}
 
-		if (isset($this->config[$group]['subdriver']))
+		if (isset($this->config[$group]['driver']))
 		{
-			self::$subdriver = $this->config[$group]['subdriver'];
+			self::$subdriver = $this->config[$group]['driver'];
 		}
 
 		$params = array(
@@ -60,7 +60,7 @@ class Mock_Database_DB {
 
 		$config = array_merge($this->config[$group], $params);
 		$dsnstring = empty($config['dsn']) ? FALSE : $config['dsn'];
-		$subdriver = empty($config['subdriver']) ? FALSE: $config['subdriver'];
+		$subdriver = empty($config['driver']) ? FALSE: $config['driver'];
 		$failover = empty($config['failover']) ? FALSE : $config['failover'];
 
 		$dsn = $config['driver'].'://'.$config['username'].':'.$config['password']
@@ -69,7 +69,7 @@ class Mock_Database_DB {
 		// Build the parameter
 		$other_params = array_slice($config, 6);
 		if ($dsnstring) $other_params['dsn'] = $dsnstring;
-		if ($subdriver) $other_params['subdriver'] = $subdriver;
+		if ($subdriver) $other_params['driver'] = $subdriver;
 		if ($failover) $other_params['failover'] = $failover;
 
 		return $dsn.'?'.http_build_query($other_params);
