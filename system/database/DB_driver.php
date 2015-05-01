@@ -1618,8 +1618,6 @@ abstract class CI_DB_driver {
 	 */
 	public function call_function($function)
 	{
-		$driver = ($this->dbdriver === 'postgre') ? 'pg_' : $this->dbdriver.'_';
-
 		if (FALSE === strpos($driver, $function))
 		{
 			$function = $driver.$function;
@@ -2081,18 +2079,6 @@ abstract class CI_DB_driver {
 	}
 	
 	// --------------------------------------------------------------------
-	
-	/**
-	 * Dummy method to allow smooth transition from master/slave to default database mode
-	 *
-	 * @return	void
-	 */
-	public function __call($name, $arguments)
-    {
-        return NULL;
-    }
-	
-		// --------------------------------------------------------------------
 	
 	/**
 	 * Initialize database credentials when in read/write mode

@@ -124,7 +124,7 @@ function &DB($params = '', $query_builder_override = NULL)
 			'username'	=> isset($dsn['user']) ? rawurldecode($dsn['user']) : '',
 			'password'	=> isset($dsn['pass']) ? rawurldecode($dsn['pass']) : '',
 			'database'	=> isset($dsn['path']) ? rawurldecode(substr($dsn['path'], 1)) : ''
-		);
+			);
 
 		// Were additional config items set?
 		if (isset($dsn['query']))
@@ -144,9 +144,10 @@ function &DB($params = '', $query_builder_override = NULL)
 	}
 
 	// No DB specified yet? Beat them senseless...
-	if (empty($params['driver']))
+	include(BASEPATH.'database/config/main.php');
+	if (empty($params['driver']) OR ! in_array($params['driver'], $config['drivers'], TRUE))
 	{
-		show_error('You have not selected a database type to connect to.');
+		show_error('Invalid DB driver');
 	}
 	else
 	{
@@ -200,11 +201,7 @@ function &DB($params = '', $query_builder_override = NULL)
 	require_once($driver_file);
 
 	$driver_file = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$params['subdriver'].'_driver.php';
-	file_exists($driver_file) OR show_error('Invalid DB driver');
-	if ($params['subdriver'] === 'undefined')
-	{
-		show_error('Invalid DB driver');
-	}
+
 	// Instantiate the DB adapter
 	require_once($driver_file);
 	$driver = 'CI_DB_pdo_'.$params['subdriver'].'_driver';
