@@ -10,7 +10,7 @@ class Mock_Database_DB {
 	/**
 	 * @var string DB driver name
 	 */
-	private static $dbdriver = '';
+	private static $dbdriver = 'pdo';
 
 	/**
 	 * @var string DB sub-driver name
@@ -41,7 +41,6 @@ class Mock_Database_DB {
 			throw new InvalidArgumentException('Group '.$group.' not exists');
 		}
 
-		self::$dbdriver = $this->config[$group]['dbdriver'];
 		if (isset($this->config[$group]['subdriver']))
 		{
 			self::$subdriver = $this->config[$group]['subdriver'];
@@ -64,7 +63,7 @@ class Mock_Database_DB {
 		$subdriver = empty($config['subdriver']) ? FALSE: $config['subdriver'];
 		$failover = empty($config['failover']) ? FALSE : $config['failover'];
 
-		$dsn = $config['dbdriver'].'://'.$config['username'].':'.$config['password']
+		$dsn = $config['driver'].'://'.$config['username'].':'.$config['password']
 					.'@'.$config['hostname'].'/'.$config['database'];
 
 		// Build the parameter

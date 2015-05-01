@@ -11,7 +11,7 @@ class DB_test extends CI_TestCase {
 				'username' => 'undefined',
 				'password' => 'undefined',
 				'database' => 'undefined',
-				'dbdriver' => 'undefined',
+				'driver' => 'undefined',
 			),
 		));
 
