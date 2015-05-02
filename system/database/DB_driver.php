@@ -156,21 +156,21 @@ abstract class CI_DB_driver {
 	/**
 	 * Connection ID
 	 *
-	 * @var	object|resource
+	 * @var	object
 	 */
 	public $conn_id			= FALSE;
 	
 	/**
 	 * Connection ID write
 	 *
-	 * @var	object|resource
+	 * @var	object
 	 */
 	public $conn_id_write		= FALSE;
 	
 	/**
 	 * Connection ID read
 	 *
-	 * @var	object|resource
+	 * @var	object
 	 */
 	public $conn_id_read		= FALSE;
 	
@@ -1752,11 +1752,7 @@ abstract class CI_DB_driver {
 	 */
 	private function _close_single()
 	{
-		if ($this->conn_id)
-		{
-			$this->_close($this->conn_id);
-			$this->conn_id = FALSE;
-		}
+		$this->_close($this->conn_id);
 	}
 	
 	// --------------------------------------------------------------------
@@ -1774,27 +1770,9 @@ abstract class CI_DB_driver {
 	{
 		if ($conn === NULL)
 		{
-			$closed = 0;
-			if (is_resource($this->conn_id_write) OR is_object($this->conn_id_write))
-			{
-				$this->_close($this->conn_id_write);
-				++$closed;
-			}
-			$this->conn_id_write = FALSE;
-			
-			if (is_resource($this->conn_id_read) OR is_object($this->conn_id_read))
-			{
-				$this->_close($this->conn_id_read);
-				++$closed;
-			}
-			$this->conn_id_read = FALSE;
-			
-			// If write and read were closed, conn_id should not be closed
-			if ($closed !== 2 AND (is_resource($this->conn_id) OR is_object($this->conn_id)))
-			{
-				$this->_close($this->conn_id);
-			}
-			$this->conn_id = FALSE;
+			$this->_close($this->conn_id_read);
+			$this->_close($this->conn_id_write);
+			$this->_close($this->conn_id);
 		}
 		else if ($conn === 'active')
 		{
@@ -2157,7 +2135,7 @@ abstract class CI_DB_driver {
 	{
 		$this->conn_force = $conn;
 		$this->conn_force_clr = $conn_force_clr;
-		$this->_config_write_read();
+		$this->_config_read_write();
 	}
 
 	// --------------------------------------------------------------------
