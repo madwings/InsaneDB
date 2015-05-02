@@ -1801,6 +1801,7 @@ abstract class CI_DB_driver {
 	protected function _close(&$conn_id)
 	{
 		$conn_id = FALSE;
+		$this->result_id = FALSE;
 	}
 	
 	// --------------------------------------------------------------------
