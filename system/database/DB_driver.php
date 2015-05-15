@@ -549,7 +549,7 @@ abstract class CI_DB_driver {
 	/**
 	 * Reconnect
 	 *
-	 * Reestablish the db connection.
+	 * Re-establish database connections.
 	 *
 	 * @return      void
 	 */
@@ -1793,8 +1793,6 @@ abstract class CI_DB_driver {
 	/**
 	 * Close DB Connection
 	 *
-	 * This method would be overridden by most of the drivers.
-	 *
 	 * @param	resource
 	 * @return	void
 	 */
@@ -2079,7 +2077,7 @@ abstract class CI_DB_driver {
 	// --------------------------------------------------------------------
 	
 	/**
-	 * Configure db params for read/write setup
+	 * Configure db params for read/write mode
 	 *
 	 * @param	string	the sql query
 	 * @return	void
