@@ -59,13 +59,6 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	public $dbdriver = 'pdo';
 
-	/**
-	 * PDO Options
-	 *
-	 * @var	array
-	 */
-	public $options = array();
-
 	// --------------------------------------------------------------------
 
 	/**

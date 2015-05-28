@@ -126,11 +126,11 @@ abstract class CI_DB_driver {
 	public $dbcollat		= 'utf8mb4_bin';
 
 	/**
-	 * Encryption flag/data
+	 * Additional driver options
 	 *
-	 * @var	mixed
+	 * @var	array
 	 */
-	public $encrypt			= FALSE;
+	public $options			= array();
 
 	/**
 	 * Swap Prefix

@@ -60,13 +60,6 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	public $subdriver = 'mysql';
 
 	/**
-	 * Compression flag
-	 *
-	 * @var	bool
-	 */
-	public $compress = FALSE;
-
-	/**
 	 * Strict ON flag
 	 *
 	 * Whether we're running in strict SQL mode.
@@ -144,11 +137,6 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 			{
 				$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ', @@session.sql_mode = "STRICT_ALL_TABLES"';
 			}
-		}
-
-		if ($this->compress === TRUE)
-		{
-			$this->options[PDO::MYSQL_ATTR_COMPRESS] = TRUE;
 		}
 
 		return parent::db_connect($persistent);
@@ -308,7 +296,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * If query faild due to lost connection to server, initiate reconnection
+	 * If query failed due to lost connection to server, force reconnection
 	 *
 	 * Returns TRUE if pending reconnection otherwise FALSE
 	 *

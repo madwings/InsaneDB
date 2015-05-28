@@ -11,12 +11,6 @@ class CI_TestCase extends PHPUnit_Framework_TestCase {
 	private $global_map = array(
 		'benchmark'	=> 'bm',
 		'config'	=> 'cfg',
-		'hooks'		=> 'ext',
-		'utf8'		=> 'uni',
-		'router'	=> 'rtr',
-		'output'	=> 'out',
-		'security'	=> 'sec',
-		'input'		=> 'in',
 		'lang'		=> 'lang',
 		'loader'	=> 'load',
 		'model'		=> 'model'

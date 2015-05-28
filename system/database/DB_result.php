@@ -361,13 +361,11 @@ class CI_DB_result {
 			{
 				$this->row_data[$k] = $v;
 			}
-			return;
 		}
-
-		if ($key !== '' && $value !== NULL)
+		else if ($key !== '' && $value !== NULL)
 		{
 			$this->row_data[$key] = $value;
-		}
+		}	
 	}
 
 	// --------------------------------------------------------------------
@@ -469,7 +467,16 @@ class CI_DB_result {
 	public function last_row($type = 'object')
 	{
 		$result = $this->result($type);
-		return (count($result) === 0) ? NULL : $result[count($result) - 1];
+		if (($result_num = count($result)) === 0)
+		{
+			$result = NULL;
+		}
+		else
+		{
+			$result = $result[$result_num - 1];
+		}
+		
+		return $result;
 	}
 
 	// --------------------------------------------------------------------
