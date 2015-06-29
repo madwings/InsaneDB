@@ -58,6 +58,20 @@ abstract class CI_DB_driver {
 	 * @var	string
 	 */
 	public $dsn;
+	
+	/**
+	 * Data Source Name / Connect string
+	 *
+	 * @var	string
+	 */
+	protected $dsn_write;
+	
+	/**
+	 * Data Source Name / Connect string
+	 *
+	 * @var	string
+	 */
+	protected $dsn_read;
 
 	/**
 	 * Username
@@ -856,9 +870,8 @@ abstract class CI_DB_driver {
 			}
 			else
 			{
-				$error = $this->conn_id->errorInfo();
 				// Handle error, and decide on reconnection
-				if ( ! $this->_handle_reconnect($error))
+				if ( ! $this->_handle_reconnect())
 				{
 					break;
 				}

@@ -80,14 +80,6 @@ class CI_DB_pdo_driver extends CI_DB {
 			$this->subdriver = $match[1];
 			return;
 		}
-		// Legacy support for DSN specified in the hostname field
-		elseif (preg_match('/([^:]+):/', $this->hostname, $match) && count($match) === 2)
-		{
-			$this->dsn = $this->hostname;
-			$this->hostname = NULL;
-			$this->subdriver = $match[1];
-			return;
-		}
 		elseif (in_array($this->subdriver, array('mssql', 'sybase'), TRUE))
 		{
 			$this->subdriver = 'dblib';

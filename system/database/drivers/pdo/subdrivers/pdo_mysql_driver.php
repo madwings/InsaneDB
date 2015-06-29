@@ -101,7 +101,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 * @return	void
 	 */
 	protected function _build_dsn() 
-	{
+	{		
 		if (empty($this->dsn) OR $this->read_write)
 		{
 			$this->dsn = 'mysql:host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
@@ -223,7 +223,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 		for ($i = 0, $c = count($query); $i < $c; $i++)
 		{
 			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]->Field;
+			$retval[$i]->name	= $query[$i]->Field;
 
 			sscanf($query[$i]->Type, '%[a-z](%d)',
 				$retval[$i]->type,
@@ -296,16 +296,15 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * If query failed due to lost connection to server, force reconnection
+	 * If query failed due to lost connection, force reconnection
 	 *
 	 * Returns TRUE if pending reconnection otherwise FALSE
-	 *
-	 * @param	array	$error	database error
 	 * 
 	 * @return	bool
 	 */
-	protected function _handle_reconnect($error)
+	protected function _handle_reconnect()
 	{
+		$error = $this->conn_id->errorInfo();
 		// MySQL specific errors for lost connection
 		if ($error[1] === 2006 OR $error[1] === 2013)
 		{

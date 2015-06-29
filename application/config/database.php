@@ -78,11 +78,12 @@ $db['default'] = array(
 );
 
 $db['read_write'] = array(
-	'dsn'	=> '',
 	'read' 	=> array(
+		'dsn'	=> '',
 		'hostname' => 'localhost'
 	),
 	'write' => array(
+		'dsn'	=> '',
 		'hostname' => 'localhost'
 	),
 	'username' 	=> '',
