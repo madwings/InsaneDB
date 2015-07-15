@@ -58,20 +58,6 @@ abstract class CI_DB_driver {
 	 * @var	string
 	 */
 	public $dsn;
-	
-	/**
-	 * Data Source Name / Connect string
-	 *
-	 * @var	string
-	 */
-	protected $dsn_write;
-	
-	/**
-	 * Data Source Name / Connect string
-	 *
-	 * @var	string
-	 */
-	protected $dsn_read;
 
 	/**
 	 * Username
@@ -202,7 +188,7 @@ abstract class CI_DB_driver {
 	 *
 	 * @var	int
 	 */
-	protected $last_write			= NULL;
+	protected $last_write		= NULL;
 	
 	/**
 	 * Result ID
@@ -407,7 +393,7 @@ abstract class CI_DB_driver {
 	 *
 	 * @var	bool
 	 */
-	protected $read_write			= FALSE;
+	protected $read_write		= FALSE;
 	
 	/**
 	 * Force usage of particular connection in read/write mode

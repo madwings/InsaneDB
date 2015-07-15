@@ -101,7 +101,7 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _build_dsn() 
 	{
-		if (empty($this->dsn) OR $this->read_write)
+		if (empty($this->dsn))
 		{
 			$this->dsn = $params['subdriver'].':host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 
