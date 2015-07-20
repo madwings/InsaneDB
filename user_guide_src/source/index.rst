@@ -1,5 +1,5 @@
 ######################
-CodeIgniter User Guide
+InsaneDB User Guide
 ######################
 
 - :doc:`License Agreement <license>`

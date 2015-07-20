@@ -18,42 +18,20 @@ function autoload($class)
 		'Config',
 		'Controller',
 		'Exceptions',
-		'Hooks',
-		'Input',
 		'Lang',
 		'Loader',
 		'Log',
-		'Model',
-		'Output',
-		'Router',
-		'Security',
-		'URI',
-		'Utf8'
+		'Model'
 	);
 
 	$ci_libraries = array(
-		'Calendar',
-		'Cart',
-		'Driver_Library',
-		'Email',
-		'Encrypt',
-		'Encryption',
-		'Form_validation',
-		'Ftp',
-		'Image_lib',
-		'Javascript',
 		'Migration',
-		'Pagination',
 		'Parser',
 		'Profiler',
-		'Table',
 		'Trackback',
 	   	'Typography',
 		'Unit_test',
-		'Upload',
-	   	'User_agent',
-		'Xmlrpc',
-		'Zip'
+		'Xmlrpc'
 	);
 
 	$ci_drivers = array('Session', 'Cache');

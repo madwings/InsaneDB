@@ -60,13 +60,6 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	public $subdriver = 'mysql';
 
 	/**
-	 * Compression flag
-	 *
-	 * @var	bool
-	 */
-	public $compress = FALSE;
-
-	/**
 	 * Strict ON flag
 	 *
 	 * Whether we're running in strict SQL mode.
@@ -108,8 +101,8 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 * @return	void
 	 */
 	protected function _build_dsn() 
-	{
-		if (empty($this->dsn) OR $this->read_write)
+	{		
+		if (empty($this->dsn))
 		{
 			$this->dsn = 'mysql:host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 
@@ -144,11 +137,6 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 			{
 				$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ', @@session.sql_mode = "STRICT_ALL_TABLES"';
 			}
-		}
-
-		if ($this->compress === TRUE)
-		{
-			$this->options[PDO::MYSQL_ATTR_COMPRESS] = TRUE;
 		}
 
 		return parent::db_connect($persistent);
@@ -235,7 +223,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 		for ($i = 0, $c = count($query); $i < $c; $i++)
 		{
 			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]->Field;
+			$retval[$i]->name	= $query[$i]->Field;
 
 			sscanf($query[$i]->Type, '%[a-z](%d)',
 				$retval[$i]->type,
@@ -308,16 +296,15 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * If query faild due to lost connection to server, initiate reconnection
+	 * If query failed due to lost connection, force reconnection
 	 *
 	 * Returns TRUE if pending reconnection otherwise FALSE
-	 *
-	 * @param	array	$error	database error
 	 * 
 	 * @return	bool
 	 */
-	protected function _handle_reconnect($error)
+	protected function _handle_reconnect()
 	{
+		$error = $this->conn_id->errorInfo();
 		// MySQL specific errors for lost connection
 		if ($error[1] === 2006 OR $error[1] === 2013)
 		{

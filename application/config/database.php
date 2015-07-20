@@ -21,7 +21,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['database'] The name of the database you want to connect to
 |	['read'] 	 Database credentials for read connection in read/write mode
 |	['write'] 	 Database credentials for write connection in read/write mode
-|	['driver'] 	 The actual database driver used by the pdo base class.
+|	['driver'] 	 The database driver. e.g.: mysql.
 |	['dbprefix'] You can add an optional prefix, which will be added
 |				 to the table name when using the  Query Builder class
 |	['pconnect'] TRUE/FALSE - Whether to use a persistent connection
@@ -31,8 +31,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['char_set'] The character set used in communicating with the database
 |	['dbcollat'] The character collation used in communicating with the database
 |	['swap_pre'] A default table prefix that should be swapped with the dbprefix
-|	['encrypt']  Whether or not to use an encrypted connection.
-|	['compress'] Whether or not to use client compression (MySQL only)
+|	['options']  Pass additional options to the driver.
 |	['stricton'] TRUE/FALSE - forces 'Strict Mode' connections
 |							- good for ensuring strict SQL while developing
 |	['failover'] array - A array with 0 or more data for connections if the main should fail.
@@ -43,6 +42,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | 				CodeIgniter will store the SQL statement for debugging purposes.
 | 				However, this may cause high memory usage, especially if you run
 | 				a lot of SQL queries ... disable this to avoid that problem.
+|	['read_delay'] How many seconds after the last write query to delay reads from read connection. 
+|				   In the delay period all read queries will go to the write connection. Only used
+|				   in read/write mode.
 |
 | The $active_group variable lets you choose which connection group to
 | make active.  By default there is only one group (the 'default' group).
@@ -50,7 +52,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | The $query_builder variables lets you determine whether or not to load
 | the query builder class.
 */
-
 $active_group = 'default';
 $query_builder = TRUE;
 
@@ -63,25 +64,25 @@ $db['default'] = array(
 	'driver' 	=> 'mysql',
 	'dbprefix'  => '',
 	'pconnect'  => FALSE,
-	'db_debug'  => FALSE,
+	'db_debug'  => (ENVIRONMENT !== 'production'),
 	'cache_on'  => FALSE,
 	'cachedir'  => '',
 	'char_set'  => 'utf8mb4',
 	'dbcollat'  => 'utf8mb4_bin',
 	'swap_pre'  => '',
-	'encrypt'   => FALSE,
-	'compress'  => FALSE,
+	'options'   => array(),
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE
+	'save_queries'	=> FALSE
 );
 
 $db['read_write'] = array(
-	'dsn'	=> '',
 	'read' 	=> array(
+		'dsn'	=> '',
 		'hostname' => 'localhost'
 	),
 	'write' => array(
+		'dsn'	=> '',
 		'hostname' => 'localhost'
 	),
 	'username' 	=> '',
@@ -90,15 +91,15 @@ $db['read_write'] = array(
 	'driver' 	=> 'mysql',
 	'dbprefix'  => '',
 	'pconnect'  => FALSE,
-	'db_debug'  => FALSE,
+	'db_debug'  => (ENVIRONMENT !== 'production'),
 	'cache_on'  => FALSE,
 	'cachedir'  => '',
 	'char_set'  => 'utf8mb4',
 	'dbcollat'  => 'utf8mb4_bin',
 	'swap_pre'  => '',
-	'encrypt'   => FALSE,
-	'compress'  => FALSE,
+	'options'   => array(),
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries' => FALSE
+	'save_queries'	=> FALSE,
+	'read_delay'	=> 0
 );

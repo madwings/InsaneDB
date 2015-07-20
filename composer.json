@@ -1,7 +1,13 @@
 {
 	"description" : "The InsaneDB library",
 	"name" : "insanedb/library",
+	"type": "project",
+	"homepage": "https://github.com/madwings/InsaneDB",
 	"license": "MIT",
+	"support": {
+		"wiki": "https://github.com/madwings/InsaneDB/wiki",
+		"source": "https://github.com/madwings/InsaneDB"
+	},
 	"require": {
 		"php": ">=5.4"
 	},

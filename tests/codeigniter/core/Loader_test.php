@@ -152,34 +152,6 @@ class Loader_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
-	public function test_driver()
-	{
-		// Call the autoloader, to include system/libraries/Driver.php
-		class_exists('CI_Driver_Library', TRUE);
-
-		// Create driver in VFS
-		$driver = 'unit_test_driver';
-		$dir = ucfirst($driver);
-		$class = 'CI_'.$dir;
-		$content = '<?php class '.$class.' { } ';
-		$this->ci_vfs_create(ucfirst($driver), $content, $this->ci_base_root, 'libraries/'.$dir);
-
-		// Test loading as an array.
-		$this->assertInstanceOf('CI_Loader', $this->load->driver(array($driver)));
-		$this->assertTrue(class_exists($class), $class.' does not exist');
-		$this->assertAttributeInstanceOf($class, $driver, $this->ci_obj);
-
-		// Test loading as a library with a name
-		$obj = 'testdrive';
-		$this->assertInstanceOf('CI_Loader', $this->load->library($driver, NULL, $obj));
-		$this->assertAttributeInstanceOf($class, $obj, $this->ci_obj);
-
-		// Test a string given to params
-		$this->assertInstanceOf('CI_Loader', $this->load->driver($driver, ' '));
-	}
-
-	// --------------------------------------------------------------------
-
 	public function test_models()
 	{
 		$this->ci_set_core_class('model', 'CI_Model');
@@ -511,12 +483,6 @@ class Loader_test extends CI_TestCase {
 		$lib_class = 'CI_'.ucfirst($lib);
 		$this->ci_vfs_create(ucfirst($lib), '<?php class '.$lib_class.' { }', $this->ci_base_root, 'libraries');
 
-		// Create driver in VFS
-		$drv = 'autodrv';
-		$subdir = ucfirst($drv);
-		$drv_class = 'CI_'.$subdir;
-		$this->ci_vfs_create(ucfirst($drv), '<?php class '.$drv_class.' { }', $this->ci_base_root, array('libraries', $subdir));
-
 		// Create model in VFS package path
 		$dir = 'testdir';
 		$path = APPPATH.$dir.'/';
@@ -528,7 +494,6 @@ class Loader_test extends CI_TestCase {
 			'packages' => array($path),
 			'helper' => array($helper),
 			'libraries' => array($lib),
-			'drivers' => array($drv),
 			'model' => array($model),
 			'config' => array('config1', 'config2')
 		);
@@ -545,10 +510,6 @@ class Loader_test extends CI_TestCase {
 		// Verify library
 		$this->assertTrue(class_exists($lib_class), $lib_class.' does not exist');
 		$this->assertAttributeInstanceOf($lib_class, $lib, $this->ci_obj);
-
-		// Verify driver
-		$this->assertTrue(class_exists($drv_class), $drv_class.' does not exist');
-		$this->assertAttributeInstanceOf($drv_class, $drv, $this->ci_obj);
 
 		// Verify model
 		$this->assertTrue(class_exists($model), $model.' does not exist');

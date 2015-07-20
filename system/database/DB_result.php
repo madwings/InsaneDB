@@ -128,21 +128,20 @@ class CI_DB_result {
 	 * @return	int
 	 */
 	public function num_rows()
-	{
-		if (is_int($this->num_rows))
+	{		
+		if ( ! is_int($this->num_rows))
 		{
-			return $this->num_rows;
-		}
-		elseif (count($this->result_array) > 0)
-		{
-			return $this->num_rows = count($this->result_array);
-		}
-		elseif (count($this->result_object) > 0)
-		{
-			return $this->num_rows = count($this->result_object);
+			if (($num_rows = count($this->result_array)) > 0 || ($num_rows = count($this->result_object)) > 0) {
+				$this->num_rows = $num_rows;
+			}
+			else
+			{
+				$this->num_rows = count($this->result_array());
+			}
+
 		}
 
-		return $this->num_rows = count($this->result_array());
+		return $this->num_rows;
 	}
 
 	// --------------------------------------------------------------------
@@ -362,13 +361,11 @@ class CI_DB_result {
 			{
 				$this->row_data[$k] = $v;
 			}
-			return;
 		}
-
-		if ($key !== '' && $value !== NULL)
+		else if ($key !== '' && $value !== NULL)
 		{
 			$this->row_data[$key] = $value;
-		}
+		}	
 	}
 
 	// --------------------------------------------------------------------
@@ -470,7 +467,16 @@ class CI_DB_result {
 	public function last_row($type = 'object')
 	{
 		$result = $this->result($type);
-		return (count($result) === 0) ? NULL : $result[count($result) - 1];
+		if (($result_num = count($result)) === 0)
+		{
+			$result = NULL;
+		}
+		else
+		{
+			$result = $result[$result_num - 1];
+		}
+		
+		return $result;
 	}
 
 	// --------------------------------------------------------------------

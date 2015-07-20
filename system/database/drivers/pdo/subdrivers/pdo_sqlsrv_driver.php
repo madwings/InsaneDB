@@ -101,7 +101,7 @@ class CI_DB_pdo_sqlsrv_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _build_dsn() 
 	{
-		if (empty($this->dsn) OR $this->read_write)
+		if (empty($this->dsn))
 		{
 			$this->dsn = 'sqlsrv:Server='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
 
@@ -119,11 +119,6 @@ class CI_DB_pdo_sqlsrv_driver extends CI_DB_pdo_driver {
 			if (isset($this->ConnectionPooling))
 			{
 				$this->dsn .= ';ConnectionPooling='.$this->ConnectionPooling;
-			}
-
-			if ($this->encrypt === TRUE)
-			{
-				$this->dsn .= ';Encrypt=1';
 			}
 
 			if (isset($this->TraceOn))

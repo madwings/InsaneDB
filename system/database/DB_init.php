@@ -124,9 +124,9 @@ function DB($params = '', $query_builder_override = NULL)
 	}
 
 	// No DB specified yet? Beat them senseless...
-	if (empty($params['driver']))
+	if (empty($params['driver']) OR ! in_array($params['driver'], array('4d', 'cubrid', 'dblib', 'firebird', 'ibm', 'informix', 'mysql', 'oci', 'odbc', 'pgsql', 'sqlite', 'sqlsrv'), TRUE))
 	{
-		show_error('You have not selected a database type to connect to.');
+		show_error('Invalid DB driver');
 	}
 	else
 	{
@@ -173,7 +173,6 @@ function DB($params = '', $query_builder_override = NULL)
 	require_once($driver_file);
 
 	$driver_file = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$params['subdriver'].'_driver.php';
-	file_exists($driver_file) OR show_error('Invalid DB driver');
 
 	// Instantiate the DB adapter
 	require_once($driver_file);

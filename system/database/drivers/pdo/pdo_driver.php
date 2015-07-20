@@ -59,13 +59,6 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	public $dbdriver = 'pdo';
 
-	/**
-	 * PDO Options
-	 *
-	 * @var	array
-	 */
-	public $options = array();
-
 	// --------------------------------------------------------------------
 
 	/**
@@ -77,21 +70,13 @@ class CI_DB_pdo_driver extends CI_DB {
 	 * @return	void
 	 */
 	public function __construct($params)
-	{
+	{		
 		parent::__construct($params);
 
 		if (preg_match('/([^:]+):/', $this->dsn, $match) && count($match) === 2)
 		{
 			// If there is a minimum valid dsn string pattern found, we're done
 			// This is for general PDO users, who tend to have a full DSN string.
-			$this->subdriver = $match[1];
-			return;
-		}
-		// Legacy support for DSN specified in the hostname field
-		elseif (preg_match('/([^:]+):/', $this->hostname, $match) && count($match) === 2)
-		{
-			$this->dsn = $this->hostname;
-			$this->hostname = NULL;
 			$this->subdriver = $match[1];
 			return;
 		}
@@ -102,15 +87,6 @@ class CI_DB_pdo_driver extends CI_DB {
 		elseif ($this->subdriver === '4D')
 		{
 			$this->subdriver = '4d';
-		}
-		elseif ( ! in_array($this->subdriver, array('4d', 'cubrid', 'dblib', 'firebird', 'ibm', 'informix', 'mysql', 'oci', 'odbc', 'pgsql', 'sqlite', 'sqlsrv'), TRUE))
-		{
-			log_message('error', 'PDO: Invalid or non-existent subdriver');
-
-			if ($this->db_debug)
-			{
-				show_error('Invalid or non-existent PDO subdriver');
-			}
 		}
 
 		$this->dsn = NULL;
@@ -178,6 +154,11 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	protected function _execute($sql)
 	{
+		if ($this->read_write && $this->conn_active === 'write')
+		{
+			$this->last_write = time();
+		}
+		
 		return $this->conn_id->query($sql);
 	}
 
