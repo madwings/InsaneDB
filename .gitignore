@@ -8,6 +8,23 @@ application/logs/*
 !application/logs/index.html
 !application/logs/.htaccess
 
+system/core/*
+!system/core/Benchmark.php
+!system/core/CodeIgniter.php
+!system/core/Common.php
+!system/core/Config.php
+!system/core/Controller.php
+!system/core/Exceptions.php
+!system/core/Lang.php
+!system/core/Loader.php
+!system/core/Log.php
+!system/core/Model.php
+!system/core/index.php
+
+system/database/drivers/*
+!system/database/drivers/pdo
+!system/database/drivers/index.html
+
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*

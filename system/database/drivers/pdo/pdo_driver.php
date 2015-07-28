@@ -154,6 +154,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	protected function _execute($sql)
 	{
+		// Log time of last write query
 		if ($this->read_write && $this->conn_active === 'write')
 		{
 			$this->last_write = time();

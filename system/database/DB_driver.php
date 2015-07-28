@@ -1759,7 +1759,7 @@ abstract class CI_DB_driver {
 	/**
 	 * Close DB Connection in read/write mode
 	 *
-	 * If no value is passed to the param, it closes all connections
+	 * If NULL is passed to the param, it closes all connections
 	 *
 	 * @param	mixed	$conn	NULL|'active'|'write'|'read'
 	 *
@@ -2085,7 +2085,7 @@ abstract class CI_DB_driver {
 	{	
 		
 		if ($this->conn_force === 'write' 
-			OR ($this->last_write !== NULL AND time() - $this->last_write < $this->read_delay)
+			OR ($this->last_write !== NULL AND time() - $this->last_write < $this->read_delay AND $this->conn_force !== 'read')
 			OR ($this->conn_force === NULL AND $this->is_write_type($sql) === TRUE)
 			)
 		{
@@ -2112,7 +2112,7 @@ abstract class CI_DB_driver {
 			$this->conn_active = 'read';
 		}
 		
-		// Clear database force if not explicitly set not to
+		// Clear database force
 		if ($this->conn_force_clr === TRUE)
 		{
 			$this->conn_force = NULL;
@@ -2124,8 +2124,8 @@ abstract class CI_DB_driver {
 	/**
 	 * Force using specific connection in read/write mode
 	 *
-	 * @param	string which connection to use
-	 * @param	boolean toggle auto/manual connection selection after the first query
+	 * @param	string	which connection to use	read/write
+	 * @param	boolean whether to remove connection force after the first query
 	 *
 	 * @return	void
 	 */
