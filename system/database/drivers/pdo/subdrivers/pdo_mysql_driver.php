@@ -123,7 +123,6 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 *
 	 * @param	bool	$persistent
 	 * @return	object
-	 * @todo	SSL support
 	 */
 	public function db_connect($persistent = FALSE)
 	{

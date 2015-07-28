@@ -14,6 +14,7 @@ Release Date: Not Released
 -  Database
 
    -  Added ``list_fields()`` support for SQLite ('sqlite3' and 'pdo_sqlite' drivers).
+   -  Added SSL connection support for the 'mysqli' and 'pdo_mysql' drivers.
 
 -  Libraries
 
@@ -25,6 +26,15 @@ Release Date: Not Released
 
    -  Added 'is_resource' to the available expectations in :doc:`Unit Testing Library <libraries/unit_testing>`.
 
+-  Helpers
+
+   -  Added Unicode support to :doc:`URL Helper <helpers/url_helper>` function :php:func:`url_title()`.
+   -  Added support for passing the "extra" parameter as an array to all :doc:`Form Helper <helpers/form_helper>` functions that use it.
+
+-  Core
+
+   -  Added support for defining a list of specific query parameters in ``$config['cache_query_string']`` for the :doc:`Output Library <libraries/output>`.
+   -  Added class existence and inheritance checks to ``CI_Loader::model()`` in order to ease debugging in case of name collisions.
 
 Bug fixes for 3.0.1
 -------------------
@@ -52,6 +62,17 @@ Bug fixes for 3.0.1
 -  Fixed a bug (#3955) - :doc:`Cache Library <libraries/caching>` methods ``increment()`` and ``decrement()`` ignored the 'key_prefix' setting.
 -  Fixed a bug (#3963) - :doc:`Unit Testing Library <libraries/unit_testing>` wrongly tried to translate filenames, line numbers and notes values in test results.
 -  Fixed a bug (#3965) - :doc:`File Uploading Library <libraries/file_uploading>` ignored the "encrypt_name" setting when "overwrite" is enabled.
+-  Fixed a bug (#3968) - :doc:`Database Forge <database/forge>` method ``add_key()`` didn't treat array inputs as composite keys unless it's a PRIMARY KEY.
+-  Fixed a bug (#3715) - :doc:`Pagination Library <libraries/pagination>` could generate broken link when a protocol-relative base URL is used.
+-  Fixed a bug (#3828) - :doc:`Output Library <libraries/output>` method ``delete_cache()`` couldn't delete index page caches.
+-  Fixed a bug (#3704) - :doc:`Database <database/index>` method ``stored_procedure()`` in the 'oci8' driver didn't properly bind parameters.
+-  Fixed a bug (#3778) - :doc:`Download Helper <helpers/download_helper>` function :php:func:`force_download()` incorrectly sent a *Pragma* response header.
+-  Fixed a bug (#3752) - ``$routing['directory']`` overrides were not properly handled and always resulted in a 404 "Not Found" error.
+-  Fixed a bug (#3279) - :doc:`Query Builder <database/query_builder>` methods ``update()`` and ``get_compiled_update()`` did double escaping on the table name if it was provided via ``from()``.
+-  Fixed a bug (#3991) - ``$config['rewrite_short_tags']`` never worked due to ``function_exists('eval')`` always returning FALSE.
+-  Fixed a bug where the :doc:`File Uploadin Library <libraries/file_uploading>` library will not properly configure its maximum file size unless the input value is of type integer.
+-  Fixed a bug (#4000) - :doc:`Pagination Library <libraries/pagination>` didn't enable "rel" attributes by default if no attributes-related config options were used.
+-  Fixed a bug (#4004) - :doc:`URI Class <libraries/uri>` didn't properly parse the request URI if it contains a colon followed by a digit.
 
 Version 3.0.0
 =============
@@ -824,6 +845,30 @@ Bug fixes for 3.0
 -  Fixed a bug (#3189) - :doc:`Parser Library <libraries/parser>` used double replacement on ``key->value`` pairs, exposing a potential template injection vulnerability.
 -  Fixed a bug (#3573) - :doc:`Email Library <libraries/email>` violated `RFC5321 <https://tools.ietf.org/rfc/rfc5321.txt>`_ by sending 'localhost.localdomain' as a hostname.
 -  Fixed a bug (#3572) - ``CI_Security::_remove_evil_attributes()`` failed for large-sized inputs due to *pcre.backtrack_limit* and didn't properly match HTML tags.
+
+Version 2.2.3
+=============
+
+Release Date: July 14, 2015
+
+-  Security
+
+   - Removed a fallback to ``mysql_escape_string()`` in the 'mysql' database driver (``escape_str()`` method) when there's no active database connection.
+
+Version 2.2.2
+=============
+
+Release Date: April 15, 2015
+
+-  General Changes
+
+   - Added HTTP "Host" header character validation to prevent cache poisoning attacks when *base_url* auto-detection is used.
+   - Added *FSCommand* and *seekSegmentTime* to the "evil attributes" list in ``CI_Security::xss_clean()``.
+
+Bug fixes for 2.2.2
+-------------------
+
+-  Fixed a bug (#3665) - ``CI_Security::entity_decode()`` triggered warnings under some circumstances.
 
 Version 2.2.1
 =============

@@ -143,7 +143,7 @@ abstract class CI_DB_forge {
 	protected $_unsigned		= TRUE;
 
 	/**
-	 * NULL value representatin in CREATE/ALTER TABLE statements
+	 * NULL value representation in CREATE/ALTER TABLE statements
 	 *
 	 * @var	string
 	 */
@@ -239,7 +239,7 @@ abstract class CI_DB_forge {
 	 */
 	public function add_key($key, $primary = FALSE)
 	{
-		if ($primary === TRUE && is_array($key))
+		if (is_array($key))
 		{
 			foreach ($key as $one)
 			{

@@ -284,8 +284,15 @@ $config['cache_path'] = '';
 | Cache Include Query String
 |--------------------------------------------------------------------------
 |
-| Set this to TRUE if you want to use different cache files depending on the
-| URL query string.  Please be aware this might result in numerous cache files.
+| Whether to take the URL query string into consideration when generating
+| output cache files. Valid options are:
+|
+|	FALSE      = Disabled
+|	TRUE       = Enabled, take all query parameters into account.
+|	             Please be aware that this may result in numerous cache
+|	             files generated for the same page over and over again.
+|	array('q') = Enabled, but only take into account the specified list
+|	             of query parameters.
 |
 */
 $config['cache_query_string'] = FALSE;
@@ -472,6 +479,8 @@ $config['time_reference'] = 'local';
 | If your PHP installation does not have short tag support enabled CI
 | can rewrite the tags on-the-fly, enabling you to utilize that syntax
 | in your view files.  Options are TRUE or FALSE (boolean)
+|
+| Note: You need to have eval() enabled for this to work.
 |
 */
 $config['rewrite_short_tags'] = FALSE;
