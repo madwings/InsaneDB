@@ -9,6 +9,7 @@ application/logs/*
 !application/logs/.htaccess
 
 system/core/*
+!system/core/compat
 !system/core/Benchmark.php
 !system/core/CodeIgniter.php
 !system/core/Common.php
@@ -19,7 +20,7 @@ system/core/*
 !system/core/Loader.php
 !system/core/Log.php
 !system/core/Model.php
-!system/core/index.php
+!system/core/index.html
 
 system/database/drivers/*
 !system/database/drivers/pdo
