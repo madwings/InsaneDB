@@ -525,7 +525,7 @@ abstract class CI_DB_driver {
 	 *
 	 * This is just a dummy method that all drivers will override.
 	 *
-	 * @return      mixed
+	 * @return	mixed
 	 */
 	public function db_connect()
 	{
@@ -551,7 +551,7 @@ abstract class CI_DB_driver {
 	 *
 	 * Re-establish database connections.
 	 *
-	 * @return      void
+	 * @return	void
 	 */
 	public function reconnect()
 	{
@@ -567,7 +567,7 @@ abstract class CI_DB_driver {
 	 * This is just a dummy method to allow drivers without such
 	 * functionality to not declare it, while others will override it.
 	 *
-	 * @return      bool
+	 * @return	bool
 	 */
 	public function db_select()
 	{
