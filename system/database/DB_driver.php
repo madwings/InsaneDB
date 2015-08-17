@@ -719,7 +719,10 @@ abstract class CI_DB_driver {
 			}
 
 			// This will trigger a rollback if transactions are being used
-			$this->_trans_status = FALSE;
+			if ($this->_trans_depth !== 0)
+			{
+				$this->_trans_status = FALSE;
+			}
 
 			// Grab the error now, as we might run some additional queries before displaying the error
 			$error = $this->error();
@@ -1943,12 +1946,15 @@ abstract class CI_DB_driver {
 		// with an alias. While we're at it, we will escape the components
 		if (strpos($item, '.') !== FALSE)
 		{
-			$parts	= explode('.', $item);
+			$parts = explode('.', $item);
 
 			// Does the first segment of the exploded item match
 			// one of the aliases previously identified? If so,
 			// we have nothing more to do other than escape the item
-			if (in_array($parts[0], $this->qb_aliased_tables))
+			//
+			// NOTE: The ! empty() condition prevents this method
+			//       from breaking when QB isn't enabled.
+			if ( ! empty($this->qb_aliased_tables) && in_array($parts[0], $this->qb_aliased_tables))
 			{
 				if ($protect_identifiers === TRUE)
 				{

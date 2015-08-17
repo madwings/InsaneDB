@@ -2,10 +2,31 @@
 Change Log
 ##########
 
-Version 3.0.1
+Version 3.1.0
 =============
 
 Release Date: Not Released
+
+
+Version 3.0.2
+=============
+
+Release Date: Not Released
+
+-  General Changes
+
+   -  Updated the *application/config/constants.php* file to check if constants aren't already defined before doing that.
+
+Bug fixes for 3.0.2
+-------------------
+
+-  Fixed a bug (#2284) - :doc:`Database <database/index>` method ``protect_identifiers()`` breaks when :doc:`Query Builder <database/query_builder>` isn't enabled.
+-  Fixed a bug (#4052) - :doc:`Routing <general/routing>` with anonymous functions didn't work for routes that don't use regular expressions.
+
+Version 3.0.1
+=============
+
+Release Date: August 7, 2015
 
 -  Core
 
@@ -76,6 +97,9 @@ Bug fixes for 3.0.1
 -  Fixed a bug in :doc:`Query Builder <database/query_builder>` where the ``$escape`` parameter for some methods only affected field names.
 -  Fixed a bug (#4012) - :doc:`Query Builder <database/query_builder>` methods ``where_in()``, ``or_where_in()``, ``where_not_in()``, ``or_where_not_in()`` didn't take into account previously cached WHERE conditions when query cache is in use.
 -  Fixed a bug (#4015) - :doc:`Email Library <libraries/email>` method ``set_header()`` didn't support method chaining, although it was advertised.
+-  Fixed a bug (#4027) - :doc:`Routing <general/routing>` with HTTP verbs only worked if the route request method was declared in all-lowercase letters.
+-  Fixed a bug (#4026) - :doc:`Database Transactions <database/transactions>` always rollback if any previous ``query()`` call fails.
+-  Fixed a bug (#4023) - :doc:`String Helper <helpers/string_helper>` function ``increment_string()`` didn't escape its ``$separator`` parameter.
 
 Version 3.0.0
 =============
