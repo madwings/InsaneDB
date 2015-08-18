@@ -2109,7 +2109,7 @@ abstract class CI_DB_driver {
 		{
 			if ($this->conn_active === 'write')
 			{
-				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
+				if(gettype($this->conn_id_write) !== gettype($this->conn_id))
 				{
 					$this->conn_id_write = $this->conn_id;
 				}
