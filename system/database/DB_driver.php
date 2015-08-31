@@ -38,7 +38,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Database Driver Class for single mode
+ * Database Driver Class
  *
  * This is the platform-independent base DB implementation class.
  * This class will not be called directly. Rather, the adapter
