@@ -8,6 +8,8 @@ application/logs/*
 !application/logs/index.html
 !application/logs/.htaccess
 
+system/libraries/Form_validation.php
+
 system/core/*
 !system/core/compat
 !system/core/Benchmark.php
@@ -26,6 +28,8 @@ system/database/drivers/*
 !system/database/drivers/pdo
 !system/database/drivers/index.html
 
+user_guide_src/source/libraries/form_validation.rst
+user_guide_src/source/libraries/calendar.rst
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
