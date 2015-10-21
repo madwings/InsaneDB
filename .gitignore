@@ -9,6 +9,8 @@ application/logs/*
 !application/logs/.htaccess
 
 system/libraries/Form_validation.php
+system/libraries/Pagination.php
+system/libraries/Email.php
 
 system/core/*
 !system/core/compat
@@ -28,8 +30,15 @@ system/database/drivers/*
 !system/database/drivers/pdo
 !system/database/drivers/index.html
 
+system/helpers/file_helper.php
+
+tests/codeigniter/core/Security_test.php
+
 user_guide_src/source/libraries/form_validation.rst
 user_guide_src/source/libraries/calendar.rst
+user_guide_src/source/libraries/sessions.rst
+user_guide_src/source/libraries/security.rst
+user_guide_src/source/libraries/encryption.rst
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
