@@ -1912,9 +1912,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	the table to retrieve the results from
 	 * @param	array	an associative array of update values
 	 * @param	string	the where key
+	 * @param	int		batch limit
+	 * @param	array	keys included into the udpate
 	 * @return	int	number of rows affected or FALSE on failure
 	 */
-	public function update_batch($table = '', $set = NULL, $index = NULL, $batch_limit = NULL)
+	public function update_batch($table = '', $set = NULL, $index = NULL, $batch_limit = NULL, $include = NULL)
 	{
 		// Combine any cached components with the current statements
 		$this->_merge_cache();
@@ -1926,7 +1928,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		if ($set !== NULL)
 		{
-			$this->set_update_batch($set, $index);
+			$this->set_update_batch($set, $index, NULL, $include);
 		}
 
 		if (count($this->qb_set) === 0)
@@ -2010,9 +2012,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	array
 	 * @param	string
 	 * @param	bool
+	 * @param	array
 	 * @return	CI_DB_query_builder
 	 */
-	public function set_update_batch($key, $index = '', $escape = NULL)
+	public function set_update_batch($key, $index = '', $escape = NULL, $include = NULL)
 	{
 		$key = $this->_object_to_array_batch($key);
 
@@ -2029,6 +2032,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$clean = array();
 			foreach ($v as $k2 => $v2)
 			{
+				if ( ! empty($include) && ! in_array($k2, $include)) {
+					continue;
+				}
+				
 				if ($k2 === $index)
 				{
 					$index_set = TRUE;
