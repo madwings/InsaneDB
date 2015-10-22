@@ -1,6 +1,6 @@
 {
-	"description" : "The InsaneDB library",
-	"name" : "insanedb/library",
+	"name" : "madwings/insanedb",
+	"description" : "InasaneDB is a Database Toolkit for PHP forked from CodeIgniter 3",
 	"type": "project",
 	"homepage": "https://github.com/madwings/InsaneDB",
 	"license": "MIT",
