@@ -1446,14 +1446,15 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * Compiles batch insert strings and runs the queries
 	 *
-	 * @param	string	$table	Table to insert into
-	 * @param	array	$set 	An associative array of insert values
-	 * @param	bool	$escape	Whether to escape values and identifiers
-	 * @param	int		$batch_limit	number of rows to insert per batch 
+	 * @param	string	$table			Table to insert into
+	 * @param	array	$set 			An associative array of insert values
+	 * @param	bool	$escape			Whether to escape values and identifiers
+	 * @param	int		$batch_limit	Number of rows to insert per batch 
+	 * @param	array	$include		Keys included into the insert
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL)
+	public function insert_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL, $include = NULL)
 	{
 		if ($set !== NULL)
 		{
@@ -1499,12 +1500,15 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * Compiles batch insert strings and runs the queries
 	 *
-	 * @param	string	$table	Table to insert into
-	 * @param	array	$set 	An associative array of insert values
-	 * @param	bool	$escape	Whether to escape values and identifiers
+	 * @param	string	$table			Table to insert into
+	 * @param	array	$set 			An associative array of insert values
+	 * @param	bool	$escape			Whether to escape values and identifiers
+	 * @param	int		$batch_limit	number of rows to insert per batch 
+	 * @param	array	$include		Keys included into the insert
+	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_ignore_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL)
+	public function insert_ignore_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL, $include = NULL)
 	{
 		if ( ! method_exists($this, '_insert_ignore_batch')) 
 		{
@@ -1573,9 +1577,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	mixed
 	 * @param	string
 	 * @param	bool
+	 * @param	array
+	 *
 	 * @return	CI_DB_query_builder
 	 */
-	public function set_insert_batch($key, $value = '', $escape = NULL)
+	public function set_insert_batch($key, $value = '', $escape = NULL, $include = NULL)
 	{
 		$key = $this->_object_to_array_batch($key);
 
@@ -1586,13 +1592,14 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		is_bool($escape) OR $escape = $this->_protect_identifiers;
 
-		$keys = array_keys($this->_object_to_array(current($key)));
+		$keys = ! empty($include) ? array_keys($this->_object_to_array(current($key)), $include) : array_keys($this->_object_to_array(current($key)));
 		sort($keys);
 
 		foreach ($key as $row)
 		{
 			$row = $this->_object_to_array($row);
-			if (count(array_diff($keys, array_keys($row))) > 0 OR count(array_diff(array_keys($row), $keys)) > 0)
+			$row_keys = ! empty($include) ? array_keys($row, $include) : array_keys($row);
+			if (count(array_diff($keys, $row_keys)) > 0 OR count(array_diff($row_keys, $keys)) > 0)
 			{
 				// batch function above returns an error on an empty array
 				$this->qb_set[] = array();
@@ -1601,12 +1608,13 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 			ksort($row); // puts $row in the same order as our keys
 
-			if ($escape !== FALSE)
+			if ( ! empty($include) OR $escape !== FALSE)
 			{
 				$clean = array();
 				foreach ($row as $value)
 				{
-					$clean[] = $this->escape($value);
+					$clean[] = ($escape === FALSE) ? $value : $this->escape($value);
+					
 				}
 
 				$row = $clean;
@@ -1914,6 +1922,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	the where key
 	 * @param	int		batch limit
 	 * @param	array	keys included into the udpate
+	 *
 	 * @return	int	number of rows affected or FALSE on failure
 	 */
 	public function update_batch($table = '', $set = NULL, $index = NULL, $batch_limit = NULL, $include = NULL)
@@ -2026,7 +2035,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		is_bool($escape) OR $escape = $this->_protect_identifiers;
 
-		foreach ($key as $k => $v)
+		foreach ($key as $v)
 		{
 			$index_set = FALSE;
 			$clean = array();
