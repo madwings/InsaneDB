@@ -1458,7 +1458,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	{
 		if ($set !== NULL)
 		{
-			$this->set_insert_batch($set, '', $escape);
+			$this->set_insert_batch($set, '', $escape, $include);
 		}
 
 		if (count($this->qb_set) === 0)
@@ -1517,7 +1517,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		
 		if ($set !== NULL)
 		{
-			$this->set_insert_batch($set, '', $escape);
+			$this->set_insert_batch($set, '', $escape, $include);
 		}
 
 		if (count($this->qb_set) === 0)
@@ -1592,13 +1592,13 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		is_bool($escape) OR $escape = $this->_protect_identifiers;
 
-		$keys = ! empty($include) ? array_keys($this->_object_to_array(current($key)), $include) : array_keys($this->_object_to_array(current($key)));
+		$keys = ! empty($include) ? $include : array_keys($this->_object_to_array(current($key)));
 		sort($keys);
 
 		foreach ($key as $row)
 		{
 			$row = $this->_object_to_array($row);
-			$row_keys = ! empty($include) ? array_keys($row, $include) : array_keys($row);
+			$row_keys = ! empty($include) ? $include : array_keys($row);
 			if (count(array_diff($keys, $row_keys)) > 0 OR count(array_diff($row_keys, $keys)) > 0)
 			{
 				// batch function above returns an error on an empty array
@@ -1611,10 +1611,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			if ( ! empty($include) OR $escape !== FALSE)
 			{
 				$clean = array();
-				foreach ($row as $value)
+				foreach ($row as $row_key => $value)
 				{
+					if ( ! empty($include) && ! in_array($row_key, $include)) {
+						continue;
+					}
 					$clean[] = ($escape === FALSE) ? $value : $this->escape($value);
-					
 				}
 
 				$row = $clean;
@@ -2040,8 +2042,8 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$index_set = FALSE;
 			$clean = array();
 			foreach ($v as $k2 => $v2)
-			{
-				if ( ! empty($include) && ! in_array($k2, $include)) {
+			{				
+				if ( ! empty($include) && ! in_array($k2, $include) && $k2 !== $index) {
 					continue;
 				}
 				
