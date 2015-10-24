@@ -1448,17 +1448,16 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	$table			Table to insert into
 	 * @param	array	$set 			An associative array of insert values
-	 * @param	bool	$escape			Whether to escape values and identifiers
 	 * @param	int		$batch_limit	Number of rows to insert per batch 
 	 * @param	array	$include		Keys included into the insert
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL, $include = NULL)
+	public function insert_batch($table = '', $set = NULL, $batch_limit = NULL, $include = NULL)
 	{
 		if ($set !== NULL)
 		{
-			$this->set_insert_batch($set, '', $escape, $include);
+			$this->set_insert_batch($set, '', $include);
 		}
 
 		if (count($this->qb_set) === 0)
@@ -1485,7 +1484,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$affected_rows = 0;
 		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_limit)
 		{
-			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_limit)));
+			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_limit)));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1502,13 +1501,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	$table			Table to insert into
 	 * @param	array	$set 			An associative array of insert values
-	 * @param	bool	$escape			Whether to escape values and identifiers
 	 * @param	int		$batch_limit	number of rows to insert per batch 
 	 * @param	array	$include		Keys included into the insert
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_ignore_batch($table = '', $set = NULL, $escape = NULL, $batch_limit = NULL, $include = NULL)
+	public function insert_ignore_batch($table = '', $set = NULL, $batch_limit = NULL, $include = NULL)
 	{
 		if ( ! method_exists($this, '_insert_ignore_batch')) 
 		{
@@ -1517,7 +1515,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		
 		if ($set !== NULL)
 		{
-			$this->set_insert_batch($set, '', $escape, $include);
+			$this->set_insert_batch($set, '', $include);
 		}
 
 		if (count($this->qb_set) === 0)
@@ -1544,7 +1542,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$affected_rows = 0;
 		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_limit)
 		{
-			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_limit)));
+			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_limit)));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1576,12 +1574,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	mixed
 	 * @param	string
-	 * @param	bool
 	 * @param	array
 	 *
 	 * @return	CI_DB_query_builder
 	 */
-	public function set_insert_batch($key, $value = '', $escape = NULL, $include = NULL)
+	public function set_insert_batch($key, $value = '', $include = NULL)
 	{
 		$key = $this->_object_to_array_batch($key);
 
@@ -1590,7 +1587,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$key = array($key => $value);
 		}
 
-		is_bool($escape) OR $escape = $this->_protect_identifiers;
+		$escape = $this->_protect_identifiers;
 
 		$keys = ! empty($include) ? $include : array_keys($this->_object_to_array(current($key)));
 		sort($keys);
@@ -1939,7 +1936,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		if ($set !== NULL)
 		{
-			$this->set_update_batch($set, $index, NULL, $include);
+			$this->set_update_batch($set, $index, $include);
 		}
 
 		if (count($this->qb_set) === 0)
@@ -2022,11 +2019,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	array
 	 * @param	string
-	 * @param	bool
 	 * @param	array
+	 *
 	 * @return	CI_DB_query_builder
 	 */
-	public function set_update_batch($key, $index = '', $escape = NULL, $include = NULL)
+	public function set_update_batch($key, $index = '', $include = NULL)
 	{
 		$key = $this->_object_to_array_batch($key);
 
@@ -2035,7 +2032,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			// @todo error
 		}
 
-		is_bool($escape) OR $escape = $this->_protect_identifiers;
+		$escape = $this->_protect_identifiers;
 
 		foreach ($key as $v)
 		{
