@@ -10,7 +10,7 @@ Currently in active development. DO NOT use until version 1.0 is released!
 What is InsaneDB
 ###################
 
-InsaneDB is an database toolkit for PHP forked from CodeIgniter 3. 
+InsaneDB is an database toolkit for PHP forked from CodeIgniter 3 database layer. 
 Its goal is to remove limitations existing in the upstream version and add additional
 functionalities while keeping sync with CodeIgniter. It can be used standalone or
 as a replacement for the CodeIgniter database layer.
@@ -20,7 +20,7 @@ Release Information
 *******************
 
 | This repo contains in-development code.  
-| The library is still in alpha mode. No official release yet.  
+| No official release yet.  
 | Use at your own risk.  
 
 **************************
