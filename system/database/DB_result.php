@@ -233,7 +233,7 @@ class CI_DB_result {
 	 */
 	public function result_object()
 	{
-		if (count($this->result_object) > 0)
+		if ( ! empty($this->result_object))
 		{
 			return $this->result_object;
 		}
@@ -246,11 +246,12 @@ class CI_DB_result {
 			return array();
 		}
 
-		if (($c = count($this->result_array)) > 0)
+		
+		if ( ! empty($this->result_array)) 
 		{
-			for ($i = 0; $i < $c; $i++)
+			foreach ($this->result_array as $result_array)
 			{
-				$this->result_object[$i] = (object) $this->result_array[$i];
+				$this->result_object[] = (object) $result_array;
 			}
 
 			return $this->result_object;
@@ -274,7 +275,7 @@ class CI_DB_result {
 	 */
 	public function result_array()
 	{
-		if (count($this->result_array) > 0)
+		if ( ! empty($this->result_array))
 		{
 			return $this->result_array;
 		}
@@ -286,12 +287,12 @@ class CI_DB_result {
 		{
 			return array();
 		}
-
-		if (($c = count($this->result_object)) > 0)
+		
+		if ( ! empty($this->result_object))
 		{
-			for ($i = 0; $i < $c; $i++)
+			foreach ($this->result_object as $result_object)
 			{
-				$this->result_array[$i] = (array) $this->result_object[$i];
+				$this->result_array[] = (array) $result_object;
 			}
 
 			return $this->result_array;

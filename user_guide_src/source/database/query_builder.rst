@@ -1433,21 +1433,33 @@ Class Reference
 
 		Compiles and executes an INSERT statement.
 
-	.. php:method:: insert_batch([$table = ''[, $set = NULL[, $escape = NULL]]])
+	.. php:method:: insert_batch([$table = ''[, $set = NULL[, $batch_limit = NULL[, $include = NULL]]]])
 
 		:param	string	$table: Table name
 		:param	array	$set: Data to insert
-		:param	bool	$escape: Whether to escape values and identifiers
+		:param	int	$batch_limit: Number of rows to insert per batch
+		:param	array	$include: Keys included into the insert
 		:returns:	Number of rows inserted or FALSE on failure
 		:rtype:	mixed
 
 		Compiles and executes batch INSERT statements.
+	
+	.. php:method:: insert_ignore_batch([$table = ''[, $set = NULL[, $batch_limit = NULL[, $include = NULL]]]])
 
-	.. php:method:: set_insert_batch($key[, $value = ''[, $escape = NULL]])
+		:param	string	$table: Table name
+		:param	array	$set: Data to insert
+		:param	int	$batch_limit: Number of rows to insert per batch
+		:param	array	$include: Keys included into the insert
+		:returns:	Number of rows inserted or FALSE on failure
+		:rtype:	mixed
+
+		Compiles and executes batch INSERT IGNORE statements.
+
+	.. php:method:: set_insert_batch($key[, $value = ''[, $include = NULL]])
 
 		:param	mixed	$key: Field name or an array of field/value pairs
 		:param	string	$value: Field value, if $key is a single field
-		:param	bool	$escape: Whether to escape values and identifiers
+		:param	array	$include: Keys included into the insert
 		:returns:	CI_DB_query_builder instance (method chaining)
 		:rtype:	CI_DB_query_builder
 
@@ -1464,21 +1476,23 @@ Class Reference
 
 		Compiles and executes an UPDATE statement.
 
-	.. php:method:: update_batch([$table = ''[, $set = NULL[, $value = NULL]]])
+	.. php:method:: update_batch([$table = ''[, $set = NULL[, $value = NULL[, $batch_limit = NULL[, $include = NULL]]]]])
 
 		:param	string	$table: Table name
 		:param	array	$set: Field name, or an associative array of field/value pairs
 		:param	string	$value: Field value, if $set is a single field
+		:param	int		$batch_limit: Number of rows to update per batch
+		:param	array	$include: Keys included into the update
 		:returns:	Number of rows updated or FALSE on failure
 		:rtype:	mixed
 
 		Compiles and executes batch UPDATE statements.
 
-	.. php:method:: set_update_batch($key[, $value = ''[, $escape = NULL]])
+	.. php:method:: set_update_batch($key[, $value = ''[, $include = NULL]])
 
 		:param	mixed	$key: Field name or an array of field/value pairs
 		:param	string	$value: Field value, if $key is a single field
-		:param	bool	$escape: Whether to escape values and identifiers
+		:param	array	$include: Keys included into the update
 		:returns:	CI_DB_query_builder instance (method chaining)
 		:rtype:	CI_DB_query_builder
 

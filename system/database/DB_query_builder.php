@@ -1495,7 +1495,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Insert_Batch
+	 * Insert_Ignore_Batch
 	 *
 	 * Compiles batch insert strings and runs the queries
 	 *
