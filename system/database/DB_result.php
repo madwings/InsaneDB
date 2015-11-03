@@ -136,7 +136,7 @@ class CI_DB_result {
 			}
 			else
 			{
-				$this->num_rows = count($this->result_array());
+				$this->num_rows = 0;
 			}
 
 		}

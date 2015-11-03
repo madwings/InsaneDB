@@ -388,18 +388,6 @@ class Loader_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
-	public function test_language()
-	{
-		// Mock lang class and test load call
-		$file = 'test';
-		$lang = $this->getMock('CI_Lang', array('load'));
-		$lang->expects($this->once())->method('load')->with($file);
-		$this->ci_instance_var('lang', $lang);
-		$this->assertInstanceOf('CI_Loader', $this->load->language($file));
-	}
-
-	// --------------------------------------------------------------------
-
 	public function test_packages()
 	{
 		// Create model in VFS package path

@@ -16,23 +16,13 @@ function autoload($class)
 	$ci_core = array(
 		'Benchmark',
 		'Config',
-		'Controller',
 		'Exceptions',
-		'Lang',
 		'Loader',
 		'Log',
 		'Model'
 	);
 
-	$ci_libraries = array(
-		'Migration',
-		'Parser',
-		'Profiler',
-		'Trackback',
-	   	'Typography',
-		'Unit_test',
-		'Xmlrpc'
-	);
+	$ci_libraries = array();
 
 	$ci_drivers = array('Session', 'Cache');
 

@@ -170,10 +170,6 @@ useful to use APPPATH or BASEPATH as the base.
 
 Loads a helper from the real filesystem.
 
-	$this->lang($name)
-
-Loads a language file from the real filesystem and returns the $lang array.
-
 	$this->ci_get_config()  __internal__
 
 Returns the global config array. Internal as you shouldn't need to

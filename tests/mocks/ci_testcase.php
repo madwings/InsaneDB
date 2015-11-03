@@ -11,7 +11,6 @@ class CI_TestCase extends PHPUnit_Framework_TestCase {
 	private $global_map = array(
 		'benchmark'	=> 'bm',
 		'config'	=> 'cfg',
-		'lang'		=> 'lang',
 		'loader'	=> 'load',
 		'model'		=> 'model'
 	);
@@ -350,14 +349,6 @@ class CI_TestCase extends PHPUnit_Framework_TestCase {
 	public function helper($name)
 	{
 		require_once(SYSTEM_PATH.'helpers/'.$name.'_helper.php');
-	}
-
-	// --------------------------------------------------------------------
-
-	public function lang($name)
-	{
-		require(SYSTEM_PATH.'language/english/'.$name.'_lang.php');
-		return $lang;
 	}
 
 	// --------------------------------------------------------------------
