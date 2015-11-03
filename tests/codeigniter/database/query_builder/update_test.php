@@ -33,6 +33,32 @@ class Update_test extends CI_TestCase {
 		$job1 = $this->db->where('id', 1)->get('job')->row();
 		$this->assertEquals('Programmer', $job1->name);
 	}
+	
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_update_batch()
+	{
+		// Check initial record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Developer', $job1->name);
+		
+		// Check initial record
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Politician', $job2->name);
+
+		// Do the update
+		$this->db->update_batch('job', array(array('id' => 1, 'name' => 'Programmer'), array('id' => 2, 'name' => 'Musician')), 'id', 500);
+
+		// Check updated record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Programmer', $job1->name);
+		
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Musician', $job2->name);
+	}
 
 	// ------------------------------------------------------------------------
 
