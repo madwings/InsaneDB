@@ -63,7 +63,7 @@ class Insert_test extends CI_TestCase {
 		}
 	}
 	
-		// ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 
 	/**
 	 * @see ./mocks/schema/skeleton.php
@@ -76,7 +76,7 @@ class Insert_test extends CI_TestCase {
 		);
 
 		// Do insert batch except for sqlite driver
-		if (strpos(DB_DRIVER, 'sqlite') === FALSE)
+		if (strpos(DB_DRIVER, 'pdo/pgslq') === TRUE)
 		{
 			$this->assertEquals(2, $this->db->insert_ignore_batch('job', $job_datas));
 
