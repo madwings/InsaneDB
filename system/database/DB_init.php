@@ -48,7 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * return	object	$db	Database object
  */
-function DB($params = '', $query_builder_override = NULL)
+function &DB($params = '', $query_builder_override = NULL)
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && strpos($params, '://') === FALSE)
