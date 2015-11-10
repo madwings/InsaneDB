@@ -847,7 +847,11 @@ abstract class CI_DB_driver {
 		{
 			if ( ! $this->conn_id)
 			{
-				$this->initialize();
+				if ( ! $this->initialize())
+				{
+					$result = FALSE;
+					break;
+				}
 			}
 
 			$result = $this->_execute($sql);
@@ -1817,7 +1821,7 @@ abstract class CI_DB_driver {
 	 * @param	bool	whether to localize the message
 	 * @return	string	sends the application/views/errors/error_db.php template
 	 */
-	public function display_error($error = '', $swap = '', $native = FALSE)
+	public function display_error($error = '', $swap = '', $native = TRUE)
 	{
 		$LANG =& load_class('Lang', 'core');
 		$LANG->load('db');
@@ -1857,8 +1861,8 @@ abstract class CI_DB_driver {
 			}
 		}
 
-		$error =& load_class('Exceptions', 'core');
-		echo $error->show_error($heading, $message, 'error_db');
+		//$error =& load_class('Exceptions', 'core');
+		//echo $error->show_error($heading, $message, 'error_db');
 		exit(8); // EXIT_DATABASE
 	}
 
