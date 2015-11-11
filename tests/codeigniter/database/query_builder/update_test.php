@@ -39,45 +39,6 @@ class Update_test extends CI_TestCase {
 	/**
 	 * @see ./mocks/schema/skeleton.php
 	 */
-	public function test_update_batch()
-	{
-		// Check initial record
-		$job1 = $this->db->where('id', 1)->get('job')->row();
-		$this->assertEquals('Developer', $job1->name);
-		
-		// Check initial record
-		$job2 = $this->db->where('id', 2)->get('job')->row();
-		$this->assertEquals('Politician', $job2->name);
-
-		// Do the update
-		$this->db->update_batch('job', array(array('id' => 1, 'name' => 'Programmer'), array('id' => 2, 'name' => 'Musician')), 'id', 500);
-
-		// Check updated record
-		$job1 = $this->db->where('id', 1)->get('job')->row();
-		$this->assertEquals('Programmer', $job1->name);
-		
-		$job2 = $this->db->where('id', 2)->get('job')->row();
-		$this->assertEquals('Musician', $job2->name);
-		
-		// Do the update with array keys
-		$this->db->update_batch('job', array(array('id' => 1, 'name' => 'Racing driver', 'description' => 'Nascar racing driver'), 
-			array('id' => 2, 'name' => 'Football player', 'description' => 'Milan defender')), 'id', 500, array('name'));
-			
-		// Check updated record
-		$job1 = $this->db->where('id', 1)->get('job')->row();
-		$this->assertEquals('Racing driver', $job1->name);
-		$this->assertEquals('Awesome job, but sometimes makes you bored', $job1->description);
-		
-		$job2 = $this->db->where('id', 2)->get('job')->row();
-		$this->assertEquals('Football player', $job2->name);
-		$this->assertEquals('This is not really a job', $job2->description);
-	}
-
-	// ------------------------------------------------------------------------
-
-	/**
-	 * @see ./mocks/schema/skeleton.php
-	 */
 	public function test_update_with_set()
 	{
 		// Check initial record
@@ -92,5 +53,68 @@ class Update_test extends CI_TestCase {
 		$job1 = $this->db->where('id', 4)->get('job')->row();
 		$this->assertEquals('Vocalist', $job1->name);
 	}
+	
+	// ------------------------------------------------------------------------
 
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_update_batch()
+	{
+		// Check initial record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Developer', $job1->name);
+		
+		// Check initial record
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Politician', $job2->name);
+		
+		$job_datas = array(
+			array('id' => 1, 'name' => 'Programmer'), 
+			array('id' => 2, 'name' => 'Musician')
+		);
+		
+		// Do the update
+		$this->db->update_batch('job', $job_datas, 'id');
+
+		// Check updated record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Programmer', $job1->name);
+		
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Musician', $job2->name);
+	}
+	
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_update_batch_with_keys()
+	{
+		// Check initial record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Developer', $job1->name);
+		
+		// Check initial record
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Politician', $job2->name);
+
+		$job_datas = array(
+			array('id' => 1, 'name' => 'Racing driver', 'description' => 'Nascar racing driver'), 
+			array('id' => 2, 'name' => 'Football player', 'description' => 'Milan defender')
+		);
+		
+		// Do the update
+		$this->db->update_batch('job', $job_datas, 'id', 500, array('name'));
+			
+		// Check updated record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Racing driver', $job1->name);
+		$this->assertEquals('Awesome job, but sometimes makes you bored', $job1->description);
+		
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Football player', $job2->name);
+		$this->assertEquals('This is not really a job', $job2->description);
+	}
 }
