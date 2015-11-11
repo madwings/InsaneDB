@@ -195,7 +195,7 @@ function &DB($params = '', $query_builder_override = NULL)
  *
  * return	object	$db	Database Forge object
  */
-function DB_forge($db)
+function &DB_forge($db)
 {
 	require_once(BASEPATH.'database/DB_forge.php');
 	require_once(BASEPATH.'database/drivers/pdo/pdo_forge.php');

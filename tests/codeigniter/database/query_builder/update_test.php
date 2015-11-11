@@ -58,6 +58,19 @@ class Update_test extends CI_TestCase {
 		
 		$job2 = $this->db->where('id', 2)->get('job')->row();
 		$this->assertEquals('Musician', $job2->name);
+		
+		// Do the update with array keys
+		$this->db->update_batch('job', array(array('id' => 1, 'name' => 'Racing driver', 'description' => 'Nascar racing driver'), 
+			array('id' => 2, 'name' => 'Football player', 'description' => 'Milan defender')), 'id', 500, array('name'));
+			
+		// Check updated record
+		$job1 = $this->db->where('id', 1)->get('job')->row();
+		$this->assertEquals('Racing driver', $job1->name);
+		$this->assertEquals('Awesome job, but sometimes makes you bored', $job1->description);
+		
+		$job2 = $this->db->where('id', 2)->get('job')->row();
+		$this->assertEquals('Football player', $job2->name);
+		$this->assertEquals('This is not really a job', $job2->description);
 	}
 
 	// ------------------------------------------------------------------------
