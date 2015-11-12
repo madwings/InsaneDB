@@ -75,7 +75,7 @@ class Update_test extends CI_TestCase {
 		);
 		
 		// Do the update
-		$this->db->update_batch('job', $job_datas, 'id');
+		$this->assertEquals(2, $this->db->update_batch('job', $job_datas, 'id'));
 
 		// Check updated record
 		$job1 = $this->db->where('id', 1)->get('job')->row();
@@ -106,7 +106,7 @@ class Update_test extends CI_TestCase {
 		);
 		
 		// Do the update
-		$this->db->update_batch('job', $job_datas, 'id', 500, array('name'));
+		$this->assertEquals(2, $this->db->update_batch('job', $job_datas, 'id', 500, array('name')));
 			
 		// Check updated record
 		$job1 = $this->db->where('id', 1)->get('job')->row();
