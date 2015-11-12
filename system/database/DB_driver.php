@@ -976,7 +976,7 @@ abstract class CI_DB_driver {
 		{
 			$this->conn_force_clear();
 		}
-
+		
 		return $this->trans_commit();
 	}
 
