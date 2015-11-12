@@ -30,7 +30,7 @@ system/database/drivers/*
 !system/database/drivers/pdo
 !system/database/drivers/index.html
 
-system/helpers/file_helper.php
+system/helpers/*
 
 tests/codeigniter/core/Security_test.php
 
