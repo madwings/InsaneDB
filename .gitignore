@@ -32,7 +32,7 @@ system/database/drivers/*
 
 system/helpers/*
 
-tests/codeigniter/core/Security_test.php
+tests/insanedb/core/Security_test.php
 
 user_guide_src/source/libraries/form_validation.rst
 user_guide_src/source/libraries/calendar.rst

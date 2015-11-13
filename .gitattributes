@@ -15,7 +15,7 @@ phpdoc.dist.xml export-ignore
 readme.rst
 
 # They don't want all of our tests...
-tests/codeigniter/ export-ignore
+tests/insanedb/ export-ignore
 tests/travis/ export-ignore
 
 # User Guide Source Files
