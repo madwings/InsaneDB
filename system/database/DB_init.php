@@ -48,7 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * return	object	$db	Database object
  */
-function &DB($params = '', $query_builder_override = NULL)
+function &DB($autoinit = TRUE, $params = '', $query_builder_override = NULL)
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && strpos($params, '://') === FALSE)
@@ -179,7 +179,11 @@ function &DB($params = '', $query_builder_override = NULL)
 	$driver = 'CI_DB_pdo_'.$params['subdriver'].'_driver';
 	$DB = new $driver($params);
 
-	$DB->initialize();
+	if($autoinit === TRUE)
+	{
+		$DB->initialize();
+	}
+	
 	return $DB;
 }
 
