@@ -432,7 +432,7 @@ abstract class CI_DB_driver {
 			if ( ! empty($params['read']) && ! empty($params['write']))
 			{
 				$this->read_write = TRUE;
-				if ($this->_is_session_started())
+				if (is_session_started())
 				{
 					if ( ! isset($_SESSION['insanedb_read_delay']))
 					{
@@ -2251,27 +2251,6 @@ abstract class CI_DB_driver {
 	{
 		$this->conn_force = NULL;
 		$this->conn_force_clr = TRUE;
-	}
-	
-	// --------------------------------------------------------------------
-
-	/**
-	* Check session status
-	*
-	* @return bool
-	*/
-	private function _is_session_started()
-	{
-		if (php_sapi_name() !== 'cli')
-		{
-			$result = session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
-		}
-		else
-		{
-			$result = FALSE;
-		}
-
-		return $result;
 	}
 
 }
