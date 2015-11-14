@@ -432,6 +432,11 @@ abstract class CI_DB_driver {
 			if ( ! empty($params['read']) && ! empty($params['write']))
 			{
 				$this->read_write = TRUE;
+				if ($this->_is_session_started())
+				{
+					$_SESSION['insanedb_read_delay'] = $this->read_delay;
+					$this->read_delay =& $_SESSION['insanedb_read_delay'];
+				}
 			}
 			
 			foreach ($params as $key => $val)
@@ -2180,10 +2185,9 @@ abstract class CI_DB_driver {
 	private function _config_read_write($sql = '') 
 	{	
 		
-		if ($this->conn_force === 'write' 
-			OR ($this->last_write !== NULL AND time() - $this->last_write < $this->read_delay AND $this->conn_force !== 'read')
-			OR ($this->conn_force === NULL AND $this->is_write_type($sql) === TRUE)
-			)
+		if ($this->conn_force === 'write' OR
+			($this->last_write !== NULL AND time() - $this->last_write < $this->read_delay AND $this->conn_force !== 'read') OR
+			($this->conn_force === NULL AND $this->is_write_type($sql) === TRUE))
 		{
 			if ($this->conn_active === 'read') 
 			{
@@ -2246,4 +2250,24 @@ abstract class CI_DB_driver {
 	}
 	
 	// --------------------------------------------------------------------
+
+	/**
+	* Check session status
+	*
+	* @return bool
+	*/
+	private function _is_session_started()
+	{
+		if (php_sapi_name() !== 'cli')
+		{
+			$result = session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
+		}
+		else
+		{
+			$result = FALSE;
+		}
+
+		return $result;
+	}
+
 }
