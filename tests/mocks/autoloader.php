@@ -22,10 +22,6 @@ function autoload($class)
 		'Model'
 	);
 
-	$ci_libraries = array();
-
-	$ci_drivers = array('Cache');
-
 	if (strpos($class, 'Mock_') === 0)
 	{
 		$class = strtolower(str_replace(array('Mock_', '_'), array('', DIRECTORY_SEPARATOR), $class));
@@ -37,20 +33,6 @@ function autoload($class)
 		if (in_array($subclass, $ci_core))
 		{
 			$dir = SYSTEM_PATH.'core'.DIRECTORY_SEPARATOR;
-			$class = $subclass;
-		}
-		elseif (in_array($subclass, $ci_libraries))
-		{
-			$dir = SYSTEM_PATH.'libraries'.DIRECTORY_SEPARATOR;
-			$class = ($subclass === 'Driver_Library') ? 'Driver' : $subclass;
-		}
-		elseif (in_array($subclass, $ci_drivers))
-		{
-			$dir = SYSTEM_PATH.'libraries'.DIRECTORY_SEPARATOR.$subclass.DIRECTORY_SEPARATOR;
-			$class = $subclass;
-		}
-		elseif (in_array(($parent = strtok($subclass, '_')), $ci_drivers)) {
-			$dir = SYSTEM_PATH.'libraries'.DIRECTORY_SEPARATOR.$parent.DIRECTORY_SEPARATOR.'drivers'.DIRECTORY_SEPARATOR;
 			$class = $subclass;
 		}
 		elseif (preg_match('/^CI_DB_(.+)_(.+)_(driver|forge|result|utility)$/', $class, $m) && count($m) === 4)

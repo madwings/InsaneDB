@@ -8,8 +8,7 @@ application/logs/*
 !application/logs/index.html
 !application/logs/.htaccess
 
-system/libraries/*
-!system/libraries/Cache/
+system/libraries/
 
 system/core/*
 !system/core/compat
@@ -35,11 +34,7 @@ tests/insanedb/core/Security_test.php
 tests/insanedb/libraries/
 tests/mocks/libraries/
 
-user_guide_src/source/libraries/form_validation.rst
-user_guide_src/source/libraries/calendar.rst
-user_guide_src/source/libraries/sessions.rst
-user_guide_src/source/libraries/security.rst
-user_guide_src/source/libraries/encryption.rst
+user_guide_src/source/libraries/
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*

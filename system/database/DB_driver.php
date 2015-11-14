@@ -26,7 +26,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @package	CodeIgniter
+ * @package	InsaneDB
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2015, British Columbia Institute of Technology (http://bcit.ca/)
@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * This class will not be called directly. Rather, the adapter
  * class for the specific database will extend and instantiate it.
  *
- * @package		CodeIgniter
+ * @package		InsaneDB
  * @subpackage	Drivers
  * @category	Database
  * @author		EllisLab Dev Team
@@ -434,7 +434,11 @@ abstract class CI_DB_driver {
 				$this->read_write = TRUE;
 				if ($this->_is_session_started())
 				{
-					$_SESSION['insanedb_read_delay'] = $this->read_delay;
+					if ( ! isset($_SESSION['insanedb_read_delay']))
+					{
+						$_SESSION['insanedb_read_delay'] = $this->read_delay;
+					}
+
 					$this->read_delay =& $_SESSION['insanedb_read_delay'];
 				}
 			}
