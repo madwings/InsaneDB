@@ -24,7 +24,7 @@ function autoload($class)
 
 	$ci_libraries = array();
 
-	$ci_drivers = array('Session', 'Cache');
+	$ci_drivers = array('Cache');
 
 	if (strpos($class, 'Mock_') === 0)
 	{
