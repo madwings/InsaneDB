@@ -236,11 +236,11 @@ switch (ENVIRONMENT)
  *   Load db core helpers
  * ------------------------------------------------------
  */
-	require_once(BASEPATH.'core/DB_helpers.php');
+	require_once(BASEPATH.'database/DB_helpers.php');
 	
 /*
  * ------------------------------------------------------
  *  Load the DB init function
  * ------------------------------------------------------
  */
-require_once BASEPATH.'database/DB_init.php';
+	require_once BASEPATH.'database/DB_init.php';

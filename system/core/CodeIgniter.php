@@ -78,13 +78,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
  * ------------------------------------------------------
- *   Load db core helpers
- * ------------------------------------------------------
- */
-	require_once(BASEPATH.'core/DB_helpers.php');
-
-/*
- * ------------------------------------------------------
  * Security procedures
  * ------------------------------------------------------
  */

@@ -17,7 +17,6 @@ system/core/*
 !system/core/Common.php
 !system/core/Config.php
 !system/core/Controller.php
-!system/core/DB_helpers.php
 !system/core/Exceptions.php
 !system/core/Lang.php
 !system/core/Loader.php
