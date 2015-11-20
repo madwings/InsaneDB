@@ -1,5 +1,7 @@
 .DS_Store
 
+application/config/mimes.php
+
 application/cache/*
 !application/cache/index.html
 !application/cache/.htaccess
@@ -29,6 +31,8 @@ system/database/drivers/*
 !system/database/drivers/index.html
 
 system/helpers/
+
+system/libraries/
 
 tests/insanedb/core/Security_test.php
 tests/insanedb/libraries/

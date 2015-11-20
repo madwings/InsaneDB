@@ -30,6 +30,8 @@ If you change anything that requires a change to documentation then you will nee
 ### Compatibility
 
 InsaneDB requires PHP 5.4 or newer to be used.
+It is recommend to migrate to newer version of PHP sooner than later.
+PHP 5.4 is expected to be dropped as support at the beginning of 2016.
 
 ### Branching
 
