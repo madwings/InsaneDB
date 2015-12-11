@@ -385,4 +385,30 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		return $sql.' LIMIT '.$this->qb_limit.($this->qb_offset ? ' OFFSET '.$this->qb_offset : '');
 	}
 
+	// --------------------------------------------------------------------
+
+	/**
+	 * If query failed due to lost connection, force reconnection
+	 *
+	 * Returns TRUE if pending reconnection otherwise FALSE
+	 *
+	 * @return	bool
+	 */
+	protected function _handle_reconnect()
+	{
+		$error = $this->conn_id->errorInfo();
+		// PostgreSQL  specific errors for lost connection
+		if (in_array($error[1], array(08000, 08003, 08006), TRUE))
+		{
+			$this->close();
+			$result = TRUE;
+		}
+		else
+		{
+			$result = FALSE;
+		}
+
+		return $result;
+	}
+
 }

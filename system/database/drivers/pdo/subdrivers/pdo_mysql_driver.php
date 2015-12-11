@@ -317,4 +317,5 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 		
 		return $result;
 	}
+
 }

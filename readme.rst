@@ -36,9 +36,9 @@ Documenting changes to the InsaneDB is in progress. Stay tuned.
 Server Requirements
 *******************
 
-PHP version 5.4 or newer is required.
-It is recommend to migrate to newer version of PHP sooner than later.
-PHP 5.4 is expected to be dropped as support at the beginning of 2016.
+| PHP version 5.4 or newer is required.
+| It is recommend to migrate to newer version of PHP sooner than later.
+| PHP 5.4 is expected to be dropped as supported at the beginning of 2016.
 
 *******
 License
