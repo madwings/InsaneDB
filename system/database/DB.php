@@ -195,14 +195,12 @@ function &DB($params = '', $query_builder_override = NULL)
 	}
 
 	// Load the DB driver
-	$driver_file = BASEPATH.'database/drivers/pdo/pdo_driver.php';
-
-	require_once($driver_file);
-
-	$driver_file = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$params['subdriver'].'_driver.php';
-
+	require_once(BASEPATH.'database/drivers/pdo/pdo_driver.php');
+	// Load the result classes as well
+	require_once(BASEPATH.'database/DB_result.php');
+	require_once(BASEPATH.'database/drivers/pdo/pdo_result.php');
 	// Instantiate the DB adapter
-	require_once($driver_file);
+	require_once(BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$params['subdriver'].'_driver.php');
 	$driver = 'CI_DB_pdo_'.$params['subdriver'].'_driver';
 	$DB = new $driver($params);
 	

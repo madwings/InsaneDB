@@ -1,7 +1,5 @@
 .DS_Store
 
-application/config/mimes.php
-
 application/cache/*
 !application/cache/index.html
 !application/cache/.htaccess
@@ -10,35 +8,6 @@ application/logs/*
 !application/logs/index.html
 !application/logs/.htaccess
 
-system/libraries/
-
-system/core/*
-!system/core/compat/
-!system/core/Benchmark.php
-!system/core/CodeIgniter.php
-!system/core/Common.php
-!system/core/Config.php
-!system/core/Controller.php
-!system/core/Exceptions.php
-!system/core/Lang.php
-!system/core/Loader.php
-!system/core/Log.php
-!system/core/Model.php
-!system/core/index.html
-
-system/database/drivers/*
-!system/database/drivers/pdo
-!system/database/drivers/index.html
-
-system/helpers/
-
-system/libraries/
-
-tests/insanedb/core/Security_test.php
-tests/insanedb/libraries/
-tests/mocks/libraries/
-
-user_guide_src/source/libraries/
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
