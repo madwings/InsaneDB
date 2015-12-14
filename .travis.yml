@@ -25,7 +25,7 @@ script: phpunit -d zend.enable_gc=0 -d date.timezone=UTC --coverage-text --confi
 matrix:
   allow_failures:
     - php: hhvm
-    - php: 7
+    - php: 7.0
   exclude:
     - php: hhvm
       env: DB=pdo/pgsql
