@@ -2,7 +2,11 @@
 The MIT License (MIT)
 #####################
 
+<<<<<<< HEAD
 Copyright (c) 2015, Stiliyan Ivanov
+=======
+Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+>>>>>>> 1924e879b165fb119847a49a7a5eab2f28295fa2
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
