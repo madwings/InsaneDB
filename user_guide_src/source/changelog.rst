@@ -2,19 +2,21 @@
 Change Log
 ##########
 
-Version 3.1.0
+Version 3.0.5
 
 Release Date: Not Released
 
--  Libraries
+Bug fixes for 3.0.5
+-------------------
 
-   -  Added UNIX socket connection support to :doc:`Session Library <libraries/sessions>` 'redis' driver.
-
+-  Fixed a bug (#4391) - :doc:`Email Library <libraries/email>` method ``reply_to()`` didn't apply Q-encoding.
+-  Fixed a bug (#4384) - :doc:`Pagination Library <libraries/pagination>` ignored (possible) *cur_page* configuration value.
+-  Fixed a bug (#4395) - :doc:`Query Builder <database/query_builder>` method ``count_all_results()`` still fails if an ``ORDER BY`` condition is used.
 
 Version 3.0.4
 =============
 
-Release Date: Not Released
+Release Date: January 13, 2016
 
 -  General Changes
 
@@ -62,7 +64,7 @@ Release Date: October 31, 2015
    -  Changed :doc:`Config Library <libraries/config>` method ``base_url()`` to fallback to ``$_SERVER['SERVER_ADDR']`` when ``$config['base_url']`` is empty in order to avoid *Host* header injections.
    -  Changed :doc:`CAPTCHA Helper <helpers/captcha_helper>` to use the operating system's PRNG when possible.
 
--  :doc:`Database`
+-  :doc:`Database <database/index>`
 
    -  Optimized :doc:`Database Utility <database/utilities>` method ``csv_from_result()`` for speed with larger result sets.
    -  Added proper return values to :doc:`Database Transactions <database/transactions>` method ``trans_start()``.
