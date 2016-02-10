@@ -542,9 +542,8 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				$s = $m[0][$i][1] + strlen($m[0][$i][0]), $i++)
 			{
 				$temp = substr($cond, $s, ($m[0][$i][1] - $s));
-
-				$newcond .= preg_match("/([\[\]\w\.'-]+)(\s*[^\"\[`'\w]+\s*)(.+)/i", $temp, $match)
-						? $this->protect_identifiers($match[1]).$match[2].$this->protect_identifiers($match[3])
+				$newcond .= preg_match("/(\(*)?([\[\]\w\.'-]+)(\s*[^\"\[`'\w]+\s*)(.+)/i", $temp, $match)
+						? $match[1].$this->protect_identifiers($match[2]).$match[3].$this->protect_identifiers($match[4])
 						: $temp;
 
 				$newcond .= $m[0][$i][0];
@@ -553,9 +552,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$cond = ' ON '.$newcond;
 		}
 		// Split apart the condition and protect the identifiers
-		elseif ($escape === TRUE && preg_match("/([\[\]\w\.'-]+)(\s*[^\"\[`'\w]+\s*)(.+)/i", $cond, $match))
+		elseif ($escape === TRUE && preg_match("/(\(*)?([\[\]\w\.'-]+)(\s*[^\"\[`'\w]+\s*)(.+)/i", $cond, $match))
 		{
-			$cond = ' ON '.$this->protect_identifiers($match[1]).$match[2].$this->protect_identifiers($match[3]);
+			$cond = ' ON '.$match[1].$this->protect_identifiers($match[2]).$match[3].$this->protect_identifiers($match[4]);
 		}
 		elseif ( ! $this->_has_operator($cond))
 		{
@@ -1138,7 +1137,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	$key
 	 * @param	string	$value
 	 * @param	bool	$escape
-	 * @return	object
+	 * @return	CI_DB_query_builder
 	 */
 	public function having($key, $value = NULL, $escape = NULL)
 	{
@@ -1155,7 +1154,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	$key
 	 * @param	string	$value
 	 * @param	bool	$escape
-	 * @return	object
+	 * @return	CI_DB_query_builder
 	 */
 	public function or_having($key, $value = NULL, $escape = NULL)
 	{
@@ -1339,7 +1338,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	the table
 	 * @param	string	the limit clause
 	 * @param	string	the offset clause
-	 * @return	object
+	 * @return	CI_DB_result
 	 */
 	public function get($table = '', $limit = NULL, $offset = NULL)
 	{
@@ -1422,7 +1421,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	$where
 	 * @param	int	$limit
 	 * @param	int	$offset
-	 * @return	object
+	 * @return	CI_DB_result
 	 */
 	public function get_where($table = '', $where = NULL, $limit = NULL, $offset = NULL)
 	{
@@ -1462,18 +1461,24 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function insert_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL)
 	{
-		if ($set !== NULL)
+		if ($set === NULL)
 		{
+			if (empty($this->qb_set))
+			{
+				return ($this->db_debug) ? $this->display_error('db_must_use_set') : FALSE;
+			}
+		}
+		else
+		{
+			if (empty($set))
+			{
+				return ($this->db_debug) ? $this->display_error('insert_batch() called with no data') : FALSE;
+			}
+
 			$this->set_insert_batch($set, '', $include);
 		}
 
-		if (count($this->qb_set) === 0)
-		{
-			// No valid data array. Folds in cases where keys and values did not match up
-			return ($this->db_debug) ? $this->display_error('db_must_use_set') : FALSE;
-		}
-
-		if ($table === '')
+		if (strlen($table) === 0)
 		{
 			if ( ! isset($this->qb_from[0]))
 			{
@@ -1671,7 +1676,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	the table to insert data into
 	 * @param	array	an associative array of insert values
 	 * @param	bool	$escape	Whether to escape values and identifiers
-	 * @return	object
+	 * @return	bool	TRUE on success, FALSE on failure
 	 */
 	public function insert($table = '', $set = NULL, $escape = NULL)
 	{
@@ -1737,7 +1742,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	the table to replace data into
 	 * @param	array	an associative array of insert values
-	 * @return	object
+	 * @return	bool	TRUE on success, FALSE on failure
 	 */
 	public function replace($table = '', $set = NULL)
 	{
@@ -1843,7 +1848,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	array	$set	An associative array of update values
 	 * @param	mixed	$where
 	 * @param	int	$limit
-	 * @return	object
+	 * @return	bool	TRUE on success, FALSE on failure
 	 */
 	public function update($table = '', $set = NULL, $where = NULL, $limit = NULL)
 	{
@@ -1931,17 +1936,24 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			return ($this->db_debug) ? $this->display_error('db_must_use_index') : FALSE;
 		}
 
-		if ($set !== NULL)
+		if ($set === NULL)
 		{
+			if (empty($this->qb_set))
+			{
+				return ($this->db_debug) ? $this->display_error('db_must_use_set') : FALSE;
+			}
+		}
+		else
+		{
+			if (empty($set))
+			{
+				return ($this->db_debug) ? $this->display_error('update_batch() called with no data') : FALSE;
+			}
+
 			$this->set_update_batch($set, $index, $include);
 		}
 
-		if (count($this->qb_set) === 0)
-		{
-			return ($this->db_debug) ? $this->display_error('db_must_use_set') : FALSE;
-		}
-
-		if ($table === '')
+		if (strlen($table) === 0)
 		{
 			if ( ! isset($this->qb_from[0]))
 			{
@@ -2063,7 +2075,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Compiles a delete string and runs "DELETE FROM table"
 	 *
 	 * @param	string	the table to empty
-	 * @return	object
+	 * @return	bool	TRUE on success, FALSE on failure
 	 */
 	public function empty_table($table = '')
 	{
@@ -2096,7 +2108,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * This function maps to "DELETE FROM table"
 	 *
 	 * @param	string	the table to truncate
-	 * @return	object
+	 * @return	bool	TRUE on success, FALSE on failure
 	 */
 	public function truncate($table = '')
 	{
