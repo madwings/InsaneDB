@@ -255,13 +255,6 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @var	array
 	 */
 	protected $qb_cache_no_escape			= array();
-	
-	/**
-	 * QB Limit For Batch Queries
-	 *
-	 * @var	int
-	 */
-	protected $qb_batch_limit					= 100;
 
 	// --------------------------------------------------------------------
 
@@ -1462,12 +1455,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	$table			Table to insert into
 	 * @param	array	$set 			An associative array of insert values
-	 * @param	int		$batch_limit	Number of rows to insert per batch 
+	 * @param	int		$batch_size		Number of rows to insert per batch 
 	 * @param	array	$include		Keys included into the insert
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_batch($table = '', $set = NULL, $batch_limit = NULL, $include = NULL)
+	public function insert_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL)
 	{
 		if ($set !== NULL)
 		{
@@ -1490,15 +1483,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$table = $this->qb_from[0];
 		}
 
-		// Batch this baby
-		if ($batch_limit === NULL) 
-		{
-			$batch_limit = $this->qb_batch_limit;
-		}
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_limit)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_size)
 		{
-			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_limit)));
+			$this->query($this->_insert_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_size)));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1515,12 +1503,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	$table			Table to insert into
 	 * @param	array	$set 			An associative array of insert values
-	 * @param	int		$batch_limit	number of rows to insert per batch 
+	 * @param	int		$batch_size		Number of rows to insert per batch 
 	 * @param	array	$include		Keys included into the insert
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_ignore_batch($table = '', $set = NULL, $batch_limit = NULL, $include = NULL)
+	public function insert_ignore_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL)
 	{
 		if ( ! method_exists($this, '_insert_ignore_batch')) 
 		{
@@ -1548,15 +1536,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$table = $this->qb_from[0];
 		}
 
-		// Batch this baby
-		if ($batch_limit === NULL) 
-		{
-			$batch_limit = $this->qb_batch_limit;
-		}
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_limit)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_size)
 		{
-			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_limit)));
+			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_size)));
 			$affected_rows += $this->affected_rows();
 		}
 
@@ -1933,12 +1916,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	string	the table to retrieve the results from
 	 * @param	array	an associative array of update values
 	 * @param	string	the where key
-	 * @param	int		batch limit
+	 * @param	int		batch size
 	 * @param	array	keys included into the udpate
 	 *
 	 * @return	int	number of rows affected or FALSE on failure
 	 */
-	public function update_batch($table = '', $set = NULL, $index = NULL, $batch_limit = NULL, $include = NULL)
+	public function update_batch($table = '', $set = NULL, $index = NULL, $batch_size = 100, $include = NULL)
 	{
 		// Combine any cached components with the current statements
 		$this->_merge_cache();
@@ -1968,15 +1951,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$table = $this->qb_from[0];
 		}
 
-		// Batch this baby
-		if ($batch_limit === NULL) 
-		{
-			$batch_limit = $this->qb_batch_limit;
-		}
 		$affected_rows = 0;
-		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_limit)
+		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_size)
 		{
-			$this->query($this->_update_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), array_slice($this->qb_set, $i, $batch_limit), $this->protect_identifiers($index)));
+			$this->query($this->_update_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), array_slice($this->qb_set, $i, $batch_size), $this->protect_identifiers($index)));
 			$affected_rows += $this->affected_rows();
 			$this->qb_where = array();
 		}
