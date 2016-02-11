@@ -403,7 +403,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	{
 		$error = $this->conn_id->errorInfo();
 		// PostgreSQL  specific errors for lost connection
-		if (in_array($error[1], array(08000, 08003, 08006), TRUE))
+		if (in_array($error[1], array('08000', '08003', '08006'), TRUE))
 		{
 			$this->close();
 			$result = TRUE;
