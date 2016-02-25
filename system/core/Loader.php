@@ -321,7 +321,7 @@ class CI_Loader {
 		}
 
 		$model = ucfirst($model);
-		if ( ! class_exists($model))
+		if ( ! class_exists($model, FALSE))
 		{
 			foreach ($this->_ci_model_paths as $mod_path)
 			{
@@ -700,6 +700,58 @@ class CI_Loader {
 		return get_instance()->config->load($file, $use_sections, $fail_gracefully);
 	}
 
+	// --------------------------------------------------------------------
+
+	/**
+	 * Driver Loader
+	 *
+	 * Loads a driver library.
+	 *
+	 * @param	string|string[]	$library	Driver name(s)
+	 * @param	array		$params		Optional parameters to pass to the driver
+	 * @param	string		$object_name	An optional object name to assign to
+	 *
+	 * @return	object|bool	Object or FALSE on failure if $library is a string
+	 *				and $object_name is set. CI_Loader instance otherwise.
+	 */
+	public function driver($library, $params = NULL, $object_name = NULL)
+	{
+		if (is_array($library))
+		{
+			foreach ($library as $key => $value)
+			{
+				if (is_int($key))
+				{
+					$this->driver($value, $params);
+				}
+				else
+				{
+					$this->driver($key, $params, $value);
+				}
+			}
+
+			return $this;
+		}
+		elseif (empty($library))
+		{
+			return FALSE;
+		}
+
+		if ( ! class_exists('CI_Driver_Library', FALSE))
+		{
+			// We aren't instantiating an object here, just making the base class available
+			require BASEPATH.'libraries/Driver.php';
+		}
+
+		// We can save the loader some time since Drivers will *always* be in a subfolder,
+		// and typically identically named to the library
+		if ( ! strpos($library, '/'))
+		{
+			$library = ucfirst($library).'/'.$library;
+		}
+
+		return $this->library($library, $params, $object_name);
+	}
 
 	// --------------------------------------------------------------------
 
@@ -1284,6 +1336,12 @@ class CI_Loader {
 			{
 				$this->$type($autoload[$type]);
 			}
+		}
+
+		// Autoload drivers
+		if (isset($autoload['drivers']))
+		{
+			$this->driver($autoload['drivers']);
 		}
 
 		// Load libraries
