@@ -1,9 +1,10 @@
 language: php
 
 php:
-  - 5.5
+<<<<<<< HEAD
   - 5.6
   - 7.0
+  - 7.1
   - hhvm
   
 env:
@@ -14,7 +15,7 @@ env:
 sudo: false
 
 before_script:
-  - composer install --dev --no-progress
+  - sh -c "composer install --dev --no-progress"
   - sh -c "if [ '$DB' = 'pdo/pgsql' ]; then psql -c 'DROP DATABASE IF EXISTS ci_test;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'pdo/pgsql' ]; then psql -c 'create database ci_test;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'pdo/mysql' ]; then mysql -e 'create database IF NOT EXISTS ci_test;'; fi"
@@ -31,3 +32,4 @@ matrix:
 branches:
   only:
     - develop
+

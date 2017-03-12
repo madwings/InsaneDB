@@ -63,6 +63,8 @@ $config['uri_protocol']	= 'REQUEST_URI';
 | For more information please see the user guide:
 |
 | https://codeigniter.com/user_guide/general/urls.html
+|
+| Note: This option is ignored for CLI requests.
 */
 $config['url_suffix'] = '';
 
@@ -157,6 +159,8 @@ $config['composer_autoload'] = FALSE;
 |
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
+| Note: This option is ignored for CLI requests.
+|
 */
 $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 
@@ -167,9 +171,6 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 |
 | By default CodeIgniter uses search-engine friendly segment based URLs:
 | example.com/who/what/where/
-|
-| By default CodeIgniter enables access to the $_GET array.  If for some
-| reason you would like to disable it, set 'allow_get_array' to FALSE.
 |
 | You can optionally enable standard query string based URLs:
 | example.com?who=me&what=something&where=here
@@ -185,7 +186,6 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 | use segment based URLs.
 |
 */
-$config['allow_get_array'] = TRUE;
 $config['enable_query_strings'] = FALSE;
 $config['controller_trigger'] = 'c';
 $config['function_trigger'] = 'm';
@@ -221,7 +221,7 @@ $config['log_threshold'] = 0;
 |--------------------------------------------------------------------------
 |
 | Leave this BLANK unless you would like to set something other than the default
-| application/logs/ directory. Use a full server path with trailing slash.
+| application/logs/ directory. Use a full server path.
 |
 */
 $config['log_path'] = '';
@@ -269,7 +269,7 @@ $config['log_date_format'] = 'Y-m-d H:i:s';
 |--------------------------------------------------------------------------
 |
 | Leave this BLANK unless you would like to set something other than the default
-| application/views/errors/ directory.  Use a full server path with trailing slash.
+| application/views/errors/ directory.  Use a full server path.
 |
 */
 $config['error_views_path'] = '';
@@ -280,7 +280,7 @@ $config['error_views_path'] = '';
 |--------------------------------------------------------------------------
 |
 | Leave this BLANK unless you would like to set something other than the default
-| application/cache/ directory.  Use a full server path with trailing slash.
+| application/cache/ directory.  Use a full server path.
 |
 */
 $config['cache_path'] = '';
@@ -398,34 +398,6 @@ $config['cookie_httponly'] 	= FALSE;
 
 /*
 |--------------------------------------------------------------------------
-| Standardize newlines
-|--------------------------------------------------------------------------
-|
-| Determines whether to standardize newline characters in input data,
-| meaning to replace \r\n, \r, \n occurrences with the PHP_EOL value.
-|
-| This is particularly useful for portability between UNIX-based OSes,
-| (usually \n) and Windows (\r\n).
-|
-*/
-$config['standardize_newlines'] = FALSE;
-
-/*
-|--------------------------------------------------------------------------
-| Global XSS Filtering
-|--------------------------------------------------------------------------
-|
-| Determines whether the XSS filter is always active when GET, POST or
-| COOKIE data is encountered
-|
-| WARNING: This feature is DEPRECATED and currently available only
-|          for backwards compatibility purposes!
-|
-*/
-$config['global_xss_filtering'] = FALSE;
-
-/*
-|--------------------------------------------------------------------------
 | Cross Site Request Forgery
 |--------------------------------------------------------------------------
 | Enables a CSRF cookie token to be set. When set to TRUE, token will be
@@ -479,20 +451,6 @@ $config['compress_output'] = FALSE;
 |
 */
 $config['time_reference'] = 'local';
-
-/*
-|--------------------------------------------------------------------------
-| Rewrite PHP Short Tags
-|--------------------------------------------------------------------------
-|
-| If your PHP installation does not have short tag support enabled CI
-| can rewrite the tags on-the-fly, enabling you to utilize that syntax
-| in your view files.  Options are TRUE or FALSE (boolean)
-|
-| Note: You need to have eval() enabled for this to work.
-|
-*/
-$config['rewrite_short_tags'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------

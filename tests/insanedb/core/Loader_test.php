@@ -263,12 +263,14 @@ class Loader_test extends CI_TestCase {
 		$this->assertEquals($content.$value, $out);
 
 		// Mock output class
-		$output = $this->getMock('CI_Output', array('append_output'));
+		$output = $this->getMockBuilder('CI_Output')->setMethods(array('append_output'))->getMock();
 		$output->expects($this->once())->method('append_output')->with($content.$value);
 		$this->ci_instance_var('output', $output);
 
-		// Test view output
-		$this->assertInstanceOf('CI_Loader', $this->load->view($view, array($var => $value)));
+		// Test view output and $vars as an object
+		$vars = new stdClass();
+		$vars->$var = $value;
+		$this->assertInstanceOf('CI_Loader', $this->load->view($view, $vars));
 	}
 
 	// --------------------------------------------------------------------

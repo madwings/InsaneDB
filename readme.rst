@@ -36,7 +36,7 @@ Documenting changes to the InsaneDB is in progress. Stay tuned.
 Server Requirements
 *******************
 
-| PHP version 5.5 or newer is required.
+| PHP version 5.6 or newer is required.
 | It is recommend to migrate to newer version of PHP sooner than later.
 
 *******

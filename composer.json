@@ -11,6 +11,9 @@
 	"require": {
 		"php": ">=5.4"
 	},
+	"suggest": {
+		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
+	},
 	"require-dev": {
 		"mikey179/vfsStream": "1.1.*"
 	}

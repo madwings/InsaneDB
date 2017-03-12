@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * @package	InsaneDB
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
+ * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -457,7 +457,8 @@ abstract class CI_DB_driver {
 	/**
 	 * Initialize Database Settings
 	 *
-	 * @return	bool
+	 * @return	void
+	 * @throws	RuntimeException	In case of failure
 	 */
 	public function initialize()
 	{
@@ -469,7 +470,7 @@ abstract class CI_DB_driver {
 		 */
 		if ($this->conn_id)
 		{
-			return TRUE;
+			return;
 		}
 		
 		// If in read/write mode set right credentials first
@@ -512,19 +513,9 @@ abstract class CI_DB_driver {
 			// We still don't have a connection?
 			if ( ! $this->conn_id)
 			{
-				log_message('error', 'Unable to connect to the database');
-				
-				if ($this->db_debug)
-				{
-					$this->display_error('db_unable_to_connect');
-				}
-
-				return FALSE;
+				throw new RuntimeException('Unable to connect to the database.');
 			}
 		}
-
-		// Now we set the character set and that's all
-		return $this->db_set_charset($this->char_set);
 	}
 
 	// --------------------------------------------------------------------
@@ -565,7 +556,13 @@ abstract class CI_DB_driver {
 	public function reconnect()
 	{
 		$this->close();
-		$this->initialize();
+		try 
+		{
+			$this->initialize();
+		} 
+		catch (RuntimeException $e) 
+		{
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -593,31 +590,6 @@ abstract class CI_DB_driver {
 	public function error()
 	{
 		return array('code' => NULL, 'message' => NULL);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set client character set
-	 *
-	 * @param	string
-	 * @return	bool
-	 */
-	public function db_set_charset($charset)
-	{
-		if (method_exists($this, '_db_set_charset') && ! $this->_db_set_charset($charset))
-		{
-			log_message('error', 'Unable to set database connection charset: '.$charset);
-
-			if ($this->db_debug)
-			{
-				$this->display_error('db_unable_to_set_charset', $charset);
-			}
-
-			return FALSE;
-		}
-
-		return TRUE;
 	}
 
 	// --------------------------------------------------------------------
@@ -847,9 +819,13 @@ abstract class CI_DB_driver {
 		
 		for($i = 0; $i <= $this->_conn_retries; ++$i)
 		{
-			if ( ! $this->conn_id)
+			if (empty($this->conn_id))
 			{
-				if ( ! $this->initialize())
+				try 
+				{
+					$this->initialize();
+				} 
+				catch (RuntimeException $e)
 				{
 					$result = FALSE;
 					continue;
@@ -1080,7 +1056,7 @@ abstract class CI_DB_driver {
 	 */
 	public function compile_binds($sql, $binds)
 	{
-		if (empty($binds) OR empty($this->bind_marker) OR strpos($sql, $this->bind_marker) === FALSE)
+		if (empty($this->bind_marker) OR strpos($sql, $this->bind_marker) === FALSE)
 		{
 			return $sql;
 		}
@@ -1100,7 +1076,7 @@ abstract class CI_DB_driver {
 		$ml = strlen($this->bind_marker);
 
 		// Make sure not to replace a chunk inside a string that happens to match the bind marker
-		if ($c = preg_match_all("/'[^']*'/i", $sql, $matches))
+		if ($c = preg_match_all("/'[^']*'|\"[^\"]*\"/i", $sql, $matches))
 		{
 			$c = preg_match_all('/'.preg_quote($this->bind_marker, '/').'/i',
 				str_replace($matches[0],
@@ -1273,14 +1249,14 @@ abstract class CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Platform-dependant string escape
+	 * Platform-dependent string escape
 	 *
 	 * @param	string
 	 * @return	string
 	 */
 	protected function _escape_str($str)
 	{
-		return str_replace("'", "''", remove_invisible_characters($str));
+		return str_replace("'", "''", remove_invisible_characters($str, FALSE));
 	}
 
 	// --------------------------------------------------------------------
