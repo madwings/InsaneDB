@@ -1557,10 +1557,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	array	$set 			An associative array of insert values
 	 * @param	int		$batch_size		Number of rows to insert per batch 
 	 * @param	array	$include		Keys included into the insert
+	 * @param	bool	$escape			Whether to escape values and identifiers
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL)
+	public function insert_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL, $escape = NULL)
 	{
 		if ($set === NULL)
 		{
@@ -1613,10 +1614,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @param	array	$set 			An associative array of insert values
 	 * @param	int		$batch_size		Number of rows to insert per batch 
 	 * @param	array	$include		Keys included into the insert
+	 * @param	bool	$escape			Whether to escape values and identifiers
 	 *
 	 * @return	int	Number of rows inserted or FALSE on failure
 	 */
-	public function insert_ignore_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL)
+	public function insert_ignore_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL, $escape = NULL)
 	{
 		if ( ! method_exists($this, '_insert_ignore_batch')) 
 		{
@@ -1647,8 +1649,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$affected_rows = 0;
 		for ($i = 0, $total = count($this->qb_set); $i < $total; $i += $batch_size)
 		{
-			$this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, NULL, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_size)));
-			$affected_rows += $this->affected_rows();
+			if ($this->query($this->_insert_ignore_batch($this->protect_identifiers($table, TRUE, $escape, FALSE), $this->qb_keys, array_slice($this->qb_set, $i, $batch_size))))
+			{
+				$affected_rows += $this->affected_rows();
+			}
 		}
 
 		$this->_reset_write();
