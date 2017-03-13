@@ -556,13 +556,7 @@ abstract class CI_DB_driver {
 	public function reconnect()
 	{
 		$this->close();
-		try 
-		{
-			$this->initialize();
-		} 
-		catch (RuntimeException $e) 
-		{
-		}
+		$this->initialize();
 	}
 
 	// --------------------------------------------------------------------
@@ -827,25 +821,23 @@ abstract class CI_DB_driver {
 				} 
 				catch (RuntimeException $e)
 				{
-					$result = FALSE;
-					continue;
+					if ($i === $this->_conn_retries)
+					{
+						throw $e;
+					}
+					else
+					{
+						continue;
+					}
 				}
 			}
 
 			$result = $this->_execute($sql);
 			
 			// If query failed due to lost connection to server retry connecting before exit
-			if ($result !== FALSE OR ! method_exists($this, '_handle_reconnect')) 
+			if ($result !== FALSE OR ! method_exists($this, '_handle_reconnect') OR ! $this->_handle_reconnect()) 
 			{
 				break;
-			}
-			else
-			{
-				// Handle error, and decide on reconnection
-				if ( ! $this->_handle_reconnect())
-				{
-					break;
-				}
 			}
 		}
 		
