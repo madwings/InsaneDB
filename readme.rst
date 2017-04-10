@@ -30,7 +30,34 @@ Changelog and New Features
 You can find a list of all changes in the upstream version in the `user
 guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
 
-Documenting changes to the InsaneDB is in progress. Stay tuned.
+Version 1.0.0
+=============
+
+Release Date: Unknown
+
+New features
+-------------------------
+
+   -  Added Read/Write connections mode.
+   -  Read delay option in Read/Write connections mode.
+   -  Automatic reconnect on dropped connection for the MySQL and PostgreSQL drivers.
+
+
+Improvements
+-------------------------
+
+   -  PDO adapter drivers replacing all vendor specific drivers(where applicable).
+   -  Added option for manual setting the size of the batch query functions.
+   -  General simplifications of the configuration file.
+   -  Removed ['compress'] and ['encrypt'] options, they can be passed by the new ['options'] variable.
+   -  Improved ``reconnect()``, now working for all the drivers.
+   -  Improved ``num_rows()``, should be faster for big result sets.
+   -  Added option which keys to be included in ``update_batch()``, ``insert_batch()`` and ``insert_ignore_batch()``.
+   
+Bug fixes
+---------
+
+-  Fixed a bug (#) - method ``close()`` didn't close a connection with valid result object.
 
 *******************
 Server Requirements
