@@ -55,9 +55,9 @@ Improvements
    -  Added option which keys to be included in ``update_batch()``, ``insert_batch()`` and ``insert_ignore_batch()``.
    
 Bug fixes
----------
+-------------------------
 
--  Fixed a bug (#) - method ``close()`` didn't close a connection with valid result object.
+   -  Fixed a bug (#) - method ``close()`` didn't close a connection with valid result object.
 
 *******************
 Server Requirements
