@@ -6,11 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
-<<<<<<< HEAD:system/database/DB_helpers.php
- * Copyright (c) 2015, Stiliyan Ivanov
-=======
- * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
->>>>>>> 1d9aaee34ea77fdb68d79d7add37f26dd2649c00:system/language/english/pagination_lang.php
+ * Copyright (c) 2015 - 2017, Stiliyan Ivanov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
