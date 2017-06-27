@@ -26,6 +26,7 @@ Release Date: Not Released
    -  Removed previously deprecated :doc:`Routing Class <general/routing>` methods ``fetch_directory()``, ``fetch_class()`` and ``fetch_method()`` (use the respective class properties instead).
    -  Removed previously deprecated :doc:`Config Library <libraries/config>` method ``system_url()`` (encourages insecure practices).
    -  Changed :doc:`URI Library <libraries/uri>` to ignore the ``$config['url_suffix']``, ``$config['permitted_uri_chars']`` configuration settings for CLI requests.
+   -  Changed :doc:`Loader <libraries/loader>` method ``model()`` to always check if the loaded class extends ``CI_Model``.
 
    -  :doc:`Input Library <libraries/input>` changes include:
 
@@ -56,6 +57,8 @@ Release Date: Not Released
       - Removed previously deprecated method ``prep_for_form()`` / rule *prep_for_form*.
       - Changed method ``set_rules()`` to throw a ``BadMethodCallException`` when its first parameter is not an array and the ``$rules`` one is unused.
       - Added rule **valid_mac**, which replicates PHP's native ``filter_var()`` with ``FILTER_VALIDATE_MAC``.
+      - Added ability to validate entire arrays at once, if ``is_array`` is within the list of rules.
+      - Added ability to fetch processed data via a second parameter to ``run()``.
 
    -  :doc:`HTML Table Library <libraries/table>` changes include:
 
@@ -64,6 +67,7 @@ Release Date: Not Released
    -  :doc:`Email Library <libraries/email>` changes include:
 
       - Changed the default value of the **validate** option to ``TRUE``.
+      - Changed the ``send()`` method to always return ``TRUE`` when sending multiple batches of emails.
 
 -  :doc:`Database <database/index>` changes include:
 
@@ -79,6 +83,7 @@ Release Date: Not Released
    -  :doc:`Query Builder <database/query_builder>`:
 
       - Added methods ``having_in()``, ``or_having_in()``, ``not_having_in()``, ``or_not_having_in()``.
+      - Updated logic to allow dots in alias names.
 
 -  Helpers
 
@@ -113,16 +118,39 @@ Release Date: Not Released
       - Removed the second (out of three) parameter from the :php:func:`form_upload()` function (it was never used).
 
 
-Version 3.1.5
+Version 3.1.6
 =============
 
 Release Date: Not Released
 
 
+Version 3.1.5
+=============
+
+Release Date: Jun 19, 2017
+
+-  **Security**
+
+   -  :doc:`Form Validation Library <libraries/form_validation>` rule ``valid_email`` could be bypassed if ``idn_to_ascii()`` is available.
+
+-  General Changes
+
+   -  Updated :doc:`Form Helper <helpers/form_helper>` function :php:func:`form_label()` to accept HTML attributes as a string.
+
+Bug fixes for 3.1.5
+-------------------
+
+-  Fixed a bug (#5070) - :doc:`Email Library <libraries/email>` didn't properly detect 7-bit encoding.
+-  Fixed a bug (#5084) - :doc:`XML-RPC Library <libraries/xmlrpc>` errored because of a variable name typo.
+-  Fixed a bug (#5108) - :doc:`Inflector Helper <helpers/inflector_helper>` function :php:func:`singular()` didn't properly handle 'quizzes'.
+-  Fixed a regression (#5131) - private controller methods triggered PHP errors instead of a 404 response.
+-  Fixed a bug (#5150) - :doc:`Database Forge <database/forge>` method ``modify_column()`` triggered an error while renaming columns with the 'oci8', 'pdo/oci' drivers.
+-  Fixed a bug (#5155) - :doc:`Query Builder <database/query_builder>` method ``count_all_results()`` returned incorrect result for queries using ``LIMIT``, ``OFFSET``.
+
 Version 3.1.4
 =============
 
-Release Date: March 20, 2017
+Release Date: Mar 20, 2017
 
 -  **Security**
 
