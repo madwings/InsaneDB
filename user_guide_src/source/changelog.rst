@@ -27,6 +27,7 @@ Release Date: Not Released
    -  Removed previously deprecated :doc:`Config Library <libraries/config>` method ``system_url()`` (encourages insecure practices).
    -  Changed :doc:`URI Library <libraries/uri>` to ignore the ``$config['url_suffix']``, ``$config['permitted_uri_chars']`` configuration settings for CLI requests.
    -  Changed :doc:`Loader <libraries/loader>` method ``model()`` to always check if the loaded class extends ``CI_Model``.
+   -  Changed :doc:`Output Library <libraries/output>` method ``_display()`` default parameter value to ``NULL`` instead of empty string.
 
    -  :doc:`Input Library <libraries/input>` changes include:
 
@@ -83,6 +84,7 @@ Release Date: Not Released
    -  :doc:`Query Builder <database/query_builder>`:
 
       - Added methods ``having_in()``, ``or_having_in()``, ``not_having_in()``, ``or_not_having_in()``.
+      - Updated method ``join()`` to allow accepting ``NATURAL`` clauses in its third parameter.
       - Updated logic to allow dots in alias names.
 
 -  Helpers
