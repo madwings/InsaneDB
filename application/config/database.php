@@ -32,6 +32,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['dbcollat'] The character collation used in communicating with the database
 |	['swap_pre'] A default table prefix that should be swapped with the dbprefix
 |	['options']  Pass additional options to the driver.
+|		['encrypt']  Whether or not to use an encrypted connection.
+|
+|			'mysqli' and 'pdo/mysql' drivers accept an array with the following options:
+|
+|				'ssl_key'    - Path to the private key file
+|				'ssl_cert'   - Path to the public key certificate file
+|				'ssl_ca'     - Path to the certificate authority file
+|				'ssl_capath' - Path to a directory containing trusted CA certificates in PEM format
+|				'ssl_cipher' - List of *allowed* ciphers to be used for the encryption, separated by colons (':')
+|				'ssl_verify' - TRUE/FALSE; Whether verify the server certificate or not ('mysqli' only)
+|
+|		['compress'] Whether or not to use client compression (MySQL only)
 |	['stricton'] TRUE/FALSE - forces 'Strict Mode' connections
 |							- good for ensuring strict SQL while developing
 |	['failover'] array - A array with 0 or more data for connections if the main should fail.
