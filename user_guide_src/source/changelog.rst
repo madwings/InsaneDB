@@ -95,7 +95,6 @@ Release Date: Not Released
    -  Removed previously deprecated :doc:`Security Helper <helpers/security_helper>` function ``do_hash()`` (use PHP's native ``hash()`` instead).
    -  Removed previously deprecated :doc:`File Helper <helpers/file_helper>` function ``read_file()`` (use PHP's native ``file_get_contents()`` instead).
    -  Added new function :php:func:`ordinal_format()` to :doc:`Inflector Helper <helpers/inflector_helper>`.
-   -  Added 'img_alt' option to :php:func`create_captcha()` :doc:`CAPTCHA Helper <helpers/captcha_helper>` with a default value of 'captcha'.
 
    -  :doc:`Download Helper <helpers/download_helper>` changes include:
 
@@ -119,16 +118,40 @@ Release Date: Not Released
       - Removed previously deprecated function ``form_prep()`` (use :php:func:`html_escape()` instead).
       - Removed the second (out of three) parameter from the :php:func:`form_upload()` function (it was never used).
 
+   -  :doc:`CAPTCHA Helper <helpers/captcha_helper>` changes include:
 
-Version 3.1.7
+      - Added 'img_alt' option with a default value of 'captcha'.
+      - Added ability to generate ``data:image/png;base64`` URIs instead of writing image files to disk.
+      - Updated to always create PNG images instead of JPEG.
+
+
+Version 3.1.8
 =============
 
 Release Date: Not Released
 
 -  General Changes
 
-   -  Updated :doc:`Form Validation Library <libraries/form_validation>` rule ``valid_email`` to use ``INTL_IDNA_VARIANT_UCS46`` for non-ASCII domain names.
-   -  Updated :doc:`Email Library <libraries/email>` to use ``INTL_IDNA_VARIANT_UCS46`` for non-ASCII domain names.
+   -  Updated :doc:`Email Library <libraries/email>` to always negotiate between TLS 1.0, 1.1, 1.2 when possible (PHP 5.6+) for SMTP connections.
+
+Bug fixes for 3.1.8
+-------------------
+
+-  Fixed a bug where :doc:`Form Validation Library <libraries/form_validation>`, :doc:`Email Library <libraries/email>` tried to use ``INTL_IDNA_VARIANT_UTS46`` when it was undeclared.
+
+Version 3.1.7
+=============
+
+Release Date: Jan 13, 2018
+
+-  General Changes
+
+   -  Updated :doc:`Form Validation Library <libraries/form_validation>` rule ``valid_email`` to use ``INTL_IDNA_VARIANT_UTS46`` for non-ASCII domain names.
+   -  Updated :doc:`Email Library <libraries/email>` to use ``INTL_IDNA_VARIANT_UTS46`` for non-ASCII domain names.
+   -  Updated :doc:`Loader Library <libraries/loader>` method ``model()`` to log both ``CI_Model`` class loading and individual models' initialization.
+   -  Updated :doc:`Pagination Library <libraries/pagination>` to preserve previously set attributes while calling ``initialize()``.
+   -  Updated :doc:`Cache Library <libraries/caching>` to automatically add items to cache on ``increment()``, ``decrement()`` calls for missing keys.
+   -  Deprecated usage of :doc:`CAPTCHA Helper <helpers/captcha_helper>` function :php:func:`create_captcha()` with parameters other than ``$data``.
 
 Bug fixes for 3.1.7
 -------------------
@@ -138,6 +161,9 @@ Bug fixes for 3.1.7
 -  Fixed a bug (#5278) - :doc:`URL Helper <helpers/url_helper>` function :php:func:`auto_link()` didn't detect trailing slashes in URLs.
 -  Fixed a regression (#5282) - :doc:`Query Builder <database/query_builder>` method ``count_all_results()`` breaks ``ORDER BY`` clauses for subsequent queries.
 -  Fixed a bug (#5279) - :doc:`Query Builder <database/query_builder>` didn't account for already escaped identifiers while applying database name prefixes.
+-  Fixed a bug (#5331) - :doc:`URL Helper <helpers/url_helper>` function :php:func:`auto_link()` converted e-mail addresses starting with 'www.' to both "url" and "email" links.
+-  Fixed a bug where ``$config['allow_get_array']`` defaulted to ``FALSE`` if it didn't exist in the config file.
+-  Fixed a bug (#5379) - :doc:`Session Library <libraries/sessions>` would incorrectly fail to obtain a lock that it already has on PHP 7 with the 'memcached' driver.
 
 Version 3.1.6
 =============

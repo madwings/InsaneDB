@@ -1,6 +1,5 @@
 # Contributing to InsaneDB
 
-
 InsaneDB is a community driven project and accepts contributions of code and documentation from the community. These contributions are made in the form of Issues or [Pull Requests](http://help.github.com/send-pull-requests/) on the [InsaneDB repository](https://github.com/madwings/InsaneDB>) on GitHub.
 
 Issues are a quick way to point out a bug. If you find a bug or documentation error in InsaneDB then please check a few things first:
