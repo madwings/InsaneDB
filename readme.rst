@@ -1,10 +1,5 @@
 .. image:: https://travis-ci.org/madwings/InsaneDB.svg?branch=develop
     :target: https://travis-ci.org/madwings/InsaneDB
-###################
-	WARNING! 
-###################
-
-Currently in active development. DO NOT use until version 1.0 is released!  
 
 ###################
 What is InsaneDB
@@ -19,9 +14,8 @@ as a replacement for the CodeIgniter database layer.
 Release Information
 *******************
 
-| This repo contains in-development code.  
-| No official release yet.  
-| Use at your own risk.  
+| First official version released.
+| Documentation is about to be updated.
 
 **************************
 Changelog and New Features
@@ -33,7 +27,7 @@ guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide
 Version 1.0.0
 =============
 
-Release Date: Unknown
+Release Date: 14.10.2018
 
 New features
 -------------------------
