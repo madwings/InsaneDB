@@ -6,11 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
-<<<<<<< HEAD:system/database/DB_helpers.php
- * Copyright (c) 2015 - 2017, Stiliyan Ivanov
-=======
- * Copyright (c) 2014 - 2018, British Columbia Institute of Technology
->>>>>>> 6545f8595480ab64220aacc8a5176383dac4122b:system/database/drivers/sqlite3/sqlite3_utility.php
+ * Copyright (c) 2015 - 2018, Stiliyan Ivanov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +31,7 @@
  * @copyright	Copyright (c) 2015 - 2018, Stiliyan Ivanov (https://github.com/madwings/)
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://github.com/madwings/InsaneDB
- * @since	Version 1.0
+ * @since	Version 1.0.0
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');

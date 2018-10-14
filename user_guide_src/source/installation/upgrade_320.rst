@@ -194,7 +194,7 @@ You should change it to::
 	form_upload('name', $extra);
 
 Step 10: Remove usage of previously deprecated functionalities
-=============================================================
+==============================================================
 
 The following is a list of functionalities deprecated in previous
 CodeIgniter versions that have been removed in 3.2.0:
@@ -248,3 +248,23 @@ on global filters is a bad practice, giving you a false sense of security.
 This functionality is now removed, and so if you've relied on it for
 whatever reasons, you should double-check that you are properly validating
 all user inputs in your application (as you always should do).
+
+Step 12: Clear your output cache (optional)
+===========================================
+
+Internal changes to the :doc:`Output Class <../libraries/output>` make it
+so that if you're using the :doc:`Web Page Caching <../general/caching>`
+feature, you'll be left with some old, garbage cache files.
+
+That shouldn't be a problem, but you may want to clear them.
+
+Step 13: Check for calls to is_countable()
+==========================================
+
+
+PHP 7.3 introduces a native `is_countable() <https://secure.php.net/is_countable>`_
+function, which creates a name collision with the ``is_countable()`` function
+we've had in our :doc:`Inflector Helpers <../helpers/inflector_helper>`.
+
+If you've been using the helper function in question, you should now rename
+the calls to it to :php:func:`word_is_countable()`.
