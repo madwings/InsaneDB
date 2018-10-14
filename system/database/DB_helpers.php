@@ -29,7 +29,7 @@
  * @package	InsaneDB
  * @author	Stiliyan Ivanov
  * @copyright	Copyright (c) 2015 - 2018, Stiliyan Ivanov (https://github.com/madwings/)
- * @license	http://opensource.org/licenses/MIT	MIT License
+ * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://github.com/madwings/InsaneDB
  * @since	Version 1.0.0
  * @filesource
