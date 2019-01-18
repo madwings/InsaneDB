@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2015 - 2018, Stiliyan Ivanov
+ * Copyright (c) 2015 - 2019, Stiliyan Ivanov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
  *
  * @package	InsaneDB
  * @author	Stiliyan Ivanov
- * @copyright	Copyright (c) 2015 - 2018, Stiliyan Ivanov (https://github.com/madwings/)
+ * @copyright	Copyright (c) 2015 - 2019, Stiliyan Ivanov (https://github.com/madwings/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://github.com/madwings/InsaneDB
  * @since	Version 1.0.0
