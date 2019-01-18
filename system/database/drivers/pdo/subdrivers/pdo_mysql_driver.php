@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2018, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
  * @package	InsaneDB
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2018, British Columbia Institute of Technology (https://bcit.ca/)
+ * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 3.0.0
@@ -157,7 +157,20 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 			}
 		}
 
-		return parent::db_connect($persistent);
+		// Prior to version 5.7.3, MySQL silently downgrades to an unencrypted connection if SSL setup fails
+		if (
+			($pdo = parent::db_connect($persistent)) !== FALSE
+			&& ! empty($this->options[PDO::MYSQL_ATTR_SSL_KEY])
+			&& version_compare($pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), '5.7.3', '<=')
+			&& empty($pdo->query("SHOW STATUS LIKE 'ssl_cipher'")->fetchObject()->Value)
+		)
+		{
+			$message = 'PDO_MYSQL was configured for an SSL connection, but got an unencrypted connection instead!';
+			log_message('error', $message);
+			return ($this->db_debug) ? $this->display_error($message, '', TRUE) : FALSE;
+		}
+
+		return $pdo;
 	}
 
 	// --------------------------------------------------------------------
