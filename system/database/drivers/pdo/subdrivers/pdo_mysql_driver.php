@@ -157,11 +157,6 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 			}
 		}
 
-        if ( ! defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT') && isset($this->options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]))
-        {
-            unset($this->options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]);
-        }
-
 		// Prior to version 5.7.3, MySQL silently downgrades to an unencrypted connection if SSL setup fails
 		if (
 			($pdo = parent::db_connect($persistent)) !== FALSE
