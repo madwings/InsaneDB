@@ -52,7 +52,19 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', 'development');
+	if (isset($_ENV['INSANEDB_ENV']))
+    {
+        define('ENVIRONMENT', $_ENV['INSANEDB_ENV']);
+    }
+    elseif (isset($_SERVER['INSANEDB_ENV']))
+    {
+        define('ENVIRONMENT', $_SERVER['INSANEDB_ENV']);
+    }
+    else
+    {
+        define('ENVIRONMENT', 'development');
+    }
+    
 
 /*
  *---------------------------------------------------------------
