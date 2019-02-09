@@ -24,10 +24,10 @@ Changelog and New Features
 You can find a list of all changes in the upstream version in the `user
 guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
 
-Version 1.0.0
+InsaneDB
 =============
 
-Release Date: 14.10.2018
+Initial Release Date: 14.10.2018
 
 New features
 -------------------------
@@ -57,7 +57,7 @@ Bug fixes
 Server Requirements
 *******************
 
-| PHP version 5.6 or newer is required.
+| PHP version 7.1 or newer is required.
 | It is recommend to migrate to newer version of PHP sooner than later.
 
 *******
