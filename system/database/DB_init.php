@@ -42,19 +42,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category	Database
  * @author	Stiliyan Ivanov
  *
+ * @param 	bool            $autoinit
+ * @param 	string          $autoinit
  * @param 	string|string[]	$params
- * @param 	bool		$query_builder_override
- *				Determines if query builder should be used or not
+ * @param 	bool            $query_builder_override     Determines if query builder should be used or not
  *
  * return	object	$db	Database object
  */
-function &DB($autoinit = TRUE, $params = '', $query_builder_override = NULL)
+function &DB($autoinit = TRUE, $file_path = '', $params = '', $query_builder_override = NULL)
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && strpos($params, '://') === FALSE)
 	{
-		// Is the config file in the environment folder?
-		if ( ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/database.php')
+		// Is the config file in the environment folder or passed to the function?
+		if ( ! file_exists($file_path) && ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/database.php')
 			&& ! file_exists($file_path = APPPATH.'config/database.php'))
 		{
 			show_error('The configuration file database.php does not exist.');
