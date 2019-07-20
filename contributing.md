@@ -57,7 +57,6 @@ If you are using [Tower](https://www.git-tower.com/) there is a "Sign-Off" check
 
 By signing your work in this manner, you certify to a "Developer's Certificate of Origin". The current version of this certificate is in the `DCO.txt` file in the root of this repository.
 
-
 ## How-to Guide
 
 There are two ways to make changes, the easy way and the hard way. Either way you will need to [create a GitHub account](https://github.com/signup/free).
@@ -70,11 +69,11 @@ Hard way The best way to contribute is to "clone" your fork of InsaneDB to your 
 2. Go to the InsaneDB repo
 3. Fork it
 4. Clone your InsaneDB repo: git@github.com:<your-name>/InsaneDB.git
-5. Checkout the "develop" branch At this point you are ready to start making changes. 
+5. Checkout the "develop" branch At this point you are ready to start making changes.
 6. Fix existing bugs on the Issue tracker after taking a look to see nobody else is working on them.
 7. Commit the files
 8. Push your develop branch to your fork
-9. Send a pull request [http://help.github.com/send-pull-requests/](http://help.github.com/send-pull-requests/)
+9. Send a pull request
 
 The Reactor Engineers will now be alerted about the change and at least one of the team will respond. If your change fails to meet the guidelines it will be bounced, or feedback will be provided to help you improve it.
 
