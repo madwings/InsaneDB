@@ -86,7 +86,7 @@ abstract class CI_DB_driver {
 	 * @var	string
 	 */
 	public $database;
-	
+
 	/**
 	 * Database driver
 	 *
@@ -159,37 +159,37 @@ abstract class CI_DB_driver {
 	 * @var	object
 	 */
 	public $conn_id			= FALSE;
-	
+
 	/**
 	 * Connection ID write
 	 *
 	 * @var	object
 	 */
 	public $conn_id_write		= FALSE;
-	
+
 	/**
 	 * Connection ID read
 	 *
 	 * @var	object
 	 */
 	public $conn_id_read		= FALSE;
-	
+
 	/**
-	 * How many seconds after the last write query to delay 
-	 * reads from the read connection. In the delay period all 
+	 * How many seconds after the last write query to delay
+	 * reads from the read connection. In the delay period all
 	 * read queries will go to the write connection
 	 *
 	 * @var	int
 	 */
 	public $read_delay			= 0;
-	
+
 	/**
 	 * Timestamp of last write query
 	 *
 	 * @var	int
 	 */
 	protected $last_write		= NULL;
-	
+
 	/**
 	 * Result ID
 	 *
@@ -385,23 +385,23 @@ abstract class CI_DB_driver {
 	 * @var	string
 	 */
 	protected $_count_string 	= 'SELECT COUNT(*) AS ';
-	
-	protected $_conn_retries 	= 1;
-	
+
+	protected $_query_retries 	= 2;
+
 	/**
 	 * read/write mode flag
 	 *
 	 * @var	bool
 	 */
 	protected $read_write		= FALSE;
-	
+
 	/**
 	 * Force usage of particular connection in read/write mode
 	 *
 	 * @var	string|null
 	 */
 	private $conn_force   	    = NULL;
-	
+
 	/**
 	 * Whether to clear forced usage of particular connection in read/write mode
 	 * after each query
@@ -409,14 +409,14 @@ abstract class CI_DB_driver {
 	 * @var	bool
 	 */
 	private $conn_force_clr     = TRUE;
-	
+
 	/**
 	 * Active connection in read/write mode
 	 *
 	 * @var	string
 	 */
 	protected $conn_active      	= 'read';
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -442,7 +442,7 @@ abstract class CI_DB_driver {
 					$this->read_delay =& $_SESSION['insanedb_read_delay'];
 				}
 			}
-			
+
 			foreach ($params as $key => $val)
 			{
 				$this->$key = $val;
@@ -472,13 +472,13 @@ abstract class CI_DB_driver {
 		{
 			return;
 		}
-		
+
 		// If in read/write mode set right credentials first
 		if ($this->read_write)
 		{
 			$this->_set_cred();
 		}
-		
+
 		// ----------------------------------------------------------------
 
 		// Connect to the database and set the connection ID
@@ -810,18 +810,18 @@ abstract class CI_DB_driver {
 		{
 			$this->_config_read_write($sql);
 		}
-		
-		for($i = 0; $i <= $this->_conn_retries; ++$i)
+
+		for($i = 0; $i <= $this->_query_retries; ++$i)
 		{
 			if (empty($this->conn_id))
 			{
-				try 
+				try
 				{
 					$this->initialize();
-				} 
+				}
 				catch (RuntimeException $e)
 				{
-					if ($i === $this->_conn_retries)
+					if ($i === $this->_query_retries)
 					{
 						throw $e;
 					}
@@ -833,14 +833,14 @@ abstract class CI_DB_driver {
 			}
 
 			$result = $this->_execute($sql);
-			
+
 			// If query failed due to lost connection to server retry connecting before exit
-			if ($result !== FALSE OR ! method_exists($this, '_handle_reconnect') OR ! $this->_handle_reconnect()) 
+			if ($result !== FALSE OR ! method_exists($this, 'is_retryable') OR ! $this->is_retryable())
 			{
 				break;
 			}
 		}
-		
+
 		return $result;
 	}
 
@@ -891,7 +891,7 @@ abstract class CI_DB_driver {
 		{
 			return FALSE;
 		}
-		
+
 		if ($this->read_write)
 		{
 			$this->conn_force('write', FALSE);
@@ -932,7 +932,7 @@ abstract class CI_DB_driver {
 			{
 				$this->conn_force_clear();
 			}
-			
+
 			return FALSE;
 		}
 
@@ -940,7 +940,7 @@ abstract class CI_DB_driver {
 		{
 			$this->conn_force_clear();
 		}
-		
+
 		return $this->trans_commit();
 	}
 
@@ -1781,7 +1781,7 @@ abstract class CI_DB_driver {
 			$this->_close_single();
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -1793,7 +1793,7 @@ abstract class CI_DB_driver {
 	{
 		$this->_close($this->conn_id);
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -1826,7 +1826,7 @@ abstract class CI_DB_driver {
 			$this->_close($this->conn_id_read);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -1840,7 +1840,7 @@ abstract class CI_DB_driver {
 		$conn_id = FALSE;
 		$this->result_id = FALSE;
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -1907,7 +1907,7 @@ abstract class CI_DB_driver {
 		{
 			print_r($message);
 		}
-		
+
 		exit(8); // EXIT_DATABASE
 	}
 
@@ -2115,16 +2115,16 @@ abstract class CI_DB_driver {
 	protected function _reset_select()
 	{
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize database credentials when in read/write mode
 	 *
 	 * @return	void
 	 */
-	private function _set_cred() 
-	{		
+	private function _set_cred()
+	{
 		if (is_array($this->{$this->conn_active}))
 		{
 			foreach ($this->{$this->conn_active} as $key => $val)
@@ -2136,21 +2136,21 @@ abstract class CI_DB_driver {
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Configure db params for read/write mode
 	 *
 	 * @param	string	the sql query
 	 * @return	void
 	 */
-	private function _config_read_write($sql = '') 
-	{	
-		
+	private function _config_read_write($sql = '')
+	{
+
 		if ($this->conn_force === 'write' OR
 			($this->last_write !== NULL AND time() - $this->last_write < $this->read_delay AND $this->conn_force !== 'read') OR
 			($this->conn_force === NULL AND $this->is_write_type($sql) === TRUE))
 		{
-			if ($this->conn_active === 'read') 
+			if ($this->conn_active === 'read')
 			{
 				if(gettype($this->conn_id_read) !== gettype($this->conn_id))
 				{
@@ -2172,7 +2172,7 @@ abstract class CI_DB_driver {
 			}
 			$this->conn_active = 'read';
 		}
-		
+
 		// Clear database force
 		if ($this->conn_force_clr === TRUE)
 		{
@@ -2181,7 +2181,7 @@ abstract class CI_DB_driver {
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Force using specific connection in read/write mode
 	 *
@@ -2198,7 +2198,7 @@ abstract class CI_DB_driver {
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Clear force for using specific connection in read/write mode
 	 *

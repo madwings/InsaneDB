@@ -393,13 +393,11 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * If query failed due to lost connection, force reconnection
-	 *
-	 * Returns TRUE if pending reconnection otherwise FALSE
+	 * Check if query error is retryable
 	 *
 	 * @return	bool
 	 */
-	protected function _handle_reconnect()
+	protected function is_retryable()
 	{
 		$error = $this->conn_id->errorInfo();
 		// PostgreSQL  specific errors for lost connection
