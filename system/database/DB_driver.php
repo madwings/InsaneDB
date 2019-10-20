@@ -714,7 +714,7 @@ abstract class CI_DB_driver {
 			$error = $this->error();
 
 			// Log errors
-			log_message('error', 'Query error: '.$error['message'].' - Invalid query: '.$sql);
+			log_message('error', 'Query error: '.$error['message'].' - Error code: '.$error['code'].' - Invalid query: '.$sql);
 
 			if ($this->db_debug)
 			{

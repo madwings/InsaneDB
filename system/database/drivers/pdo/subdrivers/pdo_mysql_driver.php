@@ -383,22 +383,23 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	 */
 	protected function is_retryable()
 	{
+		$result = FALSE;
 		$error = $this->conn_id->errorInfo();
-		// MySQL specific errors for lost connection
-		if ($error[1] === 2006 OR $error[1] === 2013)
+		if ( ! isset($error[1]))
 		{
-			$this->close();
+			$result = FALSE;
+		}
+		// MySQL specific errors for lost connection
+		elseif ($error[1] === 2006 OR $error[1] === 2013)
+		{
 			$result = TRUE;
+			$this->close();
 		}
 		// MySQL specific errors for Deadlock found
 		elseif ($error[1] === 1213)
 		{
 			$result = TRUE;
 			sleep(1);
-		}
-		else
-		{
-			$result = FALSE;
 		}
 
 		return $result;

@@ -90,13 +90,13 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		parent::__construct($params);
 		$this->_build_dsn();
 	}
-	
+
 	/**
 	 * Build the DSN
 	 *
 	 * @return	void
 	 */
-	protected function _build_dsn() 
+	protected function _build_dsn()
 	{
 		if (empty($this->dsn))
 		{
@@ -112,7 +112,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -399,16 +399,17 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	 */
 	protected function is_retryable()
 	{
+		$result = FALSE;
 		$error = $this->conn_id->errorInfo();
+		if ( ! isset($error[1]))
+		{
+			$result = FALSE;
+		}
 		// PostgreSQL  specific errors for lost connection
-		if (in_array($error[1], array('08000', '08003', '08006'), TRUE))
+		elseif (in_array($error[1], array('08000', '08003', '08006'), TRUE))
 		{
 			$this->close();
 			$result = TRUE;
-		}
-		else
-		{
-			$result = FALSE;
 		}
 
 		return $result;
