@@ -835,7 +835,7 @@ abstract class CI_DB_driver {
 			$result = $this->_execute($sql);
 
 			// If query succeeds or fails with unretryable error - do not retry
-			if ($result !== FALSE OR ! is_callable([$this, 'is_retryable']) OR ! $this->is_retryable())
+			if ($result !== FALSE OR ! is_callable(array($this, 'is_retryable')) OR ! $this->is_retryable())
 			{
 				break;
 			}
