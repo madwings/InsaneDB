@@ -405,7 +405,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		{
 			$result = FALSE;
 		}
-		// PostgreSQL  specific errors for lost connection
+		// PostgreSQL specific errors for lost connection
 		elseif (in_array($error[1], array('08000', '08003', '08006'), TRUE))
 		{
 			$this->close();

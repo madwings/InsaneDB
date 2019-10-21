@@ -42,7 +42,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | 				CodeIgniter will store the SQL statement for debugging purposes.
 | 				However, this may cause high memory usage, especially if you run
 | 				a lot of SQL queries ... disable this to avoid that problem.
-|	['read_delay'] How many seconds after the last write query to delay reads from read connection. 
+|	['query_retries'] How many time to retry the query. In case the query fails with a retryable error.
+|	['read_delay'] How many seconds after the last write query to delay reads from read connection.
 |				   In the delay period all read queries will go to the write connection. Only used
 |				   in read/write mode.
 |
@@ -73,7 +74,8 @@ $db['default'] = array(
 	'options'   => array(),
 	'stricton'  => FALSE,
 	'failover'  => array(),
-	'save_queries'	=> FALSE
+	'save_queries'	=> FALSE,
+	'query_retries'	=> 2
 );
 
 $db['read_write'] = array(
@@ -101,5 +103,6 @@ $db['read_write'] = array(
 	'stricton'  => FALSE,
 	'failover'  => array(),
 	'save_queries'	=> FALSE,
+	'query_retries'	=> 2,
 	'read_delay'	=> 0
 );

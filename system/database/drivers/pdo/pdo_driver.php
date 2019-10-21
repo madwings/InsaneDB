@@ -59,6 +59,13 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	public $dbdriver = 'pdo';
 
+	/**
+	 * PDO Options
+	 *
+	 * @var	array
+	 */
+	public $options = array();
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -70,7 +77,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	 * @return	void
 	 */
 	public function __construct($params)
-	{		
+	{
 		parent::__construct($params);
 
 		if (preg_match('/([^:]+):/', $this->dsn, $match) && count($match) === 2)
@@ -162,7 +169,7 @@ class CI_DB_pdo_driver extends CI_DB {
 		{
 			$this->last_write = time();
 		}
-		
+
 		return $this->conn_id->query($sql);
 	}
 

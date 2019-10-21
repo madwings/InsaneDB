@@ -386,7 +386,7 @@ abstract class CI_DB_driver {
 	 */
 	protected $_count_string 	= 'SELECT COUNT(*) AS ';
 
-	protected $_query_retries 	= 2;
+	public $query_retries 		= 2;
 
 	/**
 	 * read/write mode flag
@@ -415,7 +415,7 @@ abstract class CI_DB_driver {
 	 *
 	 * @var	string
 	 */
-	protected $conn_active      	= 'read';
+	protected $conn_active      = 'read';
 
 	// --------------------------------------------------------------------
 
@@ -811,7 +811,7 @@ abstract class CI_DB_driver {
 			$this->_config_read_write($sql);
 		}
 
-		for($i = 0; $i <= $this->_query_retries; ++$i)
+		for($i = 0; $i <= $this->query_retries; ++$i)
 		{
 			if (empty($this->conn_id))
 			{
@@ -821,7 +821,7 @@ abstract class CI_DB_driver {
 				}
 				catch (RuntimeException $e)
 				{
-					if ($i === $this->_query_retries)
+					if ($i === $this->query_retries)
 					{
 						throw $e;
 					}
@@ -834,8 +834,8 @@ abstract class CI_DB_driver {
 
 			$result = $this->_execute($sql);
 
-			// If query failed due to lost connection to server retry connecting before exit
-			if ($result !== FALSE OR ! method_exists($this, 'is_retryable') OR ! $this->is_retryable())
+			// If query succeeds or fails with unretryable error - do not retry
+			if ($result !== FALSE OR ! is_callable([$this, 'is_retryable']) OR ! $this->is_retryable())
 			{
 				break;
 			}
