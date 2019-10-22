@@ -839,6 +839,10 @@ abstract class CI_DB_driver {
 			{
 				break;
 			}
+
+			$error = $this->error();
+			// Log error so we know how often retries are needed
+			log_message('error', 'Query attempt: '.($i + 1).' - Error message: '.$error['message'].' - Error code: '.$error['code'].' - Invalid query: '.$sql);
 		}
 
 		return $result;
