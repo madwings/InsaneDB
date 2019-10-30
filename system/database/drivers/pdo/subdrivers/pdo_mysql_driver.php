@@ -92,16 +92,16 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 		parent::__construct($params);
 		$this->_build_dsn();
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Build the DSN
 	 *
 	 * @return	void
 	 */
-	protected function _build_dsn() 
-	{		
+	protected function _build_dsn()
+	{
 		if (empty($this->dsn))
 		{
 			$this->dsn = 'mysql:host='.(empty($this->hostname) ? '127.0.0.1' : $this->hostname);
@@ -355,7 +355,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 
 		return implode(', ', $this->qb_from);
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -373,30 +373,35 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	{
 		return 'INSERT IGNORE INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
-	 * If query failed due to lost connection, force reconnection
+	 * Check if query error is retryable
 	 *
-	 * Returns TRUE if pending reconnection otherwise FALSE
-	 * 
 	 * @return	bool
 	 */
-	protected function _handle_reconnect()
+	protected function is_retryable()
 	{
+		$result = FALSE;
 		$error = $this->conn_id->errorInfo();
-		// MySQL specific errors for lost connection
-		if ($error[1] === 2006 OR $error[1] === 2013)
-		{
-			$this->close();
-			$result = TRUE;
-		}
-		else
+		if ( ! isset($error[1]))
 		{
 			$result = FALSE;
 		}
-		
+		// MySQL specific errors for lost connection
+		elseif ($error[1] === 2006 OR $error[1] === 2013)
+		{
+			$result = TRUE;
+			$this->close();
+		}
+		// MySQL specific errors for Deadlock found
+		elseif ($error[1] === 1213)
+		{
+			$result = TRUE;
+			sleep(1);
+		}
+
 		return $result;
 	}
 
