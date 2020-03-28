@@ -526,7 +526,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	public function join($table, $cond, $type = '', $escape = NULL)
 	{
 		$type = trim(strtoupper($type).' JOIN');
-		preg_match('#^(NATURAL\s+)?((LEFT|RIGHT)\s+)?((INNER|OUTER)\s+)?JOIN$#', $type) OR $type = 'JOIN';
+		preg_match('#^(NATURAL\s+)?((LEFT|RIGHT|FULL)\s+)?((INNER|OUTER)\s+)?JOIN$#', $type) OR $type = 'JOIN';
 
 		// Extract any aliases that might exist. We use this information
 		// in the protect_identifiers to know whether to add a table prefix
@@ -1484,7 +1484,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$qb_cache_orderby = $this->qb_cache_orderby;
 		$this->qb_orderby = $this->qb_cache_orderby = array();
 
-		$result = ($this->qb_distinct === TRUE OR ! empty($this->qb_groupby) OR ! empty($this->qb_cache_groupby) OR $this->qb_limit OR $this->qb_offset)
+		$result = ($this->qb_distinct === TRUE OR ! empty($this->qb_groupby) OR ! empty($this->qb_cache_groupby) OR ! empty($this->qb_having) OR $this->qb_limit OR $this->qb_offset)
 			? $this->query($this->_count_string.$this->protect_identifiers('numrows')."\nFROM (\n".$this->_compile_select()."\n) CI_count_all_results")
 			: $this->query($this->_compile_select($this->_count_string.$this->protect_identifiers('numrows')));
 
