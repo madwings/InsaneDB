@@ -1852,10 +1852,18 @@ abstract class CI_DB_driver {
 	 * @param	resource
 	 * @return	void
 	 */
-	protected function _close(&$conn_id)
+	protected function _close(&$conn_id = NULL)
 	{
-		$conn_id = FALSE;
 		$this->result_id = FALSE;
+		
+		if ($conn_id)
+		{
+			$conn_id = FALSE;
+		}
+		else
+		{
+			$this->conn_id = FALSE;
+		}
 	}
 
 	// --------------------------------------------------------------------
