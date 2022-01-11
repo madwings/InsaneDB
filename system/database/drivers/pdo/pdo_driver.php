@@ -330,7 +330,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	 *
 	 * @return	void
 	 */
-	protected function _close()
+	protected function _close(&$conn = NULL)
 	{
 		$this->result_id = FALSE;
 		$this->conn_id = FALSE;
