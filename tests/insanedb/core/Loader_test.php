@@ -178,8 +178,6 @@ class Loader_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
-<<<<<<< HEAD:tests/insanedb/core/Loader_test.php
-=======
 	public function test_driver()
 	{
 		// Call the autoloader, to include system/libraries/Driver.php
@@ -210,7 +208,6 @@ class Loader_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
->>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76:tests/codeigniter/core/Loader_test.php
 	public function test_models()
 	{
 		$this->ci_set_core_class('model', 'CI_Model');
@@ -594,14 +591,11 @@ class Loader_test extends CI_TestCase {
 		$this->assertObjectHasAttribute($lib, $this->ci_obj);
 		$this->assertInstanceOf($lib_class, $this->ci_obj->$lib);
 
-<<<<<<< HEAD:tests/insanedb/core/Loader_test.php
-=======
 		// Verify driver
 		$this->assertTrue(class_exists($drv_class), $drv_class.' does not exist');
 		$this->assertObjectHasAttribute($drv, $this->ci_obj);
 		$this->assertInstanceOf($drv_class, $this->ci_obj->$drv);
 
->>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76:tests/codeigniter/core/Loader_test.php
 		// Verify model
 		$this->assertTrue(class_exists($model), $model.' does not exist');
 		$this->assertObjectHasAttribute($model, $this->ci_obj);
