@@ -178,36 +178,6 @@ class Loader_test extends CI_TestCase {
 
 	// --------------------------------------------------------------------
 
-	public function test_driver()
-	{
-		// Call the autoloader, to include system/libraries/Driver.php
-		class_exists('CI_Driver_Library', TRUE);
-
-		// Create driver in VFS
-		$driver = 'unit_test_driver';
-		$dir = ucfirst($driver);
-		$class = 'CI_'.$dir;
-		$content = '<?php class '.$class.' { } ';
-		$this->ci_vfs_create(ucfirst($driver), $content, $this->ci_base_root, 'libraries/'.$dir);
-
-		// Test loading as an array.
-		$this->assertInstanceOf('CI_Loader', $this->load->driver(array($driver)));
-		$this->assertTrue(class_exists($class), $class.' does not exist');
-		$this->assertObjectHasAttribute($driver, $this->ci_obj);
-		$this->assertInstanceOf($class, $this->ci_obj->$driver);
-
-		// Test loading as a library with a name
-		$obj = 'testdrive';
-		$this->assertInstanceOf('CI_Loader', $this->load->library($driver, NULL, $obj));
-		$this->assertObjectHasAttribute($obj, $this->ci_obj);
-		$this->assertInstanceOf($class, $this->ci_obj->$obj);
-
-		// Test a string given to params
-		$this->assertInstanceOf('CI_Loader', $this->load->driver($driver, ' '));
-	}
-
-	// --------------------------------------------------------------------
-
 	public function test_models()
 	{
 		$this->ci_set_core_class('model', 'CI_Model');
