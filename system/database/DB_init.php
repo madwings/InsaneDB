@@ -45,11 +45,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @param 	bool            $autoinit
  * @param 	string          $autoinit
  * @param 	string|string[]	$params
- * @param 	bool            $query_builder_override     Determines if query builder should be used or not
  *
  * return	object	$db	Database object
  */
-function &DB($autoinit = TRUE, $file_path = '', $params = '', $query_builder_override = NULL)
+function &DB($autoinit = TRUE, $file_path = '', $params = '')
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && strpos($params, '://') === FALSE)
@@ -134,38 +133,20 @@ function &DB($autoinit = TRUE, $file_path = '', $params = '', $query_builder_ove
 		$params['subdriver'] = $params['driver'];
 		unset($params['driver']);
 	}
-	// Load the DB classes. Note: Since the query builder class is optional
-	// we need to dynamically create a class that extends proper parent class
-	// based on whether we're using the query builder class or not.
-	if ($query_builder_override !== NULL)
-	{
-		$query_builder = $query_builder_override;
-	}
-	
+
 	require_once(BASEPATH.'database/DB_driver.php');
-	
-	if ( ! isset($query_builder) OR $query_builder === TRUE)
-	{
-		require_once(BASEPATH.'database/DB_query_builder.php');
-		if ( ! class_exists('CI_DB', FALSE))
-		{
-			/**
-			 * CI_DB
-			 *
-			 * Acts as an alias for both CI_DB_driver and CI_DB_query_builder.
-			 *
-			 * @see	CI_DB_query_builder
-			 * @see	CI_DB_driver
-			 */
-			class CI_DB extends CI_DB_query_builder { }
-		}
-	}
-	elseif ( ! class_exists('CI_DB', FALSE))
+	require_once(BASEPATH.'database/DB_query_builder.php');
+	if ( ! class_exists('CI_DB', FALSE))
 	{
 		/**
-	 	 * @ignore
+		 * CI_DB
+		 *
+		 * Acts as an alias for both CI_DB_driver and CI_DB_query_builder.
+		 *
+		 * @see	CI_DB_query_builder
+		 * @see	CI_DB_driver
 		 */
-		class CI_DB extends CI_DB_driver { }
+		class CI_DB extends CI_DB_query_builder { }
 	}
 
 	// Load the DB driver

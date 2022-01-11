@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Uploads
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/libraries/file_uploading.html
+ * @link		https://codeigniter.com/userguide3/libraries/file_uploading.html
  */
 class CI_Upload {
 
@@ -1227,7 +1227,7 @@ class CI_Upload {
 		if (function_exists('finfo_file'))
 		{
 			$finfo = @finfo_open(FILEINFO_MIME);
-			if (is_resource($finfo)) // It is possible that a FALSE value is returned, if there is no magic MIME database file found on the system
+			if ($finfo !== FALSE) // It is possible that a FALSE value is returned, if there is no magic MIME database file found on the system
 			{
 				$mime = @finfo_file($finfo, $file['tmp_name']);
 				finfo_close($finfo);

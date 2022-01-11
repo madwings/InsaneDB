@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Helpers
  * @category	Helpers
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/file_helper.html
+ * @link		https://codeigniter.com/userguide3/helpers/file_helper.html
  */
 
 // ------------------------------------------------------------------------
@@ -227,8 +227,9 @@ if ( ! function_exists('get_dir_file_info'))
 				}
 				elseif ($file[0] !== '.')
 				{
-					$_filedata[$file] = get_file_info($source_dir.$file);
-					$_filedata[$file]['relative_path'] = $relative_path;
+					$filedata = get_dir_file_info($source_dir.$file);
+					$filedata['relative_path'] = $relative_path;
+					$_filedata[] = $filedata;
 				}
 			}
 

@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Validation
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/libraries/form_validation.html
+ * @link		https://codeigniter.com/userguide3/libraries/form_validation.html
  */
 class CI_Form_validation {
 
@@ -851,11 +851,6 @@ class CI_Form_validation {
 		{
 			return $line;
 		}
-		// DEPRECATED support for non-prefixed keys, lang file again
-		elseif (FALSE !== ($line = $this->CI->lang->line($rule, FALSE)))
-		{
-			return $line;
-		}
 
 		return $this->CI->lang->line('form_validation_error_message_not_set').'('.$rule.')';
 	}
@@ -1062,7 +1057,7 @@ class CI_Form_validation {
 	{
 		return is_array($str)
 			? (empty($str) === FALSE)
-			: (trim($str) !== '');
+			: (trim((string) $str) !== '');
 	}
 
 	// --------------------------------------------------------------------

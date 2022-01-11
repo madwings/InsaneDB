@@ -36,6 +36,11 @@ New features
    -  Read delay option in Read/Write connections mode.
    -  Automatic reconnect on dropped connection for the MySQL and PostgreSQL drivers.
 
+<<<<<<< HEAD
+=======
+Please see the `installation section <https://codeigniter.com/userguide3/installation/index.html>`_
+of the CodeIgniter User Guide.
+>>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76
 
 Improvements
 -------------------------
@@ -53,9 +58,18 @@ Bug fixes
 
    -  Fixed a bug (#) - method ``close()`` didn't close a connection with valid result object.
 
+<<<<<<< HEAD
 *******************
 Server Requirements
 *******************
+=======
+-  `User Guide <https://codeigniter.com/docs>`_
+-  `Contributing Guide <https://github.com/bcit-ci/CodeIgniter/blob/develop/contributing.md>`_
+-  `Language File Translations <https://github.com/bcit-ci/codeigniter3-translations>`_
+-  `Community Forums <https://forum.codeigniter.com/>`_
+-  `Community Wiki <https://github.com/bcit-ci/CodeIgniter/wiki>`_
+-  `Community Slack Channel <https://codeigniterchat.slack.com>`_
+>>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76
 
 | PHP version 7.1 or newer is required.
 | It is recommend to migrate to newer version of PHP sooner than later.
