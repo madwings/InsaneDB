@@ -36,7 +36,8 @@ class Loader_test extends CI_TestCase {
 		// Test loading as an array.
 		$this->assertInstanceOf('CI_Loader', $this->load->library(array($lib)));
 		$this->assertTrue(class_exists($class), $class.' does not exist');
-		$this->assertAttributeInstanceOf($class, $lib, $this->ci_obj);
+		$this->assertObjectHasAttribute($lib, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$lib);
 
 		// Create library in VFS
 		$lib = array('unit_test_lib' => 'unit_test_lib');
@@ -87,14 +88,16 @@ class Loader_test extends CI_TestCase {
 		$this->assertInstanceOf('CI_Loader', $this->load->library($lib));
 		$this->assertTrue(class_exists($class), $class.' does not exist');
 		$this->assertTrue(class_exists($ext), $ext.' does not exist');
-		$this->assertAttributeInstanceOf($class, $name, $this->ci_obj);
-		$this->assertAttributeInstanceOf($ext, $name, $this->ci_obj);
+		$this->assertObjectHasAttribute($name, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$name);
+		$this->assertInstanceOf($ext, $this->ci_obj->$name);
 
 		// Test reloading with object name
 		$obj = 'exttest';
 		$this->assertInstanceOf('CI_Loader', $this->load->library($lib, NULL, $obj));
-		$this->assertAttributeInstanceOf($class, $obj, $this->ci_obj);
-		$this->assertAttributeInstanceOf($ext, $obj, $this->ci_obj);
+		$this->assertObjectHasAttribute($obj, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$obj);
+		$this->assertInstanceOf($ext, $this->ci_obj->$obj);
 
 		// Test reloading
 		unset($this->ci_obj->$name);
@@ -137,7 +140,8 @@ class Loader_test extends CI_TestCase {
 		$obj = 'testy';
 		$this->assertInstanceOf('CI_Loader', $this->load->library($lib, NULL, $obj));
 		$this->assertTrue(class_exists($class), $class.' does not exist');
-		$this->assertAttributeInstanceOf($class, $obj, $this->ci_obj);
+		$this->assertObjectHasAttribute($obj, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$obj);
 		$this->assertEquals($cfg, $this->ci_obj->$obj->config);
 
 		// Test is_loaded
@@ -168,11 +172,45 @@ class Loader_test extends CI_TestCase {
 
 		// Was the model class instantiated.
 		$this->assertTrue(class_exists($class), $class.' does not exist');
-		$this->assertAttributeInstanceOf($class, $lib, $this->ci_obj);
+		$this->assertObjectHasAttribute($lib, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$lib);
 	}
 
 	// --------------------------------------------------------------------
 
+<<<<<<< HEAD:tests/insanedb/core/Loader_test.php
+=======
+	public function test_driver()
+	{
+		// Call the autoloader, to include system/libraries/Driver.php
+		class_exists('CI_Driver_Library', TRUE);
+
+		// Create driver in VFS
+		$driver = 'unit_test_driver';
+		$dir = ucfirst($driver);
+		$class = 'CI_'.$dir;
+		$content = '<?php class '.$class.' { } ';
+		$this->ci_vfs_create(ucfirst($driver), $content, $this->ci_base_root, 'libraries/'.$dir);
+
+		// Test loading as an array.
+		$this->assertInstanceOf('CI_Loader', $this->load->driver(array($driver)));
+		$this->assertTrue(class_exists($class), $class.' does not exist');
+		$this->assertObjectHasAttribute($driver, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$driver);
+
+		// Test loading as a library with a name
+		$obj = 'testdrive';
+		$this->assertInstanceOf('CI_Loader', $this->load->library($driver, NULL, $obj));
+		$this->assertObjectHasAttribute($obj, $this->ci_obj);
+		$this->assertInstanceOf($class, $this->ci_obj->$obj);
+
+		// Test a string given to params
+		$this->assertInstanceOf('CI_Loader', $this->load->driver($driver, ' '));
+	}
+
+	// --------------------------------------------------------------------
+
+>>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76:tests/codeigniter/core/Loader_test.php
 	public function test_models()
 	{
 		$this->ci_set_core_class('model', 'CI_Model');
@@ -214,8 +252,9 @@ class Loader_test extends CI_TestCase {
 		// Was the model class instantiated?
 		$this->assertTrue(class_exists($model));
 		$this->assertObjectHasAttribute($name, $this->ci_obj);
-		$this->assertAttributeInstanceOf($base, $name, $this->ci_obj);
-		$this->assertAttributeInstanceOf($model, $name, $this->ci_obj);
+		$this->assertObjectHasAttribute($name, $this->ci_obj);
+		$this->assertInstanceOf($base, $this->ci_obj->$name);
+		$this->assertInstanceOf($model, $this->ci_obj->$name);
 
 		// Test name conflict
 		$obj = 'conflict';
@@ -275,11 +314,15 @@ class Loader_test extends CI_TestCase {
 		$var = 'hello';
 		$value = 'World!';
 		$content = 'This is my test page.  ';
-		$this->ci_vfs_create($view, $content.'<?php echo $'.$var.';', $this->ci_app_root, 'views');
+		$this->ci_vfs_create($view, $content.'<?php echo (isset($'.$var.') ? $'.$var.' : "undefined");', $this->ci_app_root, 'views');
 
 		// Test returning view
 		$out = $this->load->view($view, array($var => $value), TRUE);
 		$this->assertEquals($content.$value, $out);
+
+		// Test view with missing parameter in $vars
+		$out = $this->load->view($view, [], TRUE);
+		$this->assertEquals($content.'undefined', $out);
 
 		// Mock output class
 		$output = $this->getMockBuilder('CI_Output')->setMethods(array('append_output'))->getMock();
@@ -290,6 +333,15 @@ class Loader_test extends CI_TestCase {
 		$vars = new stdClass();
 		$vars->$var = $value;
 		$this->assertInstanceOf('CI_Loader', $this->load->view($view, $vars));
+
+		// Create another view in VFS, nesting the first one without its own $vars
+		$nesting_view = 'unit_test_nesting_view';
+		$nesting_content = 'Here comes a nested view.  ';
+		$this->ci_vfs_create($nesting_view, $nesting_content.'<?php $loader->view("'.$view.'");', $this->ci_app_root, 'views');
+
+		// Test $vars inheritance to nested views
+		$out = $this->load->view($nesting_view, array("loader" => $this->load, $var => $value), TRUE);
+		$this->assertEquals($nesting_content.$content.$value, $out);
 	}
 
 	// --------------------------------------------------------------------
@@ -539,11 +591,21 @@ class Loader_test extends CI_TestCase {
 
 		// Verify library
 		$this->assertTrue(class_exists($lib_class), $lib_class.' does not exist');
-		$this->assertAttributeInstanceOf($lib_class, $lib, $this->ci_obj);
+		$this->assertObjectHasAttribute($lib, $this->ci_obj);
+		$this->assertInstanceOf($lib_class, $this->ci_obj->$lib);
 
+<<<<<<< HEAD:tests/insanedb/core/Loader_test.php
+=======
+		// Verify driver
+		$this->assertTrue(class_exists($drv_class), $drv_class.' does not exist');
+		$this->assertObjectHasAttribute($drv, $this->ci_obj);
+		$this->assertInstanceOf($drv_class, $this->ci_obj->$drv);
+
+>>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76:tests/codeigniter/core/Loader_test.php
 		// Verify model
 		$this->assertTrue(class_exists($model), $model.' does not exist');
-		$this->assertAttributeInstanceOf($model, $model, $this->ci_obj);
+		$this->assertObjectHasAttribute($model, $this->ci_obj);
+		$this->assertInstanceOf($model, $this->ci_obj->$model);
 
 		// Verify config calls
 		$this->assertEquals($cfg['config'], $this->ci_obj->config->loaded);

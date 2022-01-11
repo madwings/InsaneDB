@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Image_lib
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/libraries/image_lib.html
+ * @link		https://codeigniter.com/userguide3/libraries/image_lib.html
  */
 class CI_Image_lib {
 
@@ -1474,15 +1474,16 @@ class CI_Image_lib {
 					$this->set_error(array('imglib_unsupported_imagecreate', 'imglib_png_not_supported'));
 					return FALSE;
 				}
+
+				return imagecreatefrompng($path);
 			case 18:
 				if ( ! function_exists('imagecreatefromwebp'))
 				{
 					$this->set_error(array('imglib_unsupported_imagecreate', 'imglib_webp_not_supported'));
 					return FALSE;
 				}
-				return imagecreatefromwebp($path);
 
-				return imagecreatefrompng($path);
+				return imagecreatefromwebp($path);
 			default:
 				$this->set_error(array('imglib_unsupported_imagecreate'));
 				return FALSE;

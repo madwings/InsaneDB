@@ -42,7 +42,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * @category	Database
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/database/
+ * @link		https://codeigniter.com/userguide3/database/
  */
 abstract class CI_DB_forge {
 
@@ -556,25 +556,17 @@ abstract class CI_DB_forge {
 	/**
 	 * Column Add
 	 *
-	 * @todo	Remove deprecated $_after option in 3.1+
 	 * @param	string	$table	Table name
 	 * @param	array	$field	Column definition
-	 * @param	string	$_after	Column for AFTER clause (deprecated)
 	 * @return	bool
 	 */
-	public function add_column($table, $field, $_after = NULL)
+	public function add_column($table, $field)
 	{
 		// Work-around for literal column definitions
 		is_array($field) OR $field = array($field);
 
 		foreach (array_keys($field) as $k)
 		{
-			// Backwards-compatibility work-around for MySQL/CUBRID AFTER clause (remove in 3.1+)
-			if ($_after !== NULL && is_array($field[$k]) && ! isset($field[$k]['after']))
-			{
-				$field[$k]['after'] = $_after;
-			}
-
 			$this->add_field(array($k => $field[$k]));
 		}
 
