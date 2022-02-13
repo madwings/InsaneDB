@@ -39,17 +39,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * InsaneDB Helpers
  *
-<<<<<<< HEAD:system/database/DB_helpers.php
  * @package		InsaneDB
  * @subpackage	Helpers
  * @category	Helpers
  * @author		Stiliyan Ivanov
  * @link		
-=======
- * @category	Database
- * @author	Andrey Andreev
- * @link	https://codeigniter.com/userguide3/database/
->>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76:system/database/drivers/sqlite3/sqlite3_utility.php
  */
 
 // --------------------------------------------------------------------
