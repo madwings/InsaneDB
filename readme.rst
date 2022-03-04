@@ -24,8 +24,8 @@ Changelog and New Features
 You can find a list of all changes in the upstream version in the `user
 guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
 
-InsaneDB
-=============
+InsaneDB Major Changes
+=======================
 
 Initial Release Date: 14.10.2018
 
@@ -48,7 +48,7 @@ Improvements
    -  Improved ``num_rows()``, should be faster for big result sets.
    -  Added option which keys to be included in ``update_batch()``, ``insert_batch()`` and ``insert_ignore_batch()``.
    
-Bug fixes
+Behaviour bugfix
 -------------------------
 
    -  Fixed a bug (#) - method ``close()`` didn't close a connection with valid result object.

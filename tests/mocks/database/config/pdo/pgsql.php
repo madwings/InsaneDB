@@ -7,7 +7,7 @@ return array(
 		'dsn' => 'pgsql:host=localhost;port=5432;dbname=ci_test;',
 		'hostname' => 'localhost',
 		'username' => 'postgres',
-		'password' => '',
+		'password' => 'postgres',
 		'database' => 'ci_test',
 		'driver' => 'pgsql'
 	),
@@ -25,7 +25,7 @@ return array(
 				'dsn' => 'pgsql:host=localhost;port=5432;dbname=ci_test;',
 				'hostname' => 'localhost',
 				'username' => 'postgres',
-				'password' => '',
+				'password' => 'postgres',
 				'database' => 'ci_test',
 				'driver' => 'pgsql'
 			)
