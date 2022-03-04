@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2015 - 2019, Stiliyan Ivanov
+ * Copyright (c) 2015 - 2022, Stiliyan Ivanov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
  *
  * @package	InsaneDB
  * @author	Stiliyan Ivanov
- * @copyright	Copyright (c) 2015 - 2019, Stiliyan Ivanov (https://github.com/madwings/)
+ * @copyright	Copyright (c) 2015 - 2022, Stiliyan Ivanov (https://github.com/madwings/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://github.com/madwings/InsaneDB
  * @since	Version 1.0.0
@@ -39,17 +39,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * InsaneDB Helpers
  *
-<<<<<<< HEAD:system/database/DB_helpers.php
  * @package		InsaneDB
  * @subpackage	Helpers
  * @category	Helpers
  * @author		Stiliyan Ivanov
  * @link		
-=======
- * @category	Database
- * @author	Andrey Andreev
- * @link	https://codeigniter.com/userguide3/database/
->>>>>>> d314be05ec50dace2cd8dc94b81e285208bc3a76:system/database/drivers/sqlite3/sqlite3_utility.php
  */
 
 // --------------------------------------------------------------------
