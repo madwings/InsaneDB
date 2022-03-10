@@ -106,6 +106,7 @@ class Mock_Database_DB {
 			'DB_driver.php' => '',
 			'DB_result.php' => '',
 			'DB_forge.php' => '',
+			'DB_helpers.php' => '',
 			'DB_query_builder.php' => ''
 		), '', $case->ci_base_root, 'database');
 		if (file_exists(SYSTEM_PATH.'database/drivers/'.$driver.'/'.$driver.'_driver.php'))
