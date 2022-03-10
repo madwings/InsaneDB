@@ -18,7 +18,7 @@ Replacement for the CodeIgniter database layer
 =======================
 
 - Replace all files and directories in your ``system/database`` directory.
-- Replace ``application/config/database.php``.
+- Replace ``application/config/database.php`` file.
 
 **************************
 Changelog and New Features
