@@ -134,6 +134,7 @@ function &DB($autoinit = TRUE, $file_path = '', $params = '')
 		unset($params['driver']);
 	}
 
+	require_once(BASEPATH.'database/DB_helpers.php');
 	require_once(BASEPATH.'database/DB_driver.php');
 	require_once(BASEPATH.'database/DB_query_builder.php');
 	if ( ! class_exists('CI_DB', FALSE))
