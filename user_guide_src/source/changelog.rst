@@ -2,12 +2,6 @@
 Change Log
 ##########
 
-<<<<<<< HEAD
-Version 3.0.5
-
-Release Date: Not Released
-
-=======
 Version 3.2.0
 =============
 
@@ -602,7 +596,6 @@ Version 3.0.5
 
 Release Date: March 11, 2016
 
->>>>>>> 1d9aaee34ea77fdb68d79d7add37f26dd2649c00
 -  Core
 
    -  Changed :doc:`Loader Library <libraries/loader>` to allow ``$autoload['drivers']`` assigning with custom property names.
@@ -636,8 +629,6 @@ Bug fixes for 3.0.5
 -  Fixed a bug where :doc:`Session Library <libraries/sessions>` didn't properly handle its locks' statuses with the 'memcached' driver.
 -  Fixed a bug where :doc:`Session Library <libraries/sessions>` triggered a PHP warning when writing a newly created session with the 'memcached' driver.
 -  Fixed a bug (#4449) - :doc:`Query Builder <database/query_builder>` method ``join()`` breaks conditions containing ``IS NULL``, ``IS NOT NULL``.
-<<<<<<< HEAD
-=======
 -  Fixed a bug (#4491) - :doc:`Session Library <libraries/sessions>` didn't clean-up internal variables for emulated locks with the 'redis' driver.
 -  Fixed a bug where :doc:`Session Library <libraries/sessions>` didn't clean-up internal variables for emulated locks with the 'memcached' driver.
 -  Fixed a bug where :doc:`Database <database/index>` transactions didn't work with the 'ibase' driver.
@@ -645,7 +636,6 @@ Bug fixes for 3.0.5
 -  Fixed a bug where :doc:`Profiler Library <general/profiling>` didn't apply ``htmlspecialchars()`` to all displayed inputs.
 -  Fixed a bug (#4277) - :doc:`Cache Library <libraries/caching>` triggered fatal errors if accessing the Memcache(d) and/or Redis driver and they are not available on the system.
 -  Fixed a bug where :doc:`Cache Library <libraries/caching>` method ``is_supported()`` logged an error message when it returns ``FALSE`` for the APC and Wincache drivers.
->>>>>>> 1d9aaee34ea77fdb68d79d7add37f26dd2649c00
 
 Version 3.0.4
 =============

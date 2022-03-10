@@ -1524,44 +1524,35 @@ Class Reference
 
 		Compiles and executes an INSERT statement.
 
-<<<<<<< HEAD
-	.. php:method:: insert_batch([$table = ''[, $set = NULL[, $batch_limit = NULL[, $include = NULL]]]])
+	.. php:method:: insert_batch([$table = ''[, $set = NULL[, $batch_size = 100[, $include = NULL]]]])
 
 		:param	string	$table: Table name
 		:param	array	$set: Data to insert
-		:param	int	$batch_limit: Number of rows to insert per batch
+		:param	int		$batch_size:  Count of rows to insert at once
 		:param	array	$include: Keys included into the insert
 		:returns:	Number of rows inserted or FALSE on failure
 		:rtype:	mixed
 
 		Compiles and executes batch INSERT statements.
-	
-	.. php:method:: insert_ignore_batch([$table = ''[, $set = NULL[, $batch_limit = NULL[, $include = NULL]]]])
-=======
-	.. php:method:: insert_batch($table[, $set = NULL[, $escape = NULL[, $batch_size = 100]]])
-
-		:param	string	$table: Table name
-		:param	array	$set: Data to insert
-		:param	bool	$escape: Whether to escape values and identifiers
-		:param	int	$batch_size: Count of rows to insert at once
-		:returns:	Number of rows inserted or FALSE on failure
-		:rtype:	mixed
-
-		Compiles and executes batch ``INSERT`` statements.
-
+		
 		.. note:: When more than ``$batch_size`` rows are provided, multiple
-			``INSERT`` queries will be executed, each trying to insert
+			``INSERT IGNORE`` queries will be executed, each trying to insert
 			up to ``$batch_size`` rows.
->>>>>>> a54a2b90bf057d7883ea7506d78a1073478ea4cf
+	
+	.. php:method:: insert_ignore_batch([$table = ''[, $set = NULL[, $batch_size = 100[, $include = NULL]]]])
 
 		:param	string	$table: Table name
 		:param	array	$set: Data to insert
-		:param	int	$batch_limit: Number of rows to insert per batch
+		:param	int		$batch_size:  Count of rows to insert at once
 		:param	array	$include: Keys included into the insert
 		:returns:	Number of rows inserted or FALSE on failure
 		:rtype:	mixed
 
-		Compiles and executes batch INSERT IGNORE statements.
+		Compiles and executes batch ``INSERT IGNORE`` statements.
+
+		.. note:: When more than ``$batch_size`` rows are provided, multiple
+			``INSERT`` queries will be executed, each trying to insert
+			up to ``$batch_size`` rows.
 
 	.. php:method:: set_insert_batch($key[, $value = ''[, $include = NULL]])
 
@@ -1584,21 +1575,13 @@ Class Reference
 
 		Compiles and executes an UPDATE statement.
 
-<<<<<<< HEAD
-	.. php:method:: update_batch([$table = ''[, $set = NULL[, $value = NULL[, $batch_limit = NULL[, $include = NULL]]]]])
-=======
-	.. php:method:: update_batch($table[, $set = NULL[, $value = NULL[, $batch_size = 100]]])
->>>>>>> a54a2b90bf057d7883ea7506d78a1073478ea4cf
+	.. php:method:: update_batch([$table = ''[, $set = NULL[, $value = NULL[, $batch_size = 100[, $include = NULL]]]]])
 
 		:param	string	$table: Table name
 		:param	array	$set: Field name, or an associative array of field/value pairs
 		:param	string	$value: Field value, if $set is a single field
-<<<<<<< HEAD
-		:param	int		$batch_limit: Number of rows to update per batch
+		:param	int		$batch_size:  Count of conditions to group in a single query
 		:param	array	$include: Keys included into the update
-=======
-		:param	int	$batch_size: Count of conditions to group in a single query
->>>>>>> a54a2b90bf057d7883ea7506d78a1073478ea4cf
 		:returns:	Number of rows updated or FALSE on failure
 		:rtype:	mixed
 
