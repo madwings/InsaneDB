@@ -2930,7 +2930,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	/**
 	 * Resets the query builder "write" values.
 	 *
-	 * Called by the insert() update() insert_batch() update_batch() and delete() functions
+	 * Called by the insert() update() insert_batch() insert_ignore_batch() update_batch() and delete() functions
 	 *
 	 * @return	void
 	 */

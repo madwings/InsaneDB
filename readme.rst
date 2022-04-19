@@ -5,17 +5,20 @@
 What is InsaneDB
 ###################
 
-InsaneDB is an database toolkit for PHP forked from CodeIgniter 3 database layer. 
+InsaneDB is a database toolkit for PHP forked from CodeIgniter 3 database layer.
 Its goal is to remove limitations existing in the upstream version and add additional
-functionalities while keeping sync with CodeIgniter. It can be used standalone or
-as a replacement for the CodeIgniter database layer.
+functionalities while keeping in sync with CodeIgniter. It can be used as a standalone package
+or as a replacement to the CodeIgniter database layer.
 
-*******************
-Release Information
-*******************
+**************
+Installation
+**************
 
-| First official version released.
-| Documentation is about to be updated.
+Replacement for the CodeIgniter database layer
+=======================
+
+- Replace all files and directories in your ``system/database`` directory.
+- Replace ``application/config/database.php`` file.
 
 **************************
 Changelog and New Features
@@ -26,8 +29,6 @@ guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide
 
 InsaneDB Major Changes
 =======================
-
-Initial Release Date: 14.10.2018
 
 New features
 -------------------------
@@ -46,6 +47,8 @@ Improvements
    -  Removed ['compress'] and ['encrypt'] options, they can be passed by the new ['options'] variable.
    -  Improved ``reconnect()``, now working for all the drivers.
    -  Improved ``num_rows()``, should be faster for big result sets.
+   -  Added ``insert_ignore_batch()`` method.
+   -  Changed parameter order of ``insert_batch()`` and ``insert_ignore_batch()``.
    -  Added option which keys to be included in ``update_batch()``, ``insert_batch()`` and ``insert_ignore_batch()``.
    
 Behaviour bugfix
