@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/madwings/InsaneDB.svg?branch=develop
-    :target: https://travis-ci.org/madwings/InsaneDB
+.. image:: https://github.com/madwings/InsaneDB/actions/workflows/test-phpunit.yml/badge.svg
+    :target: https://github.com/madwings/InsaneDB/actions/workflows/test-phpunit.yml
 
 ###################
 What is InsaneDB
