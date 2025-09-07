@@ -71,7 +71,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @var	array
 	 */
-	protected $qb_select			= array();
+	public $qb_select			= array();
 
 	/**
 	 * QB DISTINCT flag
@@ -141,7 +141,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @var	array
 	 */
-	protected $qb_orderby			= array();
+	public $qb_orderby			= array();
 
 	/**
 	 * QB data sets
@@ -692,11 +692,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				$k = substr($k, 0, $match[0][1]).($match[1][0] === '=' ? ' IS NULL' : ' IS NOT NULL');
 			}
 
-			${$qb_key} = array('condition' => $prefix.$k, 'value' => $v, 'escape' => $escape);
-			$this->{$qb_key}[] = ${$qb_key};
+			$$qb_key = array('condition' => $prefix.$k, 'value' => $v, 'escape' => $escape);
+			$this->{$qb_key}[] = $$qb_key;
 			if ($this->qb_caching === TRUE)
 			{
-				$this->{$qb_cache_key}[] = ${$qb_key};
+				$this->{$qb_cache_key}[] = $$qb_key;
 				$this->qb_cache_exists[] = substr($qb_key, 3);
 			}
 
