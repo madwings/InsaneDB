@@ -71,10 +71,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Override PHP ini values for JIT compiler
         if: matrix.compiler == 'jit'
-        run: echo "PHP_INI_VALUES::assert.exception=1, zend.assertions=1, opcache.enable=1, opcache.enable_cli=1, opcache.optimization_level=-1, opcache.jit=1255, opcache.jit_buffer_size=64M" >> $GITHUB_ENV 
+        run: echo "PHP_INI_VALUES::assert.exception=1, zend.assertions=1, opcache.enable=1, opcache.enable_cli=1, opcache.optimization_level=-1, opcache.jit=1255, opcache.jit_buffer_size=64M" >> $GITHUB_ENV
 
       - name: Install PHP${{ matrix.php }} - DB ${{ matrix.DB }}
         uses: shivammathur/setup-php@v2
@@ -89,11 +89,11 @@ jobs:
         id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: Cache composer dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-   
+          restore-keys: ${{ runner.os }}-composer-
       - name: Install composer dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
 
