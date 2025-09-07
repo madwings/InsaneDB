@@ -143,7 +143,7 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 			$save_path = array(
 				'host'    => $matches[1],
 				'port'    => empty($matches[2]) ? NULL : $matches[2],
-				'timeout' => NULL // We always pass this to Redis::connect(), so it needs to exist
+				'timeout' => 0.0 // We always pass this to Redis::connect(), so it needs to exist
 			);
 		}
 		else
@@ -157,7 +157,7 @@ class CI_Session_redis_driver extends CI_Session_driver implements CI_Session_dr
 			{
 				$save_path['password'] = preg_match('#auth=([^\s&]+)#', $matches['options'], $match) ? $match[1] : NULL;
 				$save_path['database'] = preg_match('#database=(\d+)#', $matches['options'], $match) ? (int) $match[1] : NULL;
-				$save_path['timeout']  = preg_match('#timeout=(\d+\.\d+)#', $matches['options'], $match) ? (float) $match[1] : NULL;
+				$save_path['timeout']  = preg_match('#timeout=(\d+\.\d+)#', $matches['options'], $match) ? (float) $match[1] : 0.0;
 
 				preg_match('#prefix=([^\s&]+)#', $matches['options'], $match) && $this->_key_prefix = $match[1];
 			}

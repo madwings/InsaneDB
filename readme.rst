@@ -50,7 +50,7 @@ Improvements
    -  Added ``insert_ignore_batch()`` method.
    -  Changed parameter order of ``insert_batch()`` and ``insert_ignore_batch()``.
    -  Added option which keys to be included in ``update_batch()``, ``insert_batch()`` and ``insert_ignore_batch()``.
-   
+
 Behaviour bugfix
 -------------------------
 
