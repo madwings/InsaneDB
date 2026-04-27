@@ -28,6 +28,7 @@ jobs:
                     -   php: '8.5'
                         DB: 'pdo/sqlite'
                         compiler: jit
+                    -   php: '8.4'
                         DB: 'pdo/mysql'
                         compiler: jit
                     -   php: '8.4'
@@ -36,6 +37,7 @@ jobs:
                     -   php: '8.4'
                         DB: 'pdo/sqlite'
                         compiler: jit
+                    -   php: '8.3'
                         DB: 'pdo/mysql'
                         compiler: jit
                     -   php: '8.3'
@@ -49,9 +51,6 @@ jobs:
                         compiler: jit
                     -   php: '8.2'
                         DB: 'pdo/pgsql'
-                        compiler: jit
-                    -   php: '8.2'
-                        DB: 'pdo/sqlite'
                         compiler: jit
                     -   php: '8.1'
                         DB: 'pdo/mysql'
