@@ -1,6 +1,11 @@
-#############################
-Upgrading from 3.1.x to 3.2.x
-#############################
+#######################################
+Upgrading from 3.1.x or 3.2-dev to 3.2+
+#######################################
+
+This guide covers upgrading to this maintenance fork, which is based on
+the unreleased CodeIgniter 3.2.0-dev. Many unnecessary breaking changes
+from 3.2.0-dev have been reverted to preserve backward compatibility.
+This is the same guide whether you are coming from 3.1.x or 3.2-dev.
 
 Before performing an update you should take your site offline by
 replacing the index.php file with a static one.
@@ -8,7 +13,16 @@ replacing the index.php file with a static one.
 Step 1: Update your CodeIgniter files
 =====================================
 
-Replace all files and directories in your *system/* directory.
+Install via Composer (recommended)::
+
+	composer require pocketarc/codeigniter
+
+Then update the ``$system_path`` in your ``index.php``::
+
+	$system_path = 'vendor/pocketarc/codeigniter/system';
+
+Alternatively, you can manually replace all files and directories in
+your *system/* directory.
 
 .. note:: If you have any custom developed files in these directories,
 	please make copies of them first.
@@ -16,53 +30,21 @@ Replace all files and directories in your *system/* directory.
 Step 2: Check your PHP version
 ==============================
 
-We recommend always running versions that are `currently supported
-<https://secure.php.net/supported-versions.php>`_, which right now is at least PHP 5.6.
+This fork supports PHP 5.4 through 8.5+. We recommend running a
+`currently supported <https://www.php.net/supported-versions.php>`_
+PHP version (8.4 or newer).
 
-PHP 5.3.x versions are now officially not supported by CodeIgniter, and while 5.4.8+
-may be at least runnable, we strongly discourage you from using any PHP versions below
-the ones listed on the `PHP.net Supported Versions <https://secure.php.net/supported-versions.php>`_
-page.
-
-Step 3: Remove calls to ``CI_Model::__construct()``
-===================================================
+Step 3: Calls to ``CI_Model::__construct()`` (optional cleanup)
+===============================================================
 
 The class constructor for ``CI_Model`` never contained vital code or useful
 logic, only a single line to log a message. A change in CodeIgniter 3.1.7
 moved this log message elsewhere and that naturally made the constructor
-completely unnecessary. However, it was left in place to avoid immedate BC
-breaks in a minor release.
+completely unnecessary.
 
-In version 3.2.0, that constructor is entirely removed, which would result
-in fatal errors on attempts to call it. Particularly in code like this:
-::
-
-	class Some_model extends CI_Model {
-
-		public function __construct()
-		{
-			parent::__construct(); // calls CI_Model::__construct()
-
-			do_some_other_thing();
-		}
-	}
-
-All you need to do is remove that ``parent::__construct()`` call. On a side
-note, the following seems to be a very common practice:
-::
-
-	class Some_class extends CI_Something {
-
-		public function __construct()
-		{
-			parent::__construct();
-		}
-	}
-
-Please, do NOT do this! It's pointless; it serves no purpose and doesn't do
-anything. If a parent class has a ``__construct()`` method, it will be
-inherited by all its child classes and will execute just fine - you DON'T
-have to explicitly call it unless you want to extend its logic.
+The constructor is kept as an empty method for backwards compatibility, so
+existing code calling ``parent::__construct()`` will continue to work.
+However, such calls are unnecessary and can be safely removed.
 
 Step 4: Change database connection handling
 ===========================================
@@ -197,7 +179,7 @@ Step 10: Remove usage of previously deprecated functionalities
 ==============================================================
 
 The following is a list of functionalities deprecated in previous
-CodeIgniter versions that have been removed in 3.2.0:
+CodeIgniter versions that have been removed in 3.2+:
 
 - ``$config['allow_get_array']`` (use ``$_GET = array();`` instead)
 - ``$config['standardize_newlines']``
@@ -205,38 +187,8 @@ CodeIgniter versions that have been removed in 3.2.0:
 
 - 'sqlite' database driver (no longer shipped with PHP 5.4+; 'sqlite3' is still available)
 
-- ``CI_Input::is_cli_request()`` (use :php:func:`is_cli()` instead)
-- ``CI_Router::fetch_directory()`` (use ``CI_Router::$directory`` instead)
-- ``CI_Router::fetch_class()`` (use ``CI_Router::$class`` instead)
-- ``CI_Router::fetch_method()`` (use ``CI_Router::$method`` instead)
-- ``CI_Config::system_url()`` (encourages insecure practices)
-- ``CI_Form_validation::prep_for_form()`` (the *prep_for_form* rule)
+- The entire *Encrypt Library* (the newer :doc:`Encryption Library <../libraries/encryption>` is still available; the old Encrypt library depends on MCrypt which was removed from PHP in 7.2)
 
-- ``standard_date()`` :doc:`Date Helper <../helpers/date_helper>` function (use ``date()`` instead)
-- ``nice_date()`` :doc:`Date Helper <../helpers/date_helper>` function (use ``DateTime::format()`` instead)
-- ``do_hash()`` :doc:`Security Helper <../helpers/security_helper>` function (use ``hash()`` instead)
-- ``br()`` :doc:`HTML Helper <../helpers/html_helper>` function (use ``str_repeat()`` with ``'<br />'`` instead)
-- ``nbs()`` :doc:`HTML Helper <../helpers/html_helper>` function (use ``str_repeat()`` with ``'&nbsp;'`` instead)
-- ``trim_slashes()`` :doc:`String Helper <../helpers/string_helper>` function (use ``trim()`` with ``'/'`` instead)
-- ``repeater()`` :doc:`String Helper <../helpers/string_helper>` function (use ``str_repeat()`` instead)
-- ``read_file()`` :doc:`File Helper <../helpers/file_helper>` function (use ``file_get_contents()`` instead)
-- ``form_prep()`` :doc:`Form Helper <../helpers/form_helper>` function (use :php:func:`html_escape()` instead)
-
-- The entire *Encrypt Library* (the newer :doc:`Encryption Library <../libraries/encryption>` is still available)
-- The entire *Cart Library* (an archived version is available on GitHub: `bcit-ci/ci3-cart-library <https://github.com/bcit-ci/ci3-cart-library>`_)
-- The entire *Javascript Library* (it was always experimental in the first place)
-
-- The entire *Email Helper*, which only had two functions:
-
-   - ``valid_email()`` (use ``filter_var($email, FILTER_VALIDATE_EMAIL)`` instead)
-   - ``send_email()`` (use ``mail()`` instead)
-
-- The entire *Smiley Helper* (an archived version is available on GitHub: `bcit-ci/ci3-smiley-helper <https://github.com/bcit-ci/ci3-smiley-helper>`_)
-
-- The ``$_after`` parameter from :doc:`Database Forge <../database/forge>` method ``add_column()``.
-- The ``anchor_class`` option from :doc:`Pagination Library <../libraries/pagination>` (use ``class`` instead).
-- The ``unique`` and ``encrypt`` options from :doc:`String Helper <../helpers/string_helper>` function ``random_string()``.
-- The ``underscore`` and ``dash`` options from :doc:`URL Helper <../helpers/url_helper>`` function :php:func:`url_title()`.
 - The ``$img_path``, ``$img_url`` and ``$font_path`` parameters from
   :doc:`CAPCHA Helper <../helpers/captcha_helper>` function :php:func:`create_captcha()` (pass as array options instead).
 
@@ -277,14 +229,12 @@ The ``$curs_id`` property is also removed.
 If you were using those, you can create your own cursors via ``oci_new_cursor()``
 and the publicly accessible ``$conn_id``.
 
-Stop 14: Replace $config['log_file_extension'] with $config['log_filename'] in application/config/config.php
-============================================================================================================
+Step 14: Check log filename configuration in application/config/config.php
+==========================================================================
 
 You can now specify the full log filename via ``$config['log_filename']``.
 Add this configuration option to your **application/config/config.php**,
 if you haven't copied the new one over.
 
-The previously existing ``$config['log_file_extension']`` option has been
-removed and no longer works. However, its functionality is essentially
-integrated into the new ``$config['log_filename']``, since it includes the
-filename extension in itself.
+The ``$config['log_file_extension']`` option still works as a fallback,
+but ``$config['log_filename']`` takes precedence when set.

@@ -147,13 +147,20 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 
 			if ( ! empty($sql))
 			{
-				if (empty($this->options[PDO::MYSQL_ATTR_INIT_COMMAND]))
+				if (class_exists('Pdo\\Mysql'))
 				{
-					$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET SESSION sql_mode = '.$sql;
+					$constant = constant('Pdo\\Mysql::ATTR_INIT_COMMAND');
+				} else {
+					$constant = PDO::MYSQL_ATTR_INIT_COMMAND;
+				}
+
+				if (empty($this->options[$constant]))
+				{
+					$this->options[$constant] = 'SET SESSION sql_mode = '.$sql;
 				}
 				else
 				{
-					$this->options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ', @@session.sql_mode = '.$sql;
+					$this->options[$constant] .= ', @@session.sql_mode = '.$sql;
 				}
 			}
 		}

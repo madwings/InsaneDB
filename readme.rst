@@ -25,7 +25,7 @@ Changelog and New Features
 **************************
 
 You can find a list of all changes in the upstream version in the `user
-guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
+guide change log <https://github.com/pocketarc/codeigniter/blob/develop/user_guide_src/source/changelog.rst>`_.
 
 InsaneDB Major Changes
 =======================
