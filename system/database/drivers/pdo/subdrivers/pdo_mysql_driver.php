@@ -165,10 +165,27 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 			}
 		}
 
-		// Prior to version 5.7.3, MySQL silently downgrades to an unencrypted connection if SSL setup fails
+        if (class_exists('Pdo\\Mysql'))
+        {
+            $sslKey = constant('Pdo\\Mysql::ATTR_SSL_KEY');
+            $sslCert = constant('Pdo\\Mysql::ATTR_SSL_CERT');
+            $sslCA = constant('Pdo\\Mysql::ATTR_SSL_CA');
+            $sslCAPath = constant('Pdo\\Mysql::ATTR_SSL_CAPATH');
+            $sslCipher = constant('Pdo\\Mysql::ATTR_SSL_CIPHER');
+            $verify = constant('Pdo\\Mysql::ATTR_SSL_VERIFY_SERVER_CERT');
+        } else {
+            $sslKey = PDO::MYSQL_ATTR_SSL_KEY;
+            $sslCert = PDO::MYSQL_ATTR_SSL_CERT;
+            $sslCA = PDO::MYSQL_ATTR_SSL_CA;
+            $sslCAPath = PDO::MYSQL_ATTR_SSL_CAPATH;
+            $sslCipher = PDO::MYSQL_ATTR_SSL_CIPHER;
+            $verify = defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT') ? PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT : null;
+        }
+		
+        // Prior to version 5.7.3, MySQL silently downgrades to an unencrypted connection if SSL setup fails
 		if (
 			($pdo = parent::db_connect($persistent)) !== FALSE
-			&& ! empty($this->options[PDO::MYSQL_ATTR_SSL_KEY])
+			&& ! empty($this->options[$sslKey])
 			&& version_compare($pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), '5.7.3', '<=')
 			&& empty($pdo->query("SHOW STATUS LIKE 'ssl_cipher'")->fetchObject()->Value)
 		)
