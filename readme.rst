@@ -60,7 +60,7 @@ Behaviour bugfix
 Server Requirements
 *******************
 
-| PHP version 7.1 or newer is required.
+| PHP version 8.0 or newer is required.
 | It is recommend to migrate to newer version of PHP sooner than later.
 
 *******

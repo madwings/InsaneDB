@@ -1,6 +1,7 @@
 {
 	"name" : "madwings/insanedb",
-	"description" : "InasaneDB is a Database Toolkit for PHP forked from CodeIgniter 3",
+	"version": "1.4.0",
+	"description" : "InsaneDB is a Database Toolkit for PHP forked from CodeIgniter 3",
 	"type": "project",
 	"homepage": "https://github.com/madwings/InsaneDB",
 	"license": "MIT",
@@ -9,7 +10,7 @@
 		"source": "https://github.com/madwings/InsaneDB"
 	},
 	"require": {
-		"php": ">=7.1"
+		"php": ">=8.0"
 	},
 	"scripts": {
 		"test:coverage": [
