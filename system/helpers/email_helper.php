@@ -39,99 +39,47 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * CodeIgniter Security Helpers
+ * CodeIgniter Email Helpers
  *
  * @package		CodeIgniter
  * @subpackage	Helpers
  * @category	Helpers
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/helpers/security_helper.html
+ * @link		https://codeigniter.com/userguide3/helpers/email_helper.html
  */
 
 // ------------------------------------------------------------------------
 
-if ( ! function_exists('xss_clean'))
+if ( ! function_exists('valid_email'))
 {
 	/**
-	 * XSS Filtering
+	 * Validate email address
 	 *
-	 * @param	string
-	 * @param	bool	whether or not the content is an image file
-	 * @return	string
+	 * @deprecated	3.0.0	Use PHP's filter_var() instead
+	 * @param	string	$email
+	 * @return	bool
 	 */
-	function xss_clean($str, $is_image = FALSE)
+	function valid_email($email)
 	{
-		return get_instance()->security->xss_clean($str, $is_image);
+		return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
 	}
 }
 
 // ------------------------------------------------------------------------
 
-if ( ! function_exists('sanitize_filename'))
+if ( ! function_exists('send_email'))
 {
 	/**
-	 * Sanitize Filename
+	 * Send an email
 	 *
-	 * @param	string
-	 * @return	string
+	 * @deprecated	3.0.0	Use PHP's mail() instead
+	 * @param	string	$recipient
+	 * @param	string	$subject
+	 * @param	string	$message
+	 * @return	bool
 	 */
-	function sanitize_filename($filename)
+	function send_email($recipient, $subject, $message)
 	{
-		return get_instance()->security->sanitize_filename($filename);
-	}
-}
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('do_hash'))
-{
-	/**
-	 * Hash encode a string
-	 *
-	 * @deprecated	3.0.0	Use PHP's native hash() instead.
-	 * @param	string	$str
-	 * @param	string	$type = 'sha1'
-	 * @return	string
-	 */
-	function do_hash($str, $type = 'sha1')
-	{
-		if ( ! in_array(strtolower($type), hash_algos()))
-		{
-			$type = 'md5';
-		}
-
-		return hash($type, $str);
-	}
-}
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('strip_image_tags'))
-{
-	/**
-	 * Strip Image Tags
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	function strip_image_tags($str)
-	{
-		return get_instance()->security->strip_image_tags($str);
-	}
-}
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('encode_php_tags'))
-{
-	/**
-	 * Convert PHP tags to entities
-	 *
-	 * @param	string
-	 * @return	string
-	 */
-	function encode_php_tags($str)
-	{
-		return str_replace(array('<?', '?>'), array('&lt;?', '?&gt;'), $str);
+		return mail($recipient, $subject, $message);
 	}
 }
