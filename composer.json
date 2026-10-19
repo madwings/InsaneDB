@@ -1,6 +1,6 @@
 {
 	"name" : "madwings/insanedb",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"description" : "InsaneDB is a Database Toolkit for PHP forked from CodeIgniter 3",
 	"type": "project",
 	"homepage": "https://github.com/madwings/InsaneDB",
@@ -18,10 +18,10 @@
 			"phpunit --color=always --coverage-text --configuration tests/travis/sqlite.phpunit.xml"
 		],
 		"post-install-cmd": [
-			"sed -i s/name{0}/name[0]/ vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php"
+			"@php tests/patch-vendor.php"
 		],
 		"post-update-cmd": [
-			"sed -i s/name{0}/name[0]/ vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php"
+			"@php tests/patch-vendor.php"
 		]
 	},
 	"require-dev": {
