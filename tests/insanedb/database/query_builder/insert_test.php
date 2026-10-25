@@ -107,6 +107,39 @@ class Insert_test extends CI_TestCase {
 	/**
 	 * @see ./mocks/schema/skeleton.php
 	 */
+	public function test_set_insert_batch_rejects_mismatched_keys()
+	{
+		$this->db->set_insert_batch(array(array('id' => 10, 'name' => 'Baker', 'description' => 'Bread')));
+
+		// A different column list must not be merged into the queued batch
+		$this->assertFalse($this->db->set_insert_batch(array(array('id' => 11, 'name' => 'Butcher'))));
+
+		// Same columns in a different order are fine
+		$this->assertInstanceOf('CI_DB_query_builder', $this->db->set_insert_batch(array(array('description' => 'Meat', 'name' => 'Butcher', 'id' => 11))));
+
+		if (strpos(DB_DRIVER, 'pdo/sqlite') === FALSE)
+		{
+			$this->assertEquals(2, $this->db->insert_batch('job'));
+
+			$job_10 = $this->db->where('id', 10)->get('job')->row();
+			$job_11 = $this->db->where('id', 11)->get('job')->row();
+
+			$this->assertEquals('Baker', $job_10->name);
+			$this->assertEquals('Bread', $job_10->description);
+			$this->assertEquals('Butcher', $job_11->name);
+			$this->assertEquals('Meat', $job_11->description);
+		}
+		else
+		{
+			$this->db->reset_query();
+		}
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
 	public function test_insert_batch_with_keys()
 	{
 		// The skipped `description` column is NOT NULL, so this only works in non-strict MySQL

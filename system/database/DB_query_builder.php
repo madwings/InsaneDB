@@ -123,6 +123,13 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	protected $qb_keys			= array();
 
 	/**
+	 * QB unprotected, sorted keys of the queued insert batch
+	 *
+	 * @var	array
+	 */
+	protected $qb_batch_keys		= array();
+
+	/**
 	 * QB LIMIT data
 	 *
 	 * @var	int
@@ -1728,6 +1735,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$keys = ! empty($include) ? $include : (is_array($first) ? array_keys($first) : array());
 		sort($keys);
 
+		// Rows already queued must have been built with the same columns
+		if ( ! empty($this->qb_set) && $keys !== $this->qb_batch_keys)
+		{
+			return ($this->db_debug) ? $this->display_error('db_batch_keys_mismatch') : FALSE;
+		}
+
 		$rows = array();
 		foreach ($key as $row)
 		{
@@ -1762,6 +1775,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		// Only add the rows once all of them are validated
 		$this->qb_set = array_merge($this->qb_set, $rows);
+		$this->qb_batch_keys = $keys;
 
 		$this->qb_keys = array();
 		foreach ($keys as $k)
@@ -2978,6 +2992,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			'qb_where'	=> array(),
 			'qb_orderby'	=> array(),
 			'qb_keys'	=> array(),
+			'qb_batch_keys'	=> array(),
 			'qb_limit'	=> FALSE
 		));
 	}
