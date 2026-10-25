@@ -80,6 +80,9 @@ class Mock_Database_Fake_Connection {
 
 	public function getAttribute($attribute)
 	{
+		// Like PDO, getAttribute() clears the last error
+		$this->error_info = array('00000', NULL, NULL);
+
 		switch ($attribute)
 		{
 			case PDO::ATTR_CONNECTION_STATUS:

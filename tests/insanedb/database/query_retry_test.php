@@ -336,6 +336,11 @@ class Query_retry_test extends CI_TestCase {
 
 		$this->assertFalse($db->query('INSERT INTO job (id) VALUES (1)'));
 		$this->assertCount(1, $this->server->queries());
+
+		// The error of a non-retryable query is still available
+		$error = $db->error();
+		$this->assertEquals('23505/7', $error['code']);
+		$this->assertEquals('Fake error 23505/7', $error['message']);
 	}
 
 	// ------------------------------------------------------------------------
