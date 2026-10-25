@@ -412,7 +412,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		// clears the error info, which would hide the error of any other failed query.
 		return strncmp($sqlstate, '08', 2) === 0
 			OR in_array($sqlstate, array('57P01', '57P02', '57P03'), TRUE)
-			OR ($sqlstate === 'HY000' && $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.'))
+			OR ($sqlstate === 'HY000' && $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.');
 	}
 
 	// --------------------------------------------------------------------
