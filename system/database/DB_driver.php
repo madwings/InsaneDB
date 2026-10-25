@@ -2329,8 +2329,11 @@ abstract class CI_DB_driver {
 	public function conn_force($conn = 'write', $conn_force_clr = TRUE)
 	{
 		$this->conn_force = $conn;
-		$this->conn_force_clr = $conn_force_clr;
+
+		// Switch the connection right away, but keep the force for the next query
+		$this->conn_force_clr = FALSE;
 		$this->_config_read_write();
+		$this->conn_force_clr = $conn_force_clr;
 	}
 
 	// --------------------------------------------------------------------

@@ -44,29 +44,64 @@ class Insert_test extends CI_TestCase {
 	 */
 	public function test_insert_batch()
 	{
-		// Do insert batch except for sqlite driver
-		if (strpos(DB_DRIVER, 'pdo/sqlite') === FALSE)
-		{
-			$job_datas = array(
-				array('id' => 2, 'name' => 'Commedian', 'description' => 'Theres something in your teeth'),
-				array('id' => 3, 'name' => 'Cab Driver', 'description' => 'Iam yellow')
-			);
+		$job_datas = array(
+			array('id' => 2, 'name' => 'Commedian', 'description' => 'Theres something in your teeth'),
+			array('id' => 3, 'name' => 'Cab Driver', 'description' => 'Iam yellow')
+		);
 
-			$this->assertEquals(2, $this->db->insert_batch('job', $job_datas));
+		$this->assertEquals(2, $this->db->insert_batch('job', $job_datas));
 
-			$job_2 = $this->db->where('id', 2)->get('job')->row();
-			$job_3 = $this->db->where('id', 3)->get('job')->row();
+		$job_2 = $this->db->where('id', 2)->get('job')->row();
+		$job_3 = $this->db->where('id', 3)->get('job')->row();
 
-			// Check the result
-			$this->assertEquals('Commedian', $job_2->name);
-			$this->assertEquals('Cab Driver', $job_3->name);
-			
-			// Check the result
-			$this->assertEquals('Theres something in your teeth', $job_2->description);
-			$this->assertEquals('Iam yellow', $job_3->description);
-		}
+		// Check the result
+		$this->assertEquals('Commedian', $job_2->name);
+		$this->assertEquals('Cab Driver', $job_3->name);
+
+		// Check the result
+		$this->assertEquals('Theres something in your teeth', $job_2->description);
+		$this->assertEquals('Iam yellow', $job_3->description);
 	}
-	
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_insert_batch_size()
+	{
+		$job_datas = array(
+			array('id' => 1, 'name' => 'Developer', 'description' => 'Awesome job'),
+			array('id' => 2, 'name' => 'Politician', 'description' => 'Not really a job'),
+			array('id' => 3, 'name' => 'Accountant', 'description' => 'Boring job')
+		);
+
+		$this->assertEquals(3, $this->db->insert_batch('job', $job_datas, 2));
+		$this->assertEquals(3, $this->db->count_all('job'));
+		$this->assertEquals('Accountant', $this->db->where('id', 3)->get('job')->row()->name);
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_insert_batch_with_different_keys()
+	{
+		$job_datas = array(
+			array('id' => 1, 'name' => 'Developer', 'description' => 'Awesome job'),
+			array('id' => 2, 'name' => 'Politician')
+		);
+
+		// Nothing is inserted, not even the valid rows
+		$this->assertFalse($this->db->insert_batch('job', $job_datas));
+		$this->assertEquals(0, $this->db->count_all('job'));
+
+		// The next insert isn't affected by the failed one
+		$this->assertEquals(1, $this->db->insert_batch('job', array(array('id' => 3, 'name' => 'Accountant', 'description' => 'Boring job'))));
+		$this->assertEquals(1, $this->db->count_all('job'));
+	}
+
 	// ------------------------------------------------------------------------
 
 	/**
@@ -74,27 +109,29 @@ class Insert_test extends CI_TestCase {
 	 */
 	public function test_insert_batch_with_keys()
 	{
-		// Do insert batch only for pdo/mysql driver
-		if (strpos(DB_DRIVER, 'pdo/mysql') !== FALSE)
+		// The skipped `description` column is NOT NULL, so this only works in non-strict MySQL
+		if (strpos(DB_DRIVER, 'pdo/mysql') === FALSE)
 		{
-			$job_datas = array(
-				array('id' => 4, 'name' => 'Commedian', 'description' => 'Theres something in your teeth'),
-				array('id' => 5, 'name' => 'Cab Driver', 'description' => 'Iam yellow')
-			);
-
-			$this->assertEquals(2, $this->db->insert_batch('job', $job_datas, 500, array('id', 'name')));
-
-			$job_2 = $this->db->where('id', 4)->get('job')->row();
-			$job_3 = $this->db->where('id', 5)->get('job')->row();
-
-			// Check the result
-			$this->assertEquals('Commedian', $job_2->name);
-			$this->assertEquals('Cab Driver', $job_3->name);
-			
-			// Check the result
-			$this->assertEmpty($job_2->description);
-			$this->assertEmpty($job_3->description);
+			$this->markTestSkipped('Requires MySQL');
 		}
+
+		$job_datas = array(
+			array('id' => 4, 'name' => 'Commedian', 'description' => 'Theres something in your teeth'),
+			array('id' => 5, 'name' => 'Cab Driver', 'description' => 'Iam yellow')
+		);
+
+		$this->assertEquals(2, $this->db->insert_batch('job', $job_datas, 500, array('id', 'name')));
+
+		$job_2 = $this->db->where('id', 4)->get('job')->row();
+		$job_3 = $this->db->where('id', 5)->get('job')->row();
+
+		// Check the result
+		$this->assertEquals('Commedian', $job_2->name);
+		$this->assertEquals('Cab Driver', $job_3->name);
+
+		// Check the result
+		$this->assertEmpty($job_2->description);
+		$this->assertEmpty($job_3->description);
 	}
 	
 	// ------------------------------------------------------------------------
