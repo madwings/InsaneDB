@@ -434,7 +434,9 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 			return TRUE;
 		}
 
-		if ($this->_is_connection_lost())
+		// Set by simple_query() from _is_connection_lost(). It can't be called again here,
+		// as it may have cleared the error info while checking the connection status.
+		if ($this->_reconnect)
 		{
 			// The query may have been executed before the connection was lost,
 			// so only recognized reads are safe to run again
