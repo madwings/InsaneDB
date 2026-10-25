@@ -37,6 +37,11 @@ class Mock_Database_Fake_Server {
 	public $fail_begin = FALSE;
 
 	/**
+	 * @var string|null Outcome of rollBack(): NULL (success), 'fail' (returns FALSE) or 'throw' (PDOException)
+	 */
+	public $rollback_outcome = NULL;
+
+	/**
 	 * Open a connection
 	 *
 	 * @param	string	$dsn

@@ -1147,8 +1147,11 @@ abstract class CI_DB_driver {
 		{
 			return FALSE;
 		}
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		elseif ($this->_trans_depth > 1 OR $this->_trans_rollback())
+		// When transactions are nested we only begin/commit/rollback the outermost ones.
+		// If the connection was lost, the server has already discarded the transaction,
+		// so only the local state is unwound (a rollback would fail or throw). The pending
+		// reconnect is left to the next query or transaction, so the error can still be read.
+		elseif ($this->_trans_depth > 1 OR $this->_reconnect OR $this->_trans_rollback())
 		{
 			if (--$this->_trans_depth === 0)
 			{
@@ -1465,6 +1468,10 @@ abstract class CI_DB_driver {
 			return 0;
 		}
 
+		// The query builder state isn't used here, but is cleared on every outcome
+		// (including errors) so that it doesn't leak into the next query
+		$this->_reset_select();
+
 		$query = $this->query($this->_count_string.$this->escape_identifiers('numrows').' FROM '.$this->protect_identifiers($table, TRUE, NULL, FALSE));
 		if ($query === FALSE)
 		{
@@ -1475,9 +1482,7 @@ abstract class CI_DB_driver {
 			return 0;
 		}
 
-		$query = $query->row();
-		$this->_reset_select();
-		return (int) $query->numrows;
+		return (int) $query->row()->numrows;
 	}
 
 	// --------------------------------------------------------------------
@@ -1849,11 +1854,20 @@ abstract class CI_DB_driver {
 	 */
 	public function call_function($function)
 	{
-		$driver = $this->dbdriver.'_';
+		$prefixes = array(
+			'postgre' => 'pg',
+			'oci8'    => 'oci'
+		);
 
-		if (FALSE === strpos($function, $driver))
+		$prefix = isset($prefixes[$this->dbdriver]) ? $prefixes[$this->dbdriver] : $this->dbdriver;
+		$length = strlen($prefix);
+
+		// Function names are case-insensitive. Names already carrying the prefix are kept,
+		// including legacy aliases without an underscore (e.g. ocilogon).
+		if (strncasecmp($function, $prefix.'_', $length + 1) !== 0
+			&& (strncasecmp($function, $prefix, $length) !== 0 OR ! function_exists($function)))
 		{
-			$function = $driver.$function;
+			$function = $prefix.'_'.$function;
 		}
 
 		if ( ! function_exists($function))

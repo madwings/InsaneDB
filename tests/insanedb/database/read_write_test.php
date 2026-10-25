@@ -270,6 +270,23 @@ class Read_write_test extends CI_TestCase {
 
 	// ------------------------------------------------------------------------
 
+	public function test_failed_rollback_after_lost_connection_restores_force()
+	{
+		$db = $this->db();
+		$this->server->rollback_outcome = 'throw';
+
+		$db->trans_start();
+		$this->server->fail('HY000', 2013);
+		$this->assertFalse($db->query('INSERT INTO job (id) VALUES (1)'));
+		$this->assertFalse($db->trans_complete());
+		$this->assertFalse($db->trans_active());
+
+		$db->query('SELECT 1');
+		$this->assertEquals('read-host', $this->host_of('SELECT 1'));
+	}
+
+	// ------------------------------------------------------------------------
+
 	public function test_close_single_connection()
 	{
 		$db = $this->db();

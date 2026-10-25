@@ -123,6 +123,16 @@ class Mock_Database_Fake_Connection {
 	public function rollBack()
 	{
 		$this->_log('ROLLBACK');
+
+		if ($this->server->rollback_outcome === 'throw')
+		{
+			throw new PDOException('There is no active transaction');
+		}
+		elseif ($this->server->rollback_outcome === 'fail')
+		{
+			return FALSE;
+		}
+
 		$this->in_transaction = FALSE;
 		return TRUE;
 	}

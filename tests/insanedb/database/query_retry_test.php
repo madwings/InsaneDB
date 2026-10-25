@@ -210,6 +210,61 @@ class Query_retry_test extends CI_TestCase {
 
 	// ------------------------------------------------------------------------
 
+	public function test_failed_rollback_after_lost_connection_unwinds_transaction()
+	{
+		foreach (array('fail', 'throw') as $outcome)
+		{
+			$db = $this->mysql();
+
+			$this->assertTrue($db->trans_begin(), $outcome);
+			$this->assertTrue($db->trans_begin(), $outcome);
+			$this->server->fail('HY000', 2013);
+			$this->server->rollback_outcome = $outcome;
+
+			$this->assertFalse($db->query('UPDATE job SET name = 1'), $outcome);
+			$this->assertFalse($db->trans_complete(), $outcome);
+			$this->assertFalse($db->trans_complete(), $outcome);
+			$this->assertFalse($db->trans_active(), $outcome);
+			$this->assertTrue($db->fake_get('_reconnect'), $outcome);
+
+			// A new transaction is not nested and runs on a new connection
+			$this->server->rollback_outcome = NULL;
+			$this->assertTrue($db->trans_begin(), $outcome);
+			$this->assertCount(2, $this->server->connections, $outcome);
+			$this->assertSame(1, $this->server->entry('BEGIN')['conn'], $outcome);
+			$this->assertTrue($db->trans_commit(), $outcome);
+			$this->assertFalse($db->trans_active(), $outcome);
+		}
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_failed_rollback_on_live_connection_keeps_transaction()
+	{
+		$db = $this->mysql();
+
+		$this->assertTrue($db->trans_begin());
+		$this->server->rollback_outcome = 'fail';
+
+		$this->assertFalse($db->trans_rollback());
+		$this->assertTrue($db->trans_active());
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_failed_count_all_resets_query_builder()
+	{
+		$db = $this->mysql();
+		$this->server->fail('42S02', 1146);
+
+		$this->assertFalse($db->where('id', 1)->count_all('missing_table'));
+
+		$db->get('job');
+		$this->assertStringNotContainsString('WHERE', $db->last_query());
+	}
+
+	// ------------------------------------------------------------------------
+
 	public function test_failed_reconnect_is_retried()
 	{
 		$db = $this->mysql(array('query_retries' => 2));
