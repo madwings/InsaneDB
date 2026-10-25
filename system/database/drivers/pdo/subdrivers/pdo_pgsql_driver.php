@@ -407,10 +407,12 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		$error = $this->conn_id->errorInfo();
 		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
 
-		// Connection exception, server shutdown or a broken connection
+		// Connection exception, server shutdown or a broken connection. The connection
+		// status is checked only for errors without a SQLSTATE, as getAttribute()
+		// clears the error info, which would hide the error of any other failed query.
 		return strncmp($sqlstate, '08', 2) === 0
 			OR in_array($sqlstate, array('57P01', '57P02', '57P03'), TRUE)
-			OR $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.';
+			OR ($sqlstate === 'HY000' && $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.');
 	}
 
 	// --------------------------------------------------------------------
@@ -432,7 +434,9 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 			return TRUE;
 		}
 
-		if ($this->_is_connection_lost())
+		// Set by simple_query() from _is_connection_lost(). It can't be called again here,
+		// as it may have cleared the error info while checking the connection status.
+		if ($this->_reconnect)
 		{
 			// The query may have been executed before the connection was lost,
 			// so only recognized reads are safe to run again
