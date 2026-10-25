@@ -420,6 +420,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		{
 			$this->qb_cache_select[] = $sql;
 			$this->qb_cache_exists[] = 'select';
+			$this->qb_cache_no_escape[] = NULL;
 		}
 
 		return $this;
@@ -1484,7 +1485,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string
 	 * @param	bool	the reset clause
-	 * @return	int
+	 * @return	int|bool	Number of rows or FALSE on failure
 	 */
 	public function count_all_results($table = '', $reset = TRUE)
 	{
@@ -1515,7 +1516,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$this->qb_cache_orderby = $qb_cache_orderby;
 		}
 
-		if ($result->num_rows() === 0)
+		if ($result === FALSE)
+		{
+			return FALSE;
+		}
+		elseif ($result->num_rows() === 0)
 		{
 			return 0;
 		}
@@ -1590,7 +1595,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				return ($this->db_debug) ? $this->display_error('insert_batch() called with no data') : FALSE;
 			}
 
-			$this->set_insert_batch($set, '', $include);
+			if ($this->set_insert_batch($set, '', $include, $escape) === FALSE)
+			{
+				return FALSE;
+			}
 		}
 
 		if (strlen($table) === 0)
@@ -1638,9 +1646,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			return FALSE;
 		}
 		
-		if ($set !== NULL)
+		if ($set !== NULL && $this->set_insert_batch($set, '', $include, $escape) === FALSE)
 		{
-			$this->set_insert_batch($set, '', $include);
+			return FALSE;
 		}
 
 		if (count($this->qb_set) === 0)
@@ -1696,11 +1704,12 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	mixed
 	 * @param	string
-	 * @param	array
+	 * @param	array	$include	Keys included into the insert
+	 * @param	bool	$escape		Whether to escape values and identifiers
 	 *
-	 * @return	CI_DB_query_builder
+	 * @return	CI_DB_query_builder|bool	FALSE if the rows don't contain the same keys
 	 */
-	public function set_insert_batch($key, $value = '', $include = NULL)
+	public function set_insert_batch($key, $value = '', $include = NULL, $escape = NULL)
 	{
 		$key = $this->_object_to_array_batch($key);
 
@@ -1708,21 +1717,28 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		{
 			$key = array($key => $value);
 		}
+		elseif (empty($key))
+		{
+			return $this;
+		}
 
-		$escape = $this->_protect_identifiers;
+		is_bool($escape) OR $escape = $this->_protect_identifiers;
 
-		$keys = ! empty($include) ? $include : array_keys($this->_object_to_array(reset($key)));
+		$first = $this->_object_to_array(reset($key));
+		$keys = ! empty($include) ? $include : (is_array($first) ? array_keys($first) : array());
 		sort($keys);
 
+		$rows = array();
 		foreach ($key as $row)
 		{
 			$row = $this->_object_to_array($row);
-			$row_keys = ! empty($include) ? $include : array_keys($row);
-			if (count(array_diff($keys, $row_keys)) > 0 OR count(array_diff($row_keys, $keys)) > 0)
+
+			// Every row must contain the included keys, or exactly the same keys when there's no $include
+			if (empty($keys) OR ! is_array($row)
+				OR count(array_diff($keys, array_keys($row))) > 0
+				OR (empty($include) && count(array_diff(array_keys($row), $keys)) > 0))
 			{
-				// batch function above returns an error on an empty array
-				$this->qb_set[] = array();
-				return;
+				return ($this->db_debug) ? $this->display_error('db_batch_keys_mismatch') : FALSE;
 			}
 
 			ksort($row); // puts $row in the same order as our keys
@@ -1741,9 +1757,13 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				$row = $clean;
 			}
 
-			$this->qb_set[] = '('.implode(',', $row).')';
+			$rows[] = '('.implode(',', $row).')';
 		}
 
+		// Only add the rows once all of them are validated
+		$this->qb_set = array_merge($this->qb_set, $rows);
+
+		$this->qb_keys = array();
 		foreach ($keys as $k)
 		{
 			$this->qb_keys[] = $this->protect_identifiers($k, FALSE, $escape);
@@ -2083,6 +2103,9 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$table = $this->qb_from[0];
 		}
 
+		// _update_batch() appends its own IN() condition to qb_where, so keep
+		// the user's conditions aside and re-apply them to every batch
+		$qb_where = $this->qb_where;
 		$affected_rows = 0;
 		for ($i = 0, $total = count($this->qb_set_ub); $i < $total; $i += $batch_size)
 		{
@@ -2091,7 +2114,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				$affected_rows += $this->affected_rows();
 			}
 
-			$this->qb_where = array();
+			$this->qb_where = $qb_where;
 		}
 
 		$this->_reset_write();
@@ -2873,15 +2896,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			return TRUE;
 		}
 
-		static $_str;
+		// Double quotes delimit string literals only when they aren't the identifier escape character
+		$quotes = ($this->_escape_char !== '"') ? array('"', "'") : array("'");
 
-		if (empty($_str))
-		{
-			$_str = ($this->_escape_char !== '"')
-				? array('"', "'") : array("'");
-		}
-
-		return in_array($str[0], $_str, TRUE);
+		return in_array($str[0], $quotes, TRUE);
 	}
 
 	// --------------------------------------------------------------------

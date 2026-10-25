@@ -396,24 +396,43 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	/**
 	 * Check if query error is retryable
 	 *
+	 * pdo_pgsql reports the SQLSTATE in errorInfo()[0], while errorInfo()[1]
+	 * holds the libpq result status. Connection losses detected by libpq
+	 * itself have no SQLSTATE (HY000), so the connection status is checked too.
+	 *
+	 * @param	string	$sql	The failed query
 	 * @return	bool
 	 */
-	protected function is_retryable()
+	protected function is_retryable($sql = '')
 	{
-		$result = FALSE;
 		$error = $this->conn_id->errorInfo();
-		if ( ! isset($error[1]))
+		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
+
+		// Deadlock or serialization failure, the statement was rolled back
+		if ($sqlstate === '40P01' OR $sqlstate === '40001')
 		{
-			$result = FALSE;
-		}
-		// PostgreSQL specific errors for lost connection
-		elseif (in_array($error[1], array('08000', '08003', '08006'), TRUE))
-		{
-			$this->close();
-			$result = TRUE;
+			return TRUE;
 		}
 
-		return $result;
+		// Connection exception, server shutdown or a broken connection
+		if (strncmp($sqlstate, '08', 2) === 0
+			OR in_array($sqlstate, array('57P01', '57P02', '57P03'), TRUE)
+			OR $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.')
+		{
+			// The query may have been executed before the connection was lost,
+			// so only reads are safe to run again. The parent check is used, as
+			// is_write_type() treats INSERT/UPDATE ... RETURNING as reads.
+			if (parent::is_write_type($sql))
+			{
+				$this->_reconnect = TRUE;
+				return FALSE;
+			}
+
+			$this->close();
+			return TRUE;
+		}
+
+		return FALSE;
 	}
 
 }
