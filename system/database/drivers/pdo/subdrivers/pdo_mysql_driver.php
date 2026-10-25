@@ -448,7 +448,7 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 				return TRUE;
 			// The statement was rolled back by the server
 			case 1213: // ER_LOCK_DEADLOCK
-				sleep(1);
+				$this->_retry_backoff();
 				return TRUE;
 			case 1205: // ER_LOCK_WAIT_TIMEOUT
 				return TRUE;

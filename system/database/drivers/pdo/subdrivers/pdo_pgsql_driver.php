@@ -76,6 +76,14 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	 */
 	protected $_random_keyword = array('RANDOM()', 'RANDOM()');
 
+	/**
+	 * Error saved by _is_connection_lost() before PDO::getAttribute()
+	 * cleared it: array(connection, error() result)
+	 *
+	 * @var	array
+	 */
+	protected $_saved_error;
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -132,6 +140,40 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		}
 
 		return $this->conn_id;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Execute the query
+	 *
+	 * @param	string	$sql	SQL query
+	 * @return	mixed
+	 */
+	protected function _execute($sql)
+	{
+		$this->_saved_error = NULL;
+		return parent::_execute($sql);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Error
+	 *
+	 * Returns an array containing code and message of the last
+	 * database error that has occurred.
+	 *
+	 * @return	array
+	 */
+	public function error()
+	{
+		if (isset($this->_saved_error) && $this->_saved_error[0] === $this->conn_id)
+		{
+			return $this->_saved_error[1];
+		}
+
+		return parent::error();
 	}
 
 	// --------------------------------------------------------------------
@@ -407,12 +449,24 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		$error = $this->conn_id->errorInfo();
 		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
 
-		// Connection exception, server shutdown or a broken connection. The connection
-		// status is checked only for errors without a SQLSTATE, as getAttribute()
-		// clears the error info, which would hide the error of any other failed query.
+		// The connection status is checked only for errors without a SQLSTATE, as
+		// getAttribute() clears the error info. It's saved first, so that error()
+		// can still report it.
+		if ($sqlstate === 'HY000')
+		{
+			$this->_saved_error = array($this->conn_id, parent::error());
+			return $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.';
+		}
+
+		// Connection exception or the server terminated the connection
 		return strncmp($sqlstate, '08', 2) === 0
-			OR in_array($sqlstate, array('57P01', '57P02', '57P03'), TRUE)
-			OR ($sqlstate === 'HY000' && $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.');
+			OR in_array($sqlstate, array(
+				'57P01', // admin_shutdown
+				'57P02', // crash_shutdown
+				'57P03', // cannot_connect_now
+				'57P05', // idle_session_timeout
+				'25P03'  // idle_in_transaction_session_timeout
+			), TRUE);
 	}
 
 	// --------------------------------------------------------------------
@@ -428,9 +482,10 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		$error = $this->conn_id->errorInfo();
 		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
 
-		// Deadlock or serialization failure, the statement was rolled back
-		if ($sqlstate === '40P01' OR $sqlstate === '40001')
+		// Deadlock, serialization failure or lock timeout, the statement was rolled back
+		if (in_array($sqlstate, array('40P01', '40001', '55P03'), TRUE))
 		{
+			$this->_retry_backoff();
 			return TRUE;
 		}
 
@@ -439,8 +494,9 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		if ($this->_reconnect)
 		{
 			// The query may have been executed before the connection was lost,
-			// so only recognized reads are safe to run again
-			if ( ! $this->_is_retry_safe($sql))
+			// so only recognized reads are safe to run again. An idle session
+			// timeout closes the connection before the query is received.
+			if ($sqlstate !== '57P05' && ! $this->_is_retry_safe($sql))
 			{
 				return FALSE;
 			}

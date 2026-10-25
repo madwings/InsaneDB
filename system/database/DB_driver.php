@@ -1284,6 +1284,19 @@ abstract class CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Wait a short random time before retrying a query that failed because
+	 * of a lock conflict, so the competing transactions don't collide again
+	 *
+	 * @return	void
+	 */
+	protected function _retry_backoff()
+	{
+		usleep(mt_rand(50000, 200000));
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Calculate the aggregate query elapsed time
 	 *
 	 * @param	int	The number of decimal places

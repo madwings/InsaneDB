@@ -266,7 +266,7 @@ class Query_retry_test extends CI_TestCase {
 
 	public function test_pgsql_deadlock_and_serialization_failure_are_retried()
 	{
-		foreach (array('40P01', '40001') as $sqlstate)
+		foreach (array('40P01', '40001', '55P03') as $sqlstate)
 		{
 			$db = $this->pgsql();
 			$this->server->fail($sqlstate, 7);
@@ -281,7 +281,7 @@ class Query_retry_test extends CI_TestCase {
 
 	public function test_pgsql_connection_errors_retry_reads_on_new_connection()
 	{
-		foreach (array('08006', '08003', '57P01', '57P02', '57P03') as $sqlstate)
+		foreach (array('08006', '08003', '57P01', '57P02', '57P03', '57P05') as $sqlstate)
 		{
 			$db = $this->pgsql();
 			$this->server->fail($sqlstate, 7);
@@ -301,6 +301,73 @@ class Query_retry_test extends CI_TestCase {
 
 		$this->assertNotFalse($db->query('SELECT 1'));
 		$this->assertCount(2, $this->server->connections);
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_pgsql_bad_connection_error_is_reported()
+	{
+		$db = $this->pgsql(array('query_retries' => 0));
+		$this->server->fail('HY000', 7, 'Bad connection.');
+
+		// The error must survive the connection status check, which clears it in PDO
+		$this->assertFalse($db->query('SELECT 1'));
+		$error = $db->error();
+		$this->assertEquals('HY000/7', $error['code']);
+		$this->assertEquals('Fake error HY000/7', $error['message']);
+		$this->assertTrue($db->fake_get('_reconnect'));
+
+		// It's not reported for the next query
+		$db->query('SELECT 1');
+		$error = $db->error();
+		$this->assertEquals('00000', $error['code']);
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_pgsql_error_without_sqlstate_on_good_connection_is_reported()
+	{
+		$db = $this->pgsql();
+		$this->server->fail('HY000', 7);
+
+		$this->assertFalse($db->query('SELECT 1'));
+		$this->assertCount(1, $this->server->queries());
+		$this->assertFalse($db->fake_get('_reconnect'));
+
+		$error = $db->error();
+		$this->assertEquals('HY000/7', $error['code']);
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_pgsql_idle_session_timeout_retries_writes()
+	{
+		$db = $this->pgsql();
+		$this->server->fail('57P05', 7);
+
+		// The server closed the idle connection before the query was received
+		$this->assertNotFalse($db->query('UPDATE job SET name = 1'));
+		$this->assertCount(2, $this->server->queries());
+		$this->assertCount(2, $this->server->connections);
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_pgsql_idle_in_transaction_timeout_reconnects_after_transaction()
+	{
+		$db = $this->pgsql();
+
+		$this->assertTrue($db->trans_begin());
+		$this->server->fail('25P03', 7);
+
+		$this->assertFalse($db->query('UPDATE job SET name = 1'));
+		$this->assertCount(1, $this->server->queries());
+		$this->assertTrue($db->fake_get('_reconnect'));
+
+		$db->trans_rollback();
+		$this->assertTrue($db->trans_begin());
+		$this->assertCount(2, $this->server->connections);
+		$db->trans_commit();
 	}
 
 	// ------------------------------------------------------------------------
