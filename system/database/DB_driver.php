@@ -411,9 +411,10 @@ abstract class CI_DB_driver {
 	/**
 	 * Reconnect before the next query flag
 	 *
-	 * Set by is_retryable() when the connection is lost but the failed
-	 * query can't be retried. The connection is not closed right away,
-	 * so that the caller can still read the error from it.
+	 * Set when a query fails due to a lost connection and wasn't retried
+	 * (no attempts left, a transaction is active or the query is not safe
+	 * to run again). The connection is not closed right away, so that the
+	 * caller can still read the error from it.
 	 *
 	 * @var	bool
 	 */
@@ -853,8 +854,9 @@ abstract class CI_DB_driver {
 			$this->_config_read_write($sql);
 		}
 
-		// The previous query lost the connection without being retried
-		if ($this->_reconnect)
+		// The previous query lost the connection without being retried. Don't reconnect
+		// within a transaction, as the following statements would run outside of it.
+		if ($this->_reconnect && $this->_trans_depth === 0)
 		{
 			$this->_reconnect = FALSE;
 			$this->close();
@@ -865,6 +867,8 @@ abstract class CI_DB_driver {
 		{
 			if (empty($this->conn_id))
 			{
+				$this->_reconnect = FALSE;
+
 				try
 				{
 					$this->initialize();
@@ -890,6 +894,13 @@ abstract class CI_DB_driver {
 				if ( ! empty($error['code']) && $error['code'] !== '00000')
 				{
 					log_message('error', 'Query attempt: '.($i + 1).' - Error message: '.$error['message'].' - Error code: '.$error['code'].' - Invalid query: '.$sql);
+				}
+
+				// Detected regardless of the retry budget, so that a broken connection
+				// is replaced before the next query even if this one isn't retried
+				if ( ! empty($this->conn_id) && $this->_is_connection_lost())
+				{
+					$this->_reconnect = TRUE;
 				}
 			}
 
@@ -1226,6 +1237,48 @@ abstract class CI_DB_driver {
 	public function is_write_type($sql)
 	{
 		return (bool) preg_match('/^\s*"?(SET|INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|TRUNCATE|LOAD|COPY|ALTER|RENAME|GRANT|REVOKE|LOCK|UNLOCK|REINDEX|MERGE)\s/i', $sql);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Determines if a query is safe to run again after the connection
+	 * was lost while it was executing (it may have been applied already).
+	 *
+	 * Only recognized read statements are considered safe. Anything else,
+	 * including data-modifying CTEs, CALL/DO and statements mentioning write
+	 * keywords anywhere, is treated as unsafe. Side effects hidden inside
+	 * functions called by a SELECT can't be detected.
+	 *
+	 * @param	string	$sql	An SQL query string
+	 * @return	bool
+	 */
+	protected function _is_retry_safe($sql)
+	{
+		// Skip leading whitespace, comments and opening parentheses
+		$sql = preg_replace('#^(?:\s+|--[^\n]*(?:\n|$)|\#[^\n]*(?:\n|$)|/\*.*?\*/|\()+#s', '', (string) $sql);
+
+		if ( ! preg_match('/^(SELECT|SHOW|DESCRIBE|DESC|EXPLAIN|VALUES|TABLE|WITH)\b/i', $sql))
+		{
+			return FALSE;
+		}
+
+		return ! preg_match('/\b(INSERT|UPDATE|DELETE|REPLACE|MERGE|UPSERT|INTO|CALL|DO|SET|CREATE|DROP|ALTER|TRUNCATE|COPY|LOCK|GRANT|REVOKE|NEXTVAL|SETVAL|GET_LOCK|RELEASE_LOCK)\b/i', $sql);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if the last query failed because the connection was lost
+	 *
+	 * Must only inspect the error and never close the connection,
+	 * as the caller may still need to read the error from it.
+	 *
+	 * @return	bool
+	 */
+	protected function _is_connection_lost()
+	{
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------

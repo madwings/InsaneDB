@@ -394,11 +394,29 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Check if query error is retryable
+	 * Check if the last query failed because the connection was lost
 	 *
 	 * pdo_pgsql reports the SQLSTATE in errorInfo()[0], while errorInfo()[1]
 	 * holds the libpq result status. Connection losses detected by libpq
 	 * itself have no SQLSTATE (HY000), so the connection status is checked too.
+	 *
+	 * @return	bool
+	 */
+	protected function _is_connection_lost()
+	{
+		$error = $this->conn_id->errorInfo();
+		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
+
+		// Connection exception, server shutdown or a broken connection
+		return strncmp($sqlstate, '08', 2) === 0
+			OR in_array($sqlstate, array('57P01', '57P02', '57P03'), TRUE)
+			OR $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.';
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if query error is retryable
 	 *
 	 * @param	string	$sql	The failed query
 	 * @return	bool
@@ -414,17 +432,12 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 			return TRUE;
 		}
 
-		// Connection exception, server shutdown or a broken connection
-		if (strncmp($sqlstate, '08', 2) === 0
-			OR in_array($sqlstate, array('57P01', '57P02', '57P03'), TRUE)
-			OR $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.')
+		if ($this->_is_connection_lost())
 		{
 			// The query may have been executed before the connection was lost,
-			// so only reads are safe to run again. The parent check is used, as
-			// is_write_type() treats INSERT/UPDATE ... RETURNING as reads.
-			if (parent::is_write_type($sql))
+			// so only recognized reads are safe to run again
+			if ( ! $this->_is_retry_safe($sql))
 			{
-				$this->_reconnect = TRUE;
 				return FALSE;
 			}
 

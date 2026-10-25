@@ -392,6 +392,27 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Check if the last query failed because the connection was lost
+	 *
+	 * @return	bool
+	 */
+	protected function _is_connection_lost()
+	{
+		$error = $this->conn_id->errorInfo();
+
+		return isset($error[1]) && in_array((int) $error[1], array(
+			2006, // CR_SERVER_GONE_ERROR
+			4031, // ER_CLIENT_INTERACTION_TIMEOUT
+			2013, // CR_SERVER_LOST
+			2055, // CR_SERVER_LOST_EXTENDED
+			1053, // ER_SERVER_SHUTDOWN
+			1927  // ER_CONNECTION_KILLED (MariaDB)
+		), TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Check if query error is retryable
 	 *
 	 * @param	string	$sql	The failed query
@@ -413,14 +434,13 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 				$this->close();
 				return TRUE;
 			// Connection was lost while the query was running, so it may have been
-			// executed already. Only reads are safe to run again.
+			// executed already. Only recognized reads are safe to run again.
 			case 2013: // CR_SERVER_LOST
 			case 2055: // CR_SERVER_LOST_EXTENDED
 			case 1053: // ER_SERVER_SHUTDOWN
 			case 1927: // ER_CONNECTION_KILLED (MariaDB)
-				if ($this->is_write_type($sql))
+				if ( ! $this->_is_retry_safe($sql))
 				{
-					$this->_reconnect = TRUE;
 					return FALSE;
 				}
 
