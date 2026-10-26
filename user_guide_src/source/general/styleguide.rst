@@ -345,10 +345,8 @@ inability for CodeIgniter to send proper headers.
 Compatibility
 =============
 
-CodeIgniter recommends PHP 5.6 or newer to be used, but it should be
-compatible with PHP 5.4.8. Your code must either be compatible with this
-requirement, provide a suitable fallback, or be an optional feature that
-dies quietly without affecting a user's application.
+InsaneDB requires PHP 8.3 or newer. Code does not need to provide fallbacks
+for older PHP versions.
 
 Additionally, do not use PHP functions that require non-default libraries
 to be installed unless your code contains an alternative method when the
@@ -562,8 +560,6 @@ Always use full PHP opening tags, in case a server does not have
 **CORRECT**::
 
 	<?php echo $foo; ?>
-
-.. note:: PHP 5.4 will always have the **<?=** tag available.
 
 One Statement Per Line
 ======================
