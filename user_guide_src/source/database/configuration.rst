@@ -95,6 +95,11 @@ These failovers can be specified by setting the failover for a connection like t
 
 You can specify as many failovers as you like.
 
+.. note:: Settings that a failover doesn't specify are inherited from the
+	connection that failed. The DSN is rebuilt from the failover's settings
+	(hostname, port, database, character set), unless the failover
+	specifies its own ``dsn``.
+
 The reason we use a multi-dimensional array rather than a more simple
 one is to permit you to optionally store multiple sets of connection
 values. If, for example, you run multiple environments (development,

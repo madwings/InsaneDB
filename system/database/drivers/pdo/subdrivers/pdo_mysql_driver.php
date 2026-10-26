@@ -158,7 +158,8 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 				{
 					$this->options[$constant] = 'SET SESSION sql_mode = '.$sql;
 				}
-				else
+				// Reconnects come through here again, so don't append the same setting twice
+				elseif (strpos($this->options[$constant], $sql) === FALSE)
 				{
 					$this->options[$constant] .= ', @@session.sql_mode = '.$sql;
 				}
@@ -223,7 +224,15 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	protected function _trans_begin()
 	{
 		$this->conn_id->setAttribute(PDO::ATTR_AUTOCOMMIT, FALSE);
-		return $this->conn_id->beginTransaction();
+
+		if ($this->conn_id->beginTransaction())
+		{
+			return TRUE;
+		}
+
+		// No transaction was started, so don't leave the connection without autocommit
+		$this->conn_id->setAttribute(PDO::ATTR_AUTOCOMMIT, TRUE);
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------

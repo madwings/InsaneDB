@@ -542,6 +542,10 @@ abstract class CI_DB_driver {
 						$this->$key = $val;
 					}
 
+					// Rebuild the DSN from the new settings, unless the failover brings its own
+					isset($failover['dsn']) OR $this->dsn = '';
+					method_exists($this, '_build_dsn') && $this->_build_dsn();
+
 					// Try to connect
 					$this->conn_id = $this->db_connect($this->pconnect);
 
