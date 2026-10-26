@@ -341,10 +341,14 @@ abstract class CI_DB_forge {
 		if (is_bool($sql))
 		{
 			$this->_reset();
-			if ($sql === FALSE)
+
+			// TRUE means the table already exists and IF NOT EXISTS was requested
+			if ($sql === TRUE)
 			{
-				return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
+				return TRUE;
 			}
+
+			return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
 		}
 
 		if (($result = $this->db->query($sql)) !== FALSE)

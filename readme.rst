@@ -30,7 +30,7 @@ guide change log <https://github.com/pocketarc/codeigniter/blob/develop/user_gui
 InsaneDB Major Changes
 =======================
 
-New features
+New features compared to the upstream version
 -------------------------
 
    -  Added Read/Write connections mode.
@@ -38,7 +38,7 @@ New features
    -  Automatic reconnect on dropped connection for the MySQL and PostgreSQL drivers.
 
 
-Improvements
+Improvements compared to the upstream version
 -------------------------
 
    -  PDO adapter drivers replacing all vendor specific drivers(where applicable).
@@ -51,10 +51,15 @@ Improvements
    -  Changed parameter order of ``insert_batch()`` and ``insert_ignore_batch()``.
    -  Added option which keys to be included in ``update_batch()``, ``insert_batch()`` and ``insert_ignore_batch()``.
 
-Behaviour bugfix
+Behaviour bugfixes compared to the upstream version
 -------------------------
 
-   -  Fixed a bug (#) - method ``close()`` didn't close a connection with valid result object.
+   -  Fixed a bug - method ``close()`` didn't close a connection with valid result object.
+   -  Fixed a bug - ``update_batch()`` applied ``where()`` conditions only to the first batch.
+   -  Fixed a bug - ``insert_batch()`` and ``insert_ignore_batch()`` generated invalid SQL when rows had different keys, now they return FALSE.
+   -  Fixed a bug - ``$escape`` parameter of ``insert_batch()`` and ``insert_ignore_batch()`` was applied only to the table name and not to the values.
+   -  Fixed a bug - ``count_all()``, ``count_all_results()``, ``list_tables()``, ``list_fields()``, ``table_exists()``, ``field_exists()`` and ``database_exists()`` caused fatal errors on a failed query, now they return FALSE.
+   -  Fixed a bug - identifier escaping used the escape character of the first connection when connections of different platforms were used.
 
 *******************
 Server Requirements

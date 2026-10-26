@@ -117,4 +117,47 @@ class Update_test extends CI_TestCase {
 		$this->assertEquals('Football player', $job2->name);
 		$this->assertEquals('This is not really a job', $job2->description);
 	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_update_batch_size()
+	{
+		$job_datas = array(
+			array('id' => 1, 'name' => 'Programmer'),
+			array('id' => 2, 'name' => 'Senator'),
+			array('id' => 3, 'name' => 'Auditor')
+		);
+
+		$this->assertEquals(3, $this->db->update_batch('job', $job_datas, 'id', 2));
+
+		$this->assertEquals('Programmer', $this->db->where('id', 1)->get('job')->row()->name);
+		$this->assertEquals('Senator', $this->db->where('id', 2)->get('job')->row()->name);
+		$this->assertEquals('Auditor', $this->db->where('id', 3)->get('job')->row()->name);
+		$this->assertEquals('Musician', $this->db->where('id', 4)->get('job')->row()->name);
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see ./mocks/schema/skeleton.php
+	 */
+	public function test_update_batch_where_applies_to_every_batch()
+	{
+		$user_datas = array(
+			array('id' => 1, 'name' => 'Derek'),
+			array('id' => 2, 'name' => 'Mahmoud'),
+			array('id' => 3, 'name' => 'Richard')
+		);
+
+		// User 2 is not from the US, so it must not be updated by any of the batches
+		$this->db->where('country', 'US');
+		$this->assertEquals(2, $this->db->update_batch('user', $user_datas, 'id', 1));
+
+		$this->assertEquals('Derek', $this->db->where('id', 1)->get('user')->row()->name);
+		$this->assertEquals('Ahmadinejad', $this->db->where('id', 2)->get('user')->row()->name);
+		$this->assertEquals('Richard', $this->db->where('id', 3)->get('user')->row()->name);
+	}
 }

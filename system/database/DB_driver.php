@@ -388,7 +388,37 @@ abstract class CI_DB_driver {
 	 */
 	protected $_count_string 	= 'SELECT COUNT(*) AS ';
 
+	/**
+	 * Escape regex patterns cache for escape_identifiers()
+	 *
+	 * Kept per instance, as the escape character differs between drivers.
+	 *
+	 * @var	string[]
+	 */
+	private $_preg_ec		= array();
+
+	/**
+	 * Operator regex patterns cache for _get_operator()
+	 *
+	 * Kept per instance, as the LIKE escape string differs between drivers.
+	 *
+	 * @var	string[]
+	 */
+	private $_operators		= array();
+
 	public $query_retries 		= 2;
+
+	/**
+	 * Reconnect before the next query flag
+	 *
+	 * Set when a query fails due to a lost connection and wasn't retried
+	 * (no attempts left, a transaction is active or the query is not safe
+	 * to run again). The connection is not closed right away, so that the
+	 * caller can still read the error from it.
+	 *
+	 * @var	bool
+	 */
+	protected $_reconnect		= FALSE;
 
 	/**
 	 * read/write mode flag
@@ -419,6 +449,13 @@ abstract class CI_DB_driver {
 	 */
 	protected $conn_active      = 'read';
 
+	/**
+	 * Connection force state saved when the outermost transaction starts
+	 *
+	 * @var	array|null
+	 */
+	private $_trans_conn_force  = NULL;
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -434,14 +471,18 @@ abstract class CI_DB_driver {
 			if ( ! empty($params['read']) && ! empty($params['write']))
 			{
 				$this->read_write = TRUE;
+
+				// Keep the last write time across requests, so that reads that follow
+				// a write in the previous request (e.g. after a redirect) also go to the
+				// write connection during the read delay period
 				if (is_session_started())
 				{
-					if ( ! isset($_SESSION['insanedb_read_delay']))
+					if ( ! isset($_SESSION['insanedb_last_write']))
 					{
-						$_SESSION['insanedb_read_delay'] = $this->read_delay;
+						$_SESSION['insanedb_last_write'] = NULL;
 					}
 
-					$this->read_delay =& $_SESSION['insanedb_read_delay'];
+					$this->last_write =& $_SESSION['insanedb_last_write'];
 				}
 			}
 
@@ -813,17 +854,28 @@ abstract class CI_DB_driver {
 			$this->_config_read_write($sql);
 		}
 
-		for($i = 0; $i <= $this->query_retries; ++$i)
+		// The previous query lost the connection without being retried. Don't reconnect
+		// within a transaction, as the following statements would run outside of it.
+		if ($this->_reconnect && $this->_trans_depth === 0)
+		{
+			$this->_reconnect = FALSE;
+			$this->close();
+		}
+
+		$retries = max(0, (int) $this->query_retries);
+		for ($i = 0; $i <= $retries; ++$i)
 		{
 			if (empty($this->conn_id))
 			{
+				$this->_reconnect = FALSE;
+
 				try
 				{
 					$this->initialize();
 				}
 				catch (RuntimeException $e)
 				{
-					if ($i === $this->query_retries)
+					if ($i === $retries)
 					{
 						throw $e;
 					}
@@ -836,15 +888,30 @@ abstract class CI_DB_driver {
 
 			$result = $this->_execute($sql);
 
-			// If query succeeds or fails with unretryable error - do not retry
-			if ($result !== FALSE OR ! is_callable(array($this, 'is_retryable')) OR ! $this->is_retryable())
+			if ($result === FALSE)
+			{
+				$error = $this->error();
+				if ( ! empty($error['code']) && $error['code'] !== '00000')
+				{
+					log_message('error', 'Query attempt: '.($i + 1).' - Error message: '.$error['message'].' - Error code: '.$error['code'].' - Invalid query: '.$sql);
+				}
+
+				// Detected regardless of the retry budget, so that a broken connection
+				// is replaced before the next query even if this one isn't retried
+				if ( ! empty($this->conn_id) && $this->_is_connection_lost())
+				{
+					$this->_reconnect = TRUE;
+				}
+			}
+
+			// Do not retry if the query succeeded, there are no attempts left, a transaction
+			// is active (a deadlock or lost connection has already discarded the transaction,
+			// so re-running a single statement would silently execute it outside of it)
+			// or the error is not retryable
+			if ($result !== FALSE OR $i === $retries OR $this->_trans_depth !== 0 OR ! is_callable(array($this, 'is_retryable')) OR ! $this->is_retryable($sql))
 			{
 				break;
 			}
-
-			$error = $this->error();
-			// Log error so we know how often retries are needed
-			log_message('error', 'Query attempt: '.($i + 1).' - Error message: '.$error['message'].' - Error code: '.$error['code'].' - Invalid query: '.$sql);
 		}
 
 		return $result;
@@ -898,11 +965,6 @@ abstract class CI_DB_driver {
 			return FALSE;
 		}
 
-		if ($this->read_write)
-		{
-			$this->conn_force('write', FALSE);
-		}
-
 		return $this->trans_begin($test_mode);
 	}
 
@@ -934,17 +996,7 @@ abstract class CI_DB_driver {
 			}
 
 			log_message('debug', 'DB Transaction Failure');
-			if ($this->read_write)
-			{
-				$this->conn_force_clear();
-			}
-
 			return FALSE;
-		}
-
-		if ($this->read_write)
-		{
-			$this->conn_force_clear();
 		}
 
 		return $this->trans_commit();
@@ -1000,6 +1052,33 @@ abstract class CI_DB_driver {
 		// even if the queries produce a successful result.
 		$this->_trans_failure = ($test_mode === TRUE);
 
+		// In read/write mode the whole transaction must run on the write connection
+		if ($this->read_write)
+		{
+			$this->_trans_conn_force = array($this->conn_force, $this->conn_force_clr);
+			$this->conn_force('write', FALSE);
+		}
+
+		// The previous query lost the connection without being retried
+		if ($this->_reconnect)
+		{
+			$this->_reconnect = FALSE;
+			$this->close();
+		}
+
+		if (empty($this->conn_id))
+		{
+			try
+			{
+				$this->initialize();
+			}
+			catch (RuntimeException $e)
+			{
+				$this->_trans_conn_restore();
+				throw $e;
+			}
+		}
+
 		if ($this->_trans_begin())
 		{
 			$this->_trans_status = TRUE;
@@ -1007,7 +1086,25 @@ abstract class CI_DB_driver {
 			return TRUE;
 		}
 
+		$this->_trans_conn_restore();
 		return FALSE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Restore the read/write connection force state that was active
+	 * before the outermost transaction was started
+	 *
+	 * @return	void
+	 */
+	private function _trans_conn_restore()
+	{
+		if ($this->read_write && is_array($this->_trans_conn_force))
+		{
+			list($this->conn_force, $this->conn_force_clr) = $this->_trans_conn_force;
+			$this->_trans_conn_force = NULL;
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -1026,7 +1123,11 @@ abstract class CI_DB_driver {
 		// When transactions are nested we only begin/commit/rollback the outermost ones
 		elseif ($this->_trans_depth > 1 OR $this->_trans_commit())
 		{
-			$this->_trans_depth--;
+			if (--$this->_trans_depth === 0)
+			{
+				$this->_trans_conn_restore();
+			}
+
 			return TRUE;
 		}
 
@@ -1046,10 +1147,17 @@ abstract class CI_DB_driver {
 		{
 			return FALSE;
 		}
-		// When transactions are nested we only begin/commit/rollback the outermost ones
-		elseif ($this->_trans_depth > 1 OR $this->_trans_rollback())
+		// When transactions are nested we only begin/commit/rollback the outermost ones.
+		// If the connection was lost, the server has already discarded the transaction,
+		// so only the local state is unwound (a rollback would fail or throw). The pending
+		// reconnect is left to the next query or transaction, so the error can still be read.
+		elseif ($this->_trans_depth > 1 OR $this->_reconnect OR $this->_trans_rollback())
 		{
-			$this->_trans_depth--;
+			if (--$this->_trans_depth === 0)
+			{
+				$this->_trans_conn_restore();
+			}
+
 			return TRUE;
 		}
 
@@ -1132,6 +1240,61 @@ abstract class CI_DB_driver {
 	public function is_write_type($sql)
 	{
 		return (bool) preg_match('/^\s*"?(SET|INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|TRUNCATE|LOAD|COPY|ALTER|RENAME|GRANT|REVOKE|LOCK|UNLOCK|REINDEX|MERGE)\s/i', $sql);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Determines if a query is safe to run again after the connection
+	 * was lost while it was executing (it may have been applied already).
+	 *
+	 * Only recognized read statements are considered safe. Anything else,
+	 * including data-modifying CTEs, CALL/DO and statements mentioning write
+	 * keywords anywhere, is treated as unsafe. Side effects hidden inside
+	 * functions called by a SELECT can't be detected.
+	 *
+	 * @param	string	$sql	An SQL query string
+	 * @return	bool
+	 */
+	protected function _is_retry_safe($sql)
+	{
+		// Skip leading whitespace, comments and opening parentheses
+		$sql = preg_replace('#^(?:\s+|--[^\n]*(?:\n|$)|\#[^\n]*(?:\n|$)|/\*.*?\*/|\()+#s', '', (string) $sql);
+
+		if ( ! preg_match('/^(SELECT|SHOW|DESCRIBE|DESC|EXPLAIN|VALUES|TABLE|WITH)\b/i', $sql))
+		{
+			return FALSE;
+		}
+
+		return ! preg_match('/\b(INSERT|UPDATE|DELETE|REPLACE|MERGE|UPSERT|INTO|CALL|DO|SET|CREATE|DROP|ALTER|TRUNCATE|COPY|LOCK|GRANT|REVOKE|NEXTVAL|SETVAL|GET_LOCK|RELEASE_LOCK)\b/i', $sql);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if the last query failed because the connection was lost
+	 *
+	 * Must only inspect the error and never close the connection,
+	 * as the caller may still need to read the error from it.
+	 *
+	 * @return	bool
+	 */
+	protected function _is_connection_lost()
+	{
+		return FALSE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Wait a short random time before retrying a query that failed because
+	 * of a lock conflict, so the competing transactions don't collide again
+	 *
+	 * @return	void
+	 */
+	protected function _retry_backoff()
+	{
+		usleep(mt_rand(50000, 200000));
 	}
 
 	// --------------------------------------------------------------------
@@ -1296,7 +1459,7 @@ abstract class CI_DB_driver {
 	 * the specified database
 	 *
 	 * @param	string
-	 * @return	int
+	 * @return	int|bool	Number of rows or FALSE on failure
 	 */
 	public function count_all($table = '')
 	{
@@ -1305,15 +1468,21 @@ abstract class CI_DB_driver {
 			return 0;
 		}
 
+		// The query builder state isn't used here, but is cleared on every outcome
+		// (including errors) so that it doesn't leak into the next query
+		$this->_reset_select();
+
 		$query = $this->query($this->_count_string.$this->escape_identifiers('numrows').' FROM '.$this->protect_identifiers($table, TRUE, NULL, FALSE));
-		if ($query->num_rows() === 0)
+		if ($query === FALSE)
+		{
+			return FALSE;
+		}
+		elseif ($query->num_rows() === 0)
 		{
 			return 0;
 		}
 
-		$query = $query->row();
-		$this->_reset_select();
-		return (int) $query->numrows;
+		return (int) $query->row()->numrows;
 	}
 
 	// --------------------------------------------------------------------
@@ -1337,9 +1506,13 @@ abstract class CI_DB_driver {
 			return ($this->db_debug) ? $this->display_error('db_unsupported_function') : FALSE;
 		}
 
-		$this->data_cache['table_names'] = array();
 		$query = $this->query($sql);
+		if ($query === FALSE)
+		{
+			return FALSE;
+		}
 
+		$this->data_cache['table_names'] = array();
 		foreach ($query->result_array() as $row)
 		{
 			// Do we know from which column to get the table name?
@@ -1381,7 +1554,8 @@ abstract class CI_DB_driver {
 	 */
 	public function table_exists($table_name)
 	{
-		return in_array($this->protect_identifiers($table_name, TRUE, FALSE, FALSE), $this->list_tables());
+		$tables = $this->list_tables();
+		return is_array($tables) && in_array($this->protect_identifiers($table_name, TRUE, FALSE, FALSE), $tables);
 	}
 
 	// --------------------------------------------------------------------
@@ -1400,6 +1574,11 @@ abstract class CI_DB_driver {
 		}
 
 		$query = $this->query($sql);
+		if ($query === FALSE)
+		{
+			return FALSE;
+		}
+
 		$fields = array();
 
 		foreach ($query->result_array() as $row)
@@ -1439,7 +1618,8 @@ abstract class CI_DB_driver {
 	 */
 	public function field_exists($field_name, $table_name)
 	{
-		return in_array($field_name, $this->list_fields($table_name));
+		$fields = $this->list_fields($table_name);
+		return is_array($fields) && in_array($field_name, $fields);
 	}
 
 	// --------------------------------------------------------------------
@@ -1488,13 +1668,11 @@ abstract class CI_DB_driver {
 			return $item;
 		}
 
-		static $preg_ec;
-
-		if (empty($preg_ec))
+		if (empty($this->_preg_ec))
 		{
 			if (is_array($this->_escape_char))
 			{
-				$preg_ec = array(
+				$this->_preg_ec = array(
 					preg_quote($this->_escape_char[0]),
 					preg_quote($this->_escape_char[1]),
 					$this->_escape_char[0],
@@ -1503,10 +1681,12 @@ abstract class CI_DB_driver {
 			}
 			else
 			{
-				$preg_ec[0] = $preg_ec[1] = preg_quote($this->_escape_char);
-				$preg_ec[2] = $preg_ec[3] = $this->_escape_char;
+				$this->_preg_ec[0] = $this->_preg_ec[1] = preg_quote($this->_escape_char);
+				$this->_preg_ec[2] = $this->_preg_ec[3] = $this->_escape_char;
 			}
 		}
+
+		$preg_ec = $this->_preg_ec;
 
 		foreach ($this->_reserved_identifiers as $id)
 		{
@@ -1637,14 +1817,12 @@ abstract class CI_DB_driver {
 	 */
 	protected function _get_operator($str)
 	{
-		static $_operators;
-
-		if (empty($_operators))
+		if (empty($this->_operators))
 		{
 			$_les = ($this->_like_escape_str !== '')
 				? '\s+'.preg_quote(trim(sprintf($this->_like_escape_str, $this->_like_escape_chr)), '/')
 				: '';
-			$_operators = array(
+			$this->_operators = array(
 				'\s*(?:<|>|!)?=\s*',             // =, <=, >=, !=
 				'\s*<>?\s*',                     // <, <>
 				'\s*>\s*',                       // >
@@ -1662,7 +1840,7 @@ abstract class CI_DB_driver {
 
 		}
 
-		return preg_match('/'.implode('|', $_operators).'/i', $str, $match)
+		return preg_match('/'.implode('|', $this->_operators).'/i', $str, $match)
 			? $match[0] : FALSE;
 	}
 
@@ -1676,9 +1854,20 @@ abstract class CI_DB_driver {
 	 */
 	public function call_function($function)
 	{
-		if (FALSE === strpos($driver, $function))
+		$prefixes = array(
+			'postgre' => 'pg',
+			'oci8'    => 'oci'
+		);
+
+		$prefix = isset($prefixes[$this->dbdriver]) ? $prefixes[$this->dbdriver] : $this->dbdriver;
+		$length = strlen($prefix);
+
+		// Function names are case-insensitive. Names already carrying the prefix are kept,
+		// including legacy aliases without an underscore (e.g. ocilogon).
+		if (strncasecmp($function, $prefix.'_', $length + 1) !== 0
+			&& (strncasecmp($function, $prefix, $length) !== 0 OR ! function_exists($function)))
 		{
-			$function = $driver.$function;
+			$function = $prefix.'_'.$function;
 		}
 
 		if ( ! function_exists($function))
@@ -1857,7 +2046,7 @@ abstract class CI_DB_driver {
 	protected function _close(&$conn_id = NULL)
 	{
 		$this->result_id = FALSE;
-		
+
 		if ($conn_id)
 		{
 			$conn_id = FALSE;
@@ -2220,8 +2409,11 @@ abstract class CI_DB_driver {
 	public function conn_force($conn = 'write', $conn_force_clr = TRUE)
 	{
 		$this->conn_force = $conn;
-		$this->conn_force_clr = $conn_force_clr;
+
+		// Switch the connection right away, but keep the force for the next query
+		$this->conn_force_clr = FALSE;
 		$this->_config_read_write();
+		$this->conn_force_clr = $conn_force_clr;
 	}
 
 	// --------------------------------------------------------------------
