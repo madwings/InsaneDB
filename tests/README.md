@@ -89,6 +89,34 @@ Any other resources which need to be read from the path constants must be
 created or cloned within your test. Functions for doing so are outlined
 below.
 
+### Database Tests:
+
+Database tests live in tests/insanedb/database and run against the database
+set by the DB_DRIVER constant of the configuration in tests/travis
+(pdo/mysql, pdo/pgsql or pdo/sqlite):
+
+	composer install
+	vendor/bin/phpunit --configuration tests/travis/pdo/sqlite.phpunit.xml
+
+Tests that use Mock_Database_Schema_Skeleton run real queries on that
+database. Tests that use the fake drivers in tests/mocks/database/fake
+(Mock_Database_Fake_Mysql and Mock_Database_Fake_Pgsql) don't need a
+database server. These are the real PDO drivers, connected to a
+Mock_Database_Fake_Server, which records every executed query and lets the
+test script the outcome of the next ones:
+
+	$db = Mock_Database_Fake_Mysql::create(array('query_retries' => 1));
+	$db->fake_server->fail('HY000', 2006);	// MySQL server has gone away
+	$db->fake_server->succeed(array(array('id' => 1)));
+
+	$db->query('SELECT id FROM job');	// retried on a new connection
+	$db->fake_server->queries();		// array('SELECT id FROM job', 'SELECT id FROM job')
+
+Use them to test the generated SQL, retries, reconnects and the read/write
+connections mode. The fake drivers don't sleep between retries and their
+display_error() throws a RuntimeException, so the db_debug paths can be
+tested as well.
+
 ### CI_TestCase Documentation
 
 Test cases should extend CI_TestCase. This internally extends

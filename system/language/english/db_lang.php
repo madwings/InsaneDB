@@ -47,6 +47,7 @@ $lang['db_must_set_table'] = 'You must set the database table to be used with yo
 $lang['db_must_use_set'] = 'You must use the "set" method to update an entry.';
 $lang['db_must_use_index'] = 'You must specify an index to match on for batch updates.';
 $lang['db_batch_missing_index'] = 'One or more rows submitted for batch updating is missing the specified index.';
+$lang['db_batch_keys_mismatch'] = 'One or more rows submitted for batch inserting do not contain the expected keys.';
 $lang['db_must_use_where'] = 'Updates are not allowed unless they contain a "where" clause.';
 $lang['db_del_must_use_where'] = 'Deletes are not allowed unless they contain a "where" or "like" clause.';
 $lang['db_field_param_missing'] = 'To fetch fields requires the name of the table as a parameter.';

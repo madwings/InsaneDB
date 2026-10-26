@@ -76,6 +76,14 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	 */
 	protected $_random_keyword = array('RANDOM()', 'RANDOM()');
 
+	/**
+	 * Error saved by _is_connection_lost() before PDO::getAttribute()
+	 * cleared it: array(connection, error() result)
+	 *
+	 * @var	array
+	 */
+	protected $_saved_error;
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -132,6 +140,40 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 		}
 
 		return $this->conn_id;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Execute the query
+	 *
+	 * @param	string	$sql	SQL query
+	 * @return	mixed
+	 */
+	protected function _execute($sql)
+	{
+		$this->_saved_error = NULL;
+		return parent::_execute($sql);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Error
+	 *
+	 * Returns an array containing code and message of the last
+	 * database error that has occurred.
+	 *
+	 * @return	array
+	 */
+	public function error()
+	{
+		if (isset($this->_saved_error) && $this->_saved_error[0] === $this->conn_id)
+		{
+			return $this->_saved_error[1];
+		}
+
+		return parent::error();
 	}
 
 	// --------------------------------------------------------------------
@@ -394,26 +436,76 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Check if query error is retryable
+	 * Check if the last query failed because the connection was lost
+	 *
+	 * pdo_pgsql reports the SQLSTATE in errorInfo()[0], while errorInfo()[1]
+	 * holds the libpq result status. Connection losses detected by libpq
+	 * itself have no SQLSTATE (HY000), so the connection status is checked too.
 	 *
 	 * @return	bool
 	 */
-	protected function is_retryable()
+	protected function _is_connection_lost()
 	{
-		$result = FALSE;
 		$error = $this->conn_id->errorInfo();
-		if ( ! isset($error[1]))
+		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
+
+		// The connection status is checked only for errors without a SQLSTATE, as
+		// getAttribute() clears the error info. It's saved first, so that error()
+		// can still report it.
+		if ($sqlstate === 'HY000')
 		{
-			$result = FALSE;
-		}
-		// PostgreSQL specific errors for lost connection
-		elseif (in_array($error[1], array('08000', '08003', '08006'), TRUE))
-		{
-			$this->close();
-			$result = TRUE;
+			$this->_saved_error = array($this->conn_id, parent::error());
+			return $this->conn_id->getAttribute(PDO::ATTR_CONNECTION_STATUS) === 'Bad connection.';
 		}
 
-		return $result;
+		// Connection exception or the server terminated the connection
+		return strncmp($sqlstate, '08', 2) === 0
+			OR in_array($sqlstate, array(
+				'57P01', // admin_shutdown
+				'57P02', // crash_shutdown
+				'57P03', // cannot_connect_now
+				'57P05', // idle_session_timeout
+				'25P03'  // idle_in_transaction_session_timeout
+			), TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if query error is retryable
+	 *
+	 * @param	string	$sql	The failed query
+	 * @return	bool
+	 */
+	protected function is_retryable($sql = '')
+	{
+		$error = $this->conn_id->errorInfo();
+		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
+
+		// Deadlock, serialization failure or lock timeout, the statement was rolled back
+		if (in_array($sqlstate, array('40P01', '40001', '55P03'), TRUE))
+		{
+			$this->_retry_backoff();
+			return TRUE;
+		}
+
+		// Set by simple_query() from _is_connection_lost(). It can't be called again here,
+		// as it may have cleared the error info while checking the connection status.
+		if ($this->_reconnect)
+		{
+			// The query may have been executed before the connection was lost,
+			// so only recognized reads are safe to run again. An idle session
+			// timeout closes the connection before the query is received.
+			if ($sqlstate !== '57P05' && ! $this->_is_retry_safe($sql))
+			{
+				return FALSE;
+			}
+
+			$this->close();
+			return TRUE;
+		}
+
+		return FALSE;
 	}
 
 }

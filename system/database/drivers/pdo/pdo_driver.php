@@ -86,7 +86,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	{
 		parent::__construct($params);
 
-		if (preg_match('/([^:]+):/', $this->dsn, $match) && count($match) === 2)
+		if (preg_match('/([^:]+):/', (string) $this->dsn, $match) && count($match) === 2)
 		{
 			// If there is a minimum valid dsn string pattern found, we're done
 			// This is for general PDO users, who tend to have a full DSN string.
@@ -115,8 +115,6 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
-		global $debugbar;
-
 		if ($persistent === TRUE)
 		{
 			$this->options[PDO::ATTR_PERSISTENT] = TRUE;
@@ -132,13 +130,7 @@ class CI_DB_pdo_driver extends CI_DB {
 
 		try
 		{
-			if ($debugbar) {
-				$pdo = new TraceablePDO(new PDO($this->dsn, $this->username, $this->password, $this->options));
-				$debugbar->addCollector(new DebugBar\DataCollector\PDO\PDOCollector($pdo));
-				return $pdo;
-			} else {
-				return new PDO($this->dsn, $this->username, $this->password, $this->options);
-			}
+			return $this->_pdo_connect();
 		}
 		catch (PDOException $e)
 		{
@@ -149,6 +141,32 @@ class CI_DB_pdo_driver extends CI_DB {
 
 			return FALSE;
 		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Create the PDO connection
+	 *
+	 * Uses the DSN, credentials and options as prepared by db_connect().
+	 * Overridden by the test drivers, which connect to a fake server.
+	 *
+	 * @return	object
+	 * @throws	PDOException
+	 */
+	protected function _pdo_connect()
+	{
+		global $debugbar;
+
+		$pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);
+
+		if ($debugbar)
+		{
+			$pdo = new TraceablePDO($pdo);
+			$debugbar->addCollector(new DebugBar\DataCollector\PDO\PDOCollector($pdo));
+		}
+
+		return $pdo;
 	}
 
 	// --------------------------------------------------------------------
@@ -186,8 +204,8 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	protected function _execute($sql)
 	{
-		// Log time of last write query
-		if ($this->read_write && $this->conn_active === 'write')
+		// Log time of last write query (reads routed to the writer don't count)
+		if ($this->read_write && $this->conn_active === 'write' && ! $this->_is_retry_safe($sql))
 		{
 			$this->last_write = time();
 		}
@@ -303,6 +321,13 @@ class CI_DB_pdo_driver extends CI_DB {
 	public function error()
 	{
 		$error = array('code' => '00000', 'message' => '');
+
+		// There is no connection to read the error from (closed or never established)
+		if (empty($this->conn_id))
+		{
+			return $error;
+		}
+
 		$pdo_error = $this->conn_id->errorInfo();
 
 		if (empty($pdo_error[0]))

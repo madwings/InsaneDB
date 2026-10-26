@@ -158,7 +158,8 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 				{
 					$this->options[$constant] = 'SET SESSION sql_mode = '.$sql;
 				}
-				else
+				// Reconnects come through here again, so don't append the same setting twice
+				elseif (strpos($this->options[$constant], $sql) === FALSE)
 				{
 					$this->options[$constant] .= ', @@session.sql_mode = '.$sql;
 				}
@@ -223,7 +224,15 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	protected function _trans_begin()
 	{
 		$this->conn_id->setAttribute(PDO::ATTR_AUTOCOMMIT, FALSE);
-		return $this->conn_id->beginTransaction();
+
+		if ($this->conn_id->beginTransaction())
+		{
+			return TRUE;
+		}
+
+		// No transaction was started, so don't leave the connection without autocommit
+		$this->conn_id->setAttribute(PDO::ATTR_AUTOCOMMIT, TRUE);
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -392,32 +401,69 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Check if query error is retryable
+	 * Check if the last query failed because the connection was lost
 	 *
 	 * @return	bool
 	 */
-	protected function is_retryable()
+	protected function _is_connection_lost()
 	{
-		$result = FALSE;
+		$error = $this->conn_id->errorInfo();
+
+		return isset($error[1]) && in_array((int) $error[1], array(
+			2006, // CR_SERVER_GONE_ERROR
+			4031, // ER_CLIENT_INTERACTION_TIMEOUT
+			2013, // CR_SERVER_LOST
+			2055, // CR_SERVER_LOST_EXTENDED
+			1053, // ER_SERVER_SHUTDOWN
+			1927  // ER_CONNECTION_KILLED (MariaDB)
+		), TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check if query error is retryable
+	 *
+	 * @param	string	$sql	The failed query
+	 * @return	bool
+	 */
+	protected function is_retryable($sql = '')
+	{
 		$error = $this->conn_id->errorInfo();
 		if ( ! isset($error[1]))
 		{
-			$result = FALSE;
-		}
-		// MySQL specific errors for lost connection
-		elseif ($error[1] === 2006 OR $error[1] === 2013)
-		{
-			$result = TRUE;
-			$this->close();
-		}
-		// MySQL specific errors for Deadlock found
-		elseif ($error[1] === 1213)
-		{
-			$result = TRUE;
-			sleep(1);
+			return FALSE;
 		}
 
-		return $result;
+		switch ((int) $error[1])
+		{
+			// Connection was already closed when the query was sent
+			case 2006: // CR_SERVER_GONE_ERROR
+			case 4031: // ER_CLIENT_INTERACTION_TIMEOUT
+				$this->close();
+				return TRUE;
+			// Connection was lost while the query was running, so it may have been
+			// executed already. Only recognized reads are safe to run again.
+			case 2013: // CR_SERVER_LOST
+			case 2055: // CR_SERVER_LOST_EXTENDED
+			case 1053: // ER_SERVER_SHUTDOWN
+			case 1927: // ER_CONNECTION_KILLED (MariaDB)
+				if ( ! $this->_is_retry_safe($sql))
+				{
+					return FALSE;
+				}
+
+				$this->close();
+				return TRUE;
+			// The statement was rolled back by the server
+			case 1213: // ER_LOCK_DEADLOCK
+				$this->_retry_backoff();
+				return TRUE;
+			case 1205: // ER_LOCK_WAIT_TIMEOUT
+				return TRUE;
+		}
+
+		return FALSE;
 	}
 
 }

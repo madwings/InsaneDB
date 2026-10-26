@@ -45,7 +45,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |	['query_retries'] How many time to retry the query. In case the query fails with a retryable error.
 |	['read_delay'] How many seconds after the last write query to delay reads from read connection.
 |				   In the delay period all read queries will go to the write connection. Only used
-|				   in read/write mode.
+|				   in read/write mode. When a session is started before the database is loaded,
+|				   the time of the last write is kept in the session, so the delay also applies
+|				   to the following requests (e.g. after a redirect).
 |
 | The $active_group variable lets you choose which connection group to
 | make active.  By default there is only one group (the 'default' group).
