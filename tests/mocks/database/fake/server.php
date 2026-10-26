@@ -45,9 +45,11 @@ class Mock_Database_Fake_Server {
 	 * Open a connection
 	 *
 	 * @param	string	$dsn
+	 * @param	string	$username
+	 * @param	array	$options	PDO options the connection was opened with
 	 * @return	Mock_Database_Fake_Connection|bool
 	 */
-	public function connect($dsn)
+	public function connect($dsn, $username = NULL, array $options = array())
 	{
 		if ($this->fail_connects > 0)
 		{
@@ -55,7 +57,11 @@ class Mock_Database_Fake_Server {
 			return FALSE;
 		}
 
-		return $this->connections[] = new Mock_Database_Fake_Connection($this, (string) $dsn, count($this->connections));
+		$conn = new Mock_Database_Fake_Connection($this, (string) $dsn, count($this->connections));
+		$conn->username = $username;
+		$conn->options = $options;
+
+		return $this->connections[] = $conn;
 	}
 
 	/**
