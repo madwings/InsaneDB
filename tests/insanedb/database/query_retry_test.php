@@ -37,6 +37,7 @@ class Query_retry_test extends CI_TestCase {
 	{
 		$db = Mock_Database_Fake_Mysql::create(array(), FALSE);
 		$method = new ReflectionMethod($db, '_is_retry_safe');
+		PHP_VERSION_ID < 80100 && $method->setAccessible(TRUE);
 		return $method->invoke($db, $sql);
 	}
 
