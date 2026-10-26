@@ -33,6 +33,50 @@ class Query_retry_test extends CI_TestCase {
 
 	// ------------------------------------------------------------------------
 
+	protected function is_retry_safe($sql)
+	{
+		$db = Mock_Database_Fake_Mysql::create(array(), FALSE);
+		$method = new ReflectionMethod($db, '_is_retry_safe');
+		return $method->invoke($db, $sql);
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_retry_safety_accepts_read_statements()
+	{
+		$sqls = array(
+			'SELECT 1',
+			'/* comment */ (SELECT 1)',
+			'WITH recent_jobs AS (SELECT id FROM job) SELECT id FROM recent_jobs'
+		);
+
+		foreach ($sqls as $sql)
+		{
+			$this->assertTrue($this->is_retry_safe($sql), $sql);
+		}
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_retry_safety_rejects_statements_that_may_write()
+	{
+		$sqls = array(
+			'WITH inactive_users AS (SELECT id FROM users) UPDATE users JOIN inactive_users USING (id) SET disabled = 1',
+			'WITH expired_orders AS (SELECT id FROM orders) DELETE orders FROM orders JOIN expired_orders USING (id)',
+			'CALL archive_old_orders(90)',
+			'DO RELEASE_LOCK(\'maintenance\')',
+			'SELECT \'UPDATE\' AS note',
+			'SELECT * FROM events WHERE message = \'DELETE\''
+		);
+
+		foreach ($sqls as $sql)
+		{
+			$this->assertFalse($this->is_retry_safe($sql), $sql);
+		}
+	}
+
+	// ------------------------------------------------------------------------
+
 	public function test_successful_query_runs_once()
 	{
 		$db = $this->mysql();
