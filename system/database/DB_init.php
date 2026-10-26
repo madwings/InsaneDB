@@ -188,7 +188,7 @@ function &DB_forge($db)
 	if ( ! empty($db->subdriver))
 	{
 		$driver_path = BASEPATH.'database/drivers/pdo/subdrivers/pdo_'.$db->subdriver.'_forge.php';
-		file_exists($driver_file) OR show_error('Invalid DB driver');
+		file_exists($driver_path) OR show_error('Invalid DB driver');
 
 		require_once($driver_path);
 		$class = 'CI_DB_pdo_'.$db->subdriver.'_forge';

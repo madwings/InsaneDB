@@ -45,4 +45,21 @@ class Count_test extends CI_TestCase {
 		$this->assertEquals(1, $this->db->like('name', 'ian')->limit(1)->count_all_results('job'));
 	}
 
+	// ------------------------------------------------------------------------
+
+	public function test_count_all_missing_table()
+	{
+		$this->assertFalse($this->db->count_all('missing_table'));
+	}
+
+	// ------------------------------------------------------------------------
+
+	public function test_count_all_results_missing_table()
+	{
+		$this->assertFalse($this->db->where('id', 1)->count_all_results('missing_table'));
+
+		// The query builder is reset, so the next query works
+		$this->assertEquals(4, $this->db->count_all_results('job'));
+	}
+
 }

@@ -86,7 +86,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	{
 		parent::__construct($params);
 
-		if (preg_match('/([^:]+):/', $this->dsn, $match) && count($match) === 2)
+		if (preg_match('/([^:]+):/', (string) $this->dsn, $match) && count($match) === 2)
 		{
 			// If there is a minimum valid dsn string pattern found, we're done
 			// This is for general PDO users, who tend to have a full DSN string.
@@ -186,8 +186,8 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	protected function _execute($sql)
 	{
-		// Log time of last write query
-		if ($this->read_write && $this->conn_active === 'write')
+		// Log time of last write query (reads routed to the writer don't count)
+		if ($this->read_write && $this->conn_active === 'write' && ! $this->_is_retry_safe($sql))
 		{
 			$this->last_write = time();
 		}
