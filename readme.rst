@@ -63,7 +63,7 @@ Improvements compared to the upstream version
 Behaviour bugfixes compared to the upstream version
 -------------------------
 
-   -  Fixed a bug - method ``close()`` didn't close a connection with valid result object.
+   -  Fixed a bug - ``close()`` didn't close a connection with valid result object.
    -  Fixed a bug - ``update_batch()`` applied ``where()`` conditions only to the first batch.
    -  Fixed a bug - ``insert_batch()`` and ``insert_ignore_batch()`` generated invalid SQL when rows had different keys, now they return FALSE.
    -  Fixed a bug - ``$escape`` parameter of ``insert_batch()`` and ``insert_ignore_batch()`` was applied only to the table name and not to the values.
