@@ -108,8 +108,8 @@ class Like_test extends CI_TestCase {
 	 *
 	 * @see ./mocks/schema/skeleton.php
 	 *
-	 * @dataProvider like_set_side_provider
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('like_set_side_provider')]
 	public function test_like_set_side($str, $side, $expected_name)
 	{
 		$actual = $this->db->like('name', $str, $side)->get('job')->result_array();
@@ -117,7 +117,7 @@ class Like_test extends CI_TestCase {
 		$this->assertEquals($expected_name, $actual[0]['name']);
 	}
 
-	public function like_set_side_provider()
+	public static function like_set_side_provider()
 	{
 		return array(
 			array('Developer', 'none', 'Developer'),

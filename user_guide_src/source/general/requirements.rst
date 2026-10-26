@@ -2,11 +2,7 @@
 Server Requirements
 ###################
 
-`PHP <https://secure.php.net/>`_ version 5.6 or newer is recommended.
-
-It should work on 5.4.8 as well, but we strongly advise you NOT to run
-such old versions of PHP, because of potential security and performance
-issues, as well as missing features.
+InsaneDB 1.5.0 requires `PHP <https://www.php.net/>`_ version 8.3 or newer.
 
 A database is required for most web application programming.
 Currently supported databases are:

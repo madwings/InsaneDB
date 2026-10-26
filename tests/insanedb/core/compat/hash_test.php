@@ -20,8 +20,8 @@ class hash_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_bootstrap
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_bootstrap')]
 	public function test_hash_equals()
 	{
 		$this->assertTrue(hash_equals('same', 'same'));
@@ -40,8 +40,8 @@ class hash_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_bootstrap
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_bootstrap')]
 	public function test_hash_pbkdf2()
 	{
 		if (is_php('5.5'))

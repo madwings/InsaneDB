@@ -292,7 +292,7 @@ class Loader_test extends CI_TestCase {
 		$this->assertEquals($content.'undefined', $out);
 
 		// Mock output class
-		$output = $this->getMockBuilder('CI_Output')->setMethods(array('append_output'))->getMock();
+		$output = $this->getMockBuilder('CI_Output')->disableOriginalConstructor()->onlyMethods(array('append_output'))->getMock();
 		$output->expects($this->once())->method('append_output')->with($content.$value);
 		$this->ci_instance_var('output', $output);
 

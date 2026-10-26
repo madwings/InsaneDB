@@ -9,7 +9,9 @@ application/logs/*
 !application/*/.htaccess
 
 composer.lock
+composer.phar
 .phpunit.result.cache
+.phpunit.cache/
 tests/mocks/database/ci_test.sqlite
 
 user_guide_src/build/*

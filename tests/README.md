@@ -14,38 +14,19 @@ format to facilitate clean api design. [see https://arrenbrecht.ch/testing/]
 
 ### Requirements
 
-PHP Unit >= 3.5.6
+PHP 8.3 or newer, PHPUnit 12, and vfsStream are required.
+PEAR installation is no longer supported; Composer manages all test dependencies.
 
-	pear channel-discover pear.phpunit.de
-	pear channel-discover pear.symfony.com
-	pear install phpunit/PHPUnit
+Download `composer.phar` using the instructions at https://getcomposer.org/download/
+and place it in the project root. From that directory, run:
 
-vfsStream
+	php composer.phar install
+	php vendor/bin/phpunit --configuration tests/phpunit.xml
 
-	pear channel-discover pear.bovigo.org
-	pear install bovigo/vfsStream-beta
+For database tests, enable the corresponding PDO extension. For SQLite coverage,
+also enable Xdebug or PCOV and run:
 
-#### Installation of PEAR and PHPUnit on Ubuntu
-
-  Installation on Ubuntu requires a few steps. Depending on your setup you may
-  need to use 'sudo' to install these. Mileage may vary but these steps are a
-  good start.
-
-	# Install the PEAR package
-	sudo apt-get install php-pear
-
-	# Add a few sources to PEAR
-	pear channel-discover pear.phpunit.de
-	pear channel-discover pear.symfony-project.com
-	pear channel-discover components.ez.no
-	pear channel-discover pear.bovigo.org
-
-	# Finally install PHPUnit and vfsStream (including dependencies)
-	pear install --alldeps phpunit/PHPUnit
-	pear install --alldeps bovigo/vfsStream-beta
-
-	# Finally, run 'phpunit' from within the ./tests directory
-	# and you should be on your way!
+	php composer.phar test:coverage
 
 ## Test Suites:
 
@@ -95,8 +76,8 @@ Database tests live in tests/insanedb/database and run against the database
 set by the DB_DRIVER constant of the configuration in tests/travis
 (pdo/mysql, pdo/pgsql or pdo/sqlite):
 
-	composer install
-	vendor/bin/phpunit --configuration tests/travis/pdo/sqlite.phpunit.xml
+	php composer.phar install
+	php vendor/bin/phpunit --configuration tests/travis/pdo/sqlite.phpunit.xml
 
 Tests that use Mock_Database_Schema_Skeleton run real queries on that
 database. Tests that use the fake drivers in tests/mocks/database/fake
@@ -118,7 +99,7 @@ connections mode.
 ### CI_TestCase Documentation
 
 Test cases should extend CI_TestCase. This internally extends
-PHPUnit\_Framework\_TestCase, so you have access to all of your
+`PHPUnit\Framework\TestCase`, so you have access to all of your
 usual PHPUnit methods.
 
 We need to provide a simple way to modify the globals and the

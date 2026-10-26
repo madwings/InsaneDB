@@ -14,23 +14,10 @@ $dir = realpath(dirname(__FILE__));
 defined('PROJECT_BASE') OR define('PROJECT_BASE', realpath($dir.'/../').'/');
 defined('SYSTEM_PATH') OR define('SYSTEM_PATH', PROJECT_BASE.'system/');
 
-// Get vfsStream either via PEAR or composer
-foreach (explode(PATH_SEPARATOR, get_include_path()) as $path)
-{
-	if (file_exists($path.DIRECTORY_SEPARATOR.'vfsStream/vfsStream.php'))
-	{
-		require_once 'vfsStream/vfsStream.php';
-		break;
-	}
-}
-
-if ( ! class_exists('vfsStream') && file_exists(PROJECT_BASE.'vendor/autoload.php'))
-{
-	include_once PROJECT_BASE.'vendor/autoload.php';
-	class_alias('org\bovigo\vfs\vfsStream', 'vfsStream');
-	class_alias('org\bovigo\vfs\vfsStreamDirectory', 'vfsStreamDirectory');
-	class_alias('org\bovigo\vfs\vfsStreamWrapper', 'vfsStreamWrapper');
-}
+require_once PROJECT_BASE.'vendor/autoload.php';
+class_alias('org\bovigo\vfs\vfsStream', 'vfsStream');
+class_alias('org\bovigo\vfs\vfsStreamDirectory', 'vfsStreamDirectory');
+class_alias('org\bovigo\vfs\vfsStreamWrapper', 'vfsStreamWrapper');
 
 // Define CI path constants to VFS (filesystem setup in CI_TestCase::setUp)
 defined('BASEPATH') OR define('BASEPATH', vfsStream::url('system/'));
@@ -69,13 +56,6 @@ else
 }
 
 is_php('5.6') && ini_set('php.internal_encoding', 'UTF-8');
-
-if (is_php('7.0'))
-{
-	$test_case_code = file_get_contents(PROJECT_BASE.'vendor/phpunit/phpunit/src/Framework/TestCase.php');
-	$test_case_code = preg_replace('/^\s+((?:protected|public)(?: static)? function \w+\(\)): void/m', '$1', $test_case_code);
-	file_put_contents(PROJECT_BASE.'vendor/phpunit/phpunit/src/Framework/TestCase.php', $test_case_code);
-}
 
 include_once SYSTEM_PATH.'core/compat/mbstring.php';
 include_once SYSTEM_PATH.'core/compat/hash.php';

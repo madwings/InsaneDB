@@ -37,8 +37,8 @@ class password_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_bootstrap
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_bootstrap')]
 	public function test_password_get_info()
 	{
 		$expected = array(
@@ -75,8 +75,8 @@ class password_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_bootstrap
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_bootstrap')]
 	public function test_password_hash()
 	{
 		// FALSE is returned if no CSPRNG source is available
@@ -110,8 +110,8 @@ class password_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_password_get_info
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_password_get_info')]
 	public function test_password_needs_rehash()
 	{
 		// invalid hash: always rehash
@@ -146,8 +146,8 @@ class password_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_bootstrap
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_bootstrap')]
 	public function test_password_verify()
 	{
 		$this->assertFalse(password_verify(123, 123));

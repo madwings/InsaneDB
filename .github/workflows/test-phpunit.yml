@@ -15,7 +15,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: [ '8.6', '8.5', '8.4', '8.3', '8.2', '8.1', '8.0' ]
+                php: [ '8.6', '8.5', '8.4', '8.3' ]
                 DB: [ 'pdo/mysql', 'pdo/pgsql', 'pdo/sqlite' ]
 
         services:
@@ -52,9 +52,12 @@ jobs:
                     ini-values: ${{ env.PHP_INI_VALUES }}
                     coverage: xdebug
 
+            -   name: Prepare composer.phar
+                run: cp "$(command -v composer)" composer.phar
+
             -   name: Get composer cache directory
                 id: composer-cache
-                run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+                run: echo "dir=$(php composer.phar config cache-files-dir)" >> $GITHUB_OUTPUT
             -   name: Cache composer dependencies
                 uses: actions/cache@v4
                 with:
@@ -62,10 +65,10 @@ jobs:
                     key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.json') }}
                     restore-keys: ${{ runner.os }}-composer-
             -   name: Install composer dependencies
-                run: composer install --no-progress --prefer-dist --optimize-autoloader
+                run: php composer.phar install --no-progress --prefer-dist --optimize-autoloader
 
             -   name: PHPUnit Test
                 run: |
-                    php -d error_reporting=E_ALL -d zend.enable_gc=0 -d date.timezone=UTC -d mbstring.func_overload=7 -d mbstring.internal_encoding=UTF-8 vendor/bin/phpunit --coverage-text --configuration tests/travis/${{ matrix.DB }}.phpunit.xml
+                    php -d error_reporting=E_ALL -d zend.enable_gc=0 -d date.timezone=UTC vendor/bin/phpunit --coverage-text --configuration tests/travis/${{ matrix.DB }}.phpunit.xml
                 env:
                     XDEBUG_MODE: coverage

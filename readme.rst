@@ -14,6 +14,15 @@ or as a replacement to the CodeIgniter database layer.
 Installation
 **************
 
+Install with Composer
+=======================
+
+Download ``composer`` from https://getcomposer.org/download/, then run:
+
+.. code-block:: sh
+
+   composer require madwings/insanedb
+
 Replacement for the CodeIgniter database layer
 =======================
 
@@ -65,7 +74,7 @@ Behaviour bugfixes compared to the upstream version
 Server Requirements
 *******************
 
-| PHP version 8.0 or newer is required.
+| PHP version 8.3 or newer is required.
 | It is recommend to migrate to newer version of PHP sooner than later.
 
 *******

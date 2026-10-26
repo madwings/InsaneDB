@@ -19,8 +19,8 @@ class standard_test extends CI_TestCase {
 	 *
 	 * Borrowed from PHP's own tests
 	 *
-	 * @depends	test_bootstrap
 	 */
+	#[\PHPUnit\Framework\Attributes\Depends('test_bootstrap')]
 	public function test_array_column()
 	{
 		// Basic tests
