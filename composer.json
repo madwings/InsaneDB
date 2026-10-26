@@ -1,6 +1,6 @@
 {
 	"name" : "madwings/insanedb",
-	"version": "1.4.1",
+	"version": "1.4.3",
 	"description" : "InsaneDB is a Database Toolkit for PHP forked from CodeIgniter 3",
 	"type": "project",
 	"homepage": "https://github.com/madwings/InsaneDB",
