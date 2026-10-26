@@ -94,7 +94,9 @@ test script the outcome of the next ones:
 	$db->fake_server->queries();		// array('SELECT id FROM job', 'SELECT id FROM job')
 
 Use them to test the generated SQL, retries, reconnects and the read/write
-connections mode.
+connections mode. The fake drivers don't sleep between retries and their
+display_error() throws a RuntimeException, so the db_debug paths can be
+tested as well.
 
 ### CI_TestCase Documentation
 

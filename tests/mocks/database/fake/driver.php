@@ -38,9 +38,43 @@ trait Mock_Database_Fake_Driver {
 		return $db;
 	}
 
-	public function db_connect($persistent = FALSE)
+	/**
+	 * Connect to the fake server instead of creating a PDO object
+	 *
+	 * @return	Mock_Database_Fake_Connection
+	 * @throws	PDOException	When the server refuses the connection, like PDO does
+	 */
+	protected function _pdo_connect()
 	{
-		return $this->fake_server->connect($this->dsn);
+		$conn = $this->fake_server->connect($this->dsn, $this->username, $this->options);
+
+		if ($conn === FALSE)
+		{
+			throw new PDOException('SQLSTATE[HY000] [2002] Connection refused');
+		}
+
+		return $conn;
+	}
+
+	/**
+	 * Don't sleep between retries
+	 */
+	protected function _retry_backoff()
+	{
+	}
+
+	/**
+	 * Throw instead of printing the error and exiting, like the show_error() mock does
+	 *
+	 * @param	string|array	$error
+	 * @param	string		$swap
+	 * @param	bool		$native
+	 * @return	void
+	 * @throws	RuntimeException
+	 */
+	public function display_error($error = '', $swap = '', $native = FALSE)
+	{
+		throw new RuntimeException('DB Error: '.implode(' | ', (array) $error));
 	}
 
 	/**

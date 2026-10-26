@@ -9,4 +9,12 @@ class Mock_Database_Fake_Pgsql extends CI_DB_pdo_pgsql_driver {
 
 	use Mock_Database_Fake_Driver;
 
+	/**
+	 * No search_path is set when connecting, so that the query log only
+	 * contains the queries of the test. Pass 'schema' to create() to test it.
+	 *
+	 * @var	string
+	 */
+	public $schema = '';
+
 }

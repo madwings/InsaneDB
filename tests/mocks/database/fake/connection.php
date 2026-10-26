@@ -18,6 +18,16 @@ class Mock_Database_Fake_Connection {
 	public $index;
 
 	/**
+	 * @var string Username the connection was opened with
+	 */
+	public $username;
+
+	/**
+	 * @var array PDO options the connection was opened with
+	 */
+	public $options = array();
+
+	/**
 	 * @var array Attributes set with setAttribute()
 	 */
 	public $attributes = array();
