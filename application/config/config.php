@@ -239,6 +239,20 @@ $config['log_filename'] = '';
 
 /*
 |--------------------------------------------------------------------------
+| Log File Suffix
+|--------------------------------------------------------------------------
+|
+| Add file suffix if an unique name is needed among different servers or environments
+|
+| The suffix is inserted before the file extension and is used as-is,
+| so include your own separator. Also applies to a custom 'log_filename'.
+| Example: '-web01' results in 'log-2026-10-27-web01.php'
+|
+*/
+$config['log_file_suffix'] = '';
+
+/*
+|--------------------------------------------------------------------------
 | Log File Extension (DEPRECATED)
 |--------------------------------------------------------------------------
 |
