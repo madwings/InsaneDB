@@ -273,8 +273,7 @@ class CI_Input {
 	 */
 	public function input_stream($index = NULL, $xss_clean = FALSE)
 	{
-		// Prior to PHP 5.6, the input stream can only be read once,
-		// so we'll need to check if we have already done that first.
+		// Parse the input stream once and cache it for subsequent reads.
 		if ( ! is_array($this->_input_stream))
 		{
 			// $this->raw_input_stream will trigger __get().
@@ -364,22 +363,6 @@ class CI_Input {
 		if ($samesite === 'None' && ! $secure)
 		{
 			log_message('error', $name.' cookie sent with SameSite=None, but without Secure attribute.');
-		}
-
-		if ( ! is_php('7.3'))
-		{
-			$maxage = $expire - time();
-			if ($maxage < 1)
-			{
-				$maxage = 0;
-			}
-
-			$cookie_header = 'Set-Cookie: '.$prefix.$name.'='.rawurlencode($value);
-			$cookie_header .= ($expire === 0 ? '' : '; Expires='.gmdate('D, d-M-Y H:i:s T', $expire)).'; Max-Age='.$maxage;
-			$cookie_header .= '; Path='.$path.($domain !== '' ? '; Domain='.$domain : '');
-			$cookie_header .= ($secure ? '; Secure' : '').($httponly ? '; HttpOnly' : '').'; SameSite='.$samesite;
-			header($cookie_header);
-			return;
 		}
 
 		$setcookie_options = array(

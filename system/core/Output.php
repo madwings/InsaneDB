@@ -124,13 +124,6 @@ class CI_Output {
 	public $parse_exec_vars = TRUE;
 
 	/**
-	 * mbstring.func_overload flag
-	 *
-	 * @var	bool
-	 */
-	protected static $func_overload;
-
-	/**
 	 * Class constructor
 	 *
 	 * Determines whether zLib output compression will be used.
@@ -145,8 +138,6 @@ class CI_Output {
 			&& config_item('compress_output') === TRUE
 			&& extension_loaded('zlib')
 		);
-
-		isset(self::$func_overload) OR self::$func_overload = ( ! is_php('8.0') && extension_loaded('mbstring') && @ini_get('mbstring.func_overload'));
 
 		// Get mime types for later
 		$this->mimes =& get_mimes();
@@ -815,9 +806,7 @@ class CI_Output {
 	 */
 	protected static function strlen($str)
 	{
-		return (self::$func_overload)
-			? mb_strlen($str, '8bit')
-			: strlen($str);
+		return strlen($str);
 	}
 
 	// --------------------------------------------------------------------
@@ -832,11 +821,6 @@ class CI_Output {
 	 */
 	protected static function substr($str, $start, $length = NULL)
 	{
-		if (self::$func_overload)
-		{
-			return mb_substr($str, $start, $length, '8bit');
-		}
-
 		return isset($length)
 			? substr($str, $start, $length)
 			: substr($str, $start);

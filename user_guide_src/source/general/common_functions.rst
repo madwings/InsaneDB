@@ -24,7 +24,7 @@ loading any libraries or helpers.
 
 	Example::
 
-		if (is_php('5.5'))
+		if (is_php('8.3'))
 		{
 			echo json_last_error_msg();
 		}
