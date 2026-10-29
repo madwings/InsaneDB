@@ -197,6 +197,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	if (extension_loaded('mbstring'))
 	{
 		define('MB_ENABLED', TRUE);
+		mb_internal_encoding($charset);
 		// This is required for mb_convert_encoding() to strip invalid characters.
 		// That's utilized by CI_Utf8, but it's also done for consistency with iconv.
 		mb_substitute_character('none');
