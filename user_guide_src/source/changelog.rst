@@ -16,8 +16,10 @@ Release Date: Not Released
 
 -  Core
 
-   -  Added a ``$config['log_file']`` option.
+   -  Added a ``$config['log_filename']`` option.
    -  Removed ``$config['log_file_extension']``.
+   -  Added the ``INSANEDB_CONFIG_PATH`` environment variable and ``CONFIGPATH`` constant to load configuration files from a custom folder, falling back per file to ``application/config/``.
+   -  Added :doc:`common functions <general/common_functions>` ``get_config_paths()`` and ``get_config_file()``.
    -  Removed ``$config['rewrite_short_tags']`` (irrelevant on PHP 5.4+).
    -  Removed previously deprecated ``$config['global_xss_filtering']``.
    -  Removed previously deprecated :doc:`Routing Class <general/routing>` methods ``fetch_directory()``, ``fetch_class()`` and ``fetch_method()`` (use the respective class properties instead).

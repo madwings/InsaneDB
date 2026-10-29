@@ -53,11 +53,26 @@ function &DB($autoinit = TRUE, $file_path = '', $params = '')
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && strpos($params, '://') === FALSE)
 	{
-		// Is the config file in the environment folder or passed to the function?
-		if ( ! file_exists($file_path) && ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/database.php')
-			&& ! file_exists($file_path = APPPATH.'config/database.php'))
+		// Is the config file passed to the function? If not, look for it in each
+		// config folder by priority, preferring the environment-specific one.
+		if ( ! file_exists($file_path))
 		{
-			show_error('The configuration file database.php does not exist.');
+			$file_path = FALSE;
+			foreach (get_config_paths() as $config_path)
+			{
+				if (file_exists($file_path = $config_path.ENVIRONMENT.'/database.php')
+					OR file_exists($file_path = $config_path.'database.php'))
+				{
+					break;
+				}
+
+				$file_path = FALSE;
+			}
+
+			if ($file_path === FALSE)
+			{
+				show_error('The configuration file database.php does not exist.');
+			}
 		}
 
 		include($file_path);
