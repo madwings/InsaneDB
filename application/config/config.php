@@ -242,7 +242,7 @@ $config['log_filename'] = '';
 | Log File Suffix
 |--------------------------------------------------------------------------
 |
-| Add file suffix if an unique name is needed among different servers or environments
+| Add a file suffix if a unique name is needed among different servers or environments
 |
 | The suffix is inserted before the file extension and is used as-is,
 | so include your own separator. Also applies to a custom 'log_filename'.
