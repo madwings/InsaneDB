@@ -36,6 +36,7 @@ New features compared to the upstream version
    -  Added Read/Write connections mode.
    -  Read delay option in Read/Write connections mode.
    -  Automatic reconnect on dropped connection for the MySQL and PostgreSQL drivers.
+   -  Configuration files can be loaded from a custom folder via the ``INSANEDB_CONFIG_PATH`` environment variable (standalone mode), with per-file fallback to ``application/config``.
 
 
 Improvements compared to the upstream version
