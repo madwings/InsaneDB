@@ -239,6 +239,11 @@ if you haven't copied the new one over.
 The ``$config['log_file_extension']`` option still works as a fallback,
 but ``$config['log_filename']`` takes precedence when set.
 
+A new ``$config['log_file_suffix']`` option is also available. When set, it
+is inserted before the file extension of the log filename (e.g. ``'-web01'``
+results in *log-2026-10-27-web01.php*), which is useful when multiple servers
+or environments write to the same log directory.
+
 Step 15: Check recursive usage of get_dir_file_info()
 =====================================================
 
