@@ -57,11 +57,25 @@ class CI_Log {
 	protected $_log_path;
 
 	/**
-	 * Log filename
+	 * Custom log filename, or an empty string for automatic daily filenames
 	 *
 	 * @var string
 	 */
-	protected $_log_filename;
+	protected $_log_filename = '';
+
+	/**
+	 * Suffix inserted before the log file extension
+	 *
+	 * @var string
+	 */
+	protected $_log_file_suffix = '';
+
+	/**
+	 * Extension for automatically generated log filenames
+	 *
+	 * @var string
+	 */
+	protected $_log_file_extension = 'php';
 
 	/**
 	 * File permissions
@@ -134,12 +148,13 @@ class CI_Log {
 		}
 		elseif (isset($config['log_file_extension']) && $config['log_file_extension'] !== '')
 		{
-			$ext = ltrim($config['log_file_extension'], '.');
-			$this->_log_filename = 'log-'.date('Y-m-d').'.'.$ext;
+			$this->_log_file_extension = ltrim($config['log_file_extension'], '.');
 		}
-		else
+
+		if (isset($config['log_file_suffix']) && $config['log_file_suffix'] !== '')
 		{
-			$this->_log_filename = 'log-'.date('Y-m-d').'.php';
+			// Prevent the suffix from escaping the log directory
+			$this->_log_file_suffix = str_replace(array('/', '\\'), '', (string) $config['log_file_suffix']);
 		}
 
 		file_exists($this->_log_path) OR mkdir($this->_log_path, 0755, TRUE);
@@ -196,14 +211,15 @@ class CI_Log {
 			return FALSE;
 		}
 
-		$filepath = $this->_log_path.$this->_log_filename;
+		$log_filename = $this->_get_log_filename();
+		$filepath = $this->_log_path.$log_filename;
 		$message = '';
 
 		if ( ! file_exists($filepath))
 		{
 			$newfile = TRUE;
 			// Only add protection to php files
-			if (substr($this->_log_filename, -3, 3) === 'php')
+			if (substr($log_filename, -3, 3) === 'php')
 			{
 				$message .= "<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>\n\n";
 			}
@@ -221,7 +237,7 @@ class CI_Log {
 		{
 			$microtime_full = microtime(TRUE);
 			$microtime_short = sprintf("%06d", ($microtime_full - floor($microtime_full)) * 1000000);
-			$date = new DateTime(date('Y-m-d H:i:s.'.$microtime_short, $microtime_full));
+			$date = new DateTime(date('Y-m-d H:i:s.'.$microtime_short, (int) $microtime_full));
 			$date = $date->format($this->_date_fmt);
 		}
 		else
@@ -248,6 +264,36 @@ class CI_Log {
 		}
 
 		return is_int($result);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Get the log filename
+	 *
+	 * Resolved on every write so daily filenames rotate in long-running processes.
+	 * If 'log_file_suffix' is set, it is inserted before the file extension.
+	 *
+	 * @return	string
+	 */
+	protected function _get_log_filename()
+	{
+		$suffix = isset($this->_log_file_suffix) ? (string) $this->_log_file_suffix : '';
+
+		if ( ! isset($this->_log_filename) OR $this->_log_filename === '')
+		{
+			return 'log-'.date('Y-m-d').$suffix.'.'.$this->_log_file_extension;
+		}
+
+		if ($suffix === '')
+		{
+			return $this->_log_filename;
+		}
+
+		// Insert before the extension; a leading dot (e.g. ".log") is not treated as one
+		return (($pos = strrpos($this->_log_filename, '.')) !== FALSE && $pos > 0)
+			? substr($this->_log_filename, 0, $pos).$suffix.substr($this->_log_filename, $pos)
+			: $this->_log_filename.$suffix;
 	}
 
 	// --------------------------------------------------------------------

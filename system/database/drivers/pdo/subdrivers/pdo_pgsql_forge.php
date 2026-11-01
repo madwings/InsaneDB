@@ -210,7 +210,7 @@ class CI_DB_pdo_pgsql_forge extends CI_DB_pdo_forge {
 	{
 		if ( ! empty($attributes['AUTO_INCREMENT']) && $attributes['AUTO_INCREMENT'] === TRUE)
 		{
-			$field['type'] = ($field['type'] === 'NUMERIC')
+			$field['type'] = in_array(strtoupper($field['type']), array('NUMERIC', 'BIGINT', 'INT8'), TRUE)
 				? 'BIGSERIAL'
 				: 'SERIAL';
 		}

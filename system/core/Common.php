@@ -224,6 +224,51 @@ if ( ! function_exists('is_loaded'))
 
 // ------------------------------------------------------------------------
 
+if ( ! function_exists('get_config_paths'))
+{
+	/**
+	 * Returns the directories config files are looked up in, by priority
+	 *
+	 * The custom config folder (CONFIGPATH), if set, comes first, followed
+	 * by the default APPPATH/config/ folder as a fallback for files that
+	 * don't exist in the custom one.
+	 *
+	 * @return	string[]	Directory paths with a trailing slash
+	 */
+	function get_config_paths()
+	{
+		return defined('CONFIGPATH')
+			? array(CONFIGPATH, APPPATH.'config/')
+			: array(APPPATH.'config/');
+	}
+}
+
+// ------------------------------------------------------------------------
+
+if ( ! function_exists('get_config_file'))
+{
+	/**
+	 * Returns the full path of the first existing config file in get_config_paths()
+	 *
+	 * @param	string	$file	Path relative to the config folder, e.g. 'config.php'
+	 * @return	string|bool	File path or FALSE if not found
+	 */
+	function get_config_file($file)
+	{
+		foreach (get_config_paths() as $path)
+		{
+			if (file_exists($path.$file))
+			{
+				return $path.$file;
+			}
+		}
+
+		return FALSE;
+	}
+}
+
+// ------------------------------------------------------------------------
+
 if ( ! function_exists('get_config'))
 {
 	/**
@@ -241,16 +286,15 @@ if ( ! function_exists('get_config'))
 
 		if (empty($config))
 		{
-			$file_path = APPPATH.'config/config.php';
 			$found = FALSE;
-			if (file_exists($file_path))
+			if (($file_path = get_config_file('config.php')) !== FALSE)
 			{
 				$found = TRUE;
 				require($file_path);
 			}
 
 			// Is the config file in the environment folder?
-			if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+			if (($file_path = get_config_file(ENVIRONMENT.'/config.php')) !== FALSE)
 			{
 				require($file_path);
 			}
@@ -319,13 +363,13 @@ if ( ! function_exists('get_mimes'))
 
 		if (empty($_mimes))
 		{
-			$_mimes = file_exists(APPPATH.'config/mimes.php')
-				? include(APPPATH.'config/mimes.php')
+			$_mimes = (($file_path = get_config_file('mimes.php')) !== FALSE)
+				? include($file_path)
 				: array();
 
-			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+			if (($file_path = get_config_file(ENVIRONMENT.'/mimes.php')) !== FALSE)
 			{
-				$_mimes = array_merge($_mimes, include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'));
+				$_mimes = array_merge($_mimes, include($file_path));
 			}
 		}
 
