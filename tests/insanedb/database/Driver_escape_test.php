@@ -6,8 +6,8 @@ class Driver_escape_test extends CI_TestCase {
 	{
 		class_exists('Mock_Database_DB_Driver', TRUE);
 
-		$this->mysql = new CI_DB_mysqli_driver(array());
-		$this->postgre = new CI_DB_postgre_driver(array());
+		$this->mysql = new CI_DB_pdo_mysql_driver(array());
+		$this->postgre = new CI_DB_pdo_pgsql_driver(array());
 	}
 
 	// --------------------------------------------------------------------
