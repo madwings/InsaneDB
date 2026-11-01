@@ -1672,23 +1672,23 @@ abstract class CI_DB_driver {
 			return $item;
 		}
 
-		if (is_array($this->_escape_char))
+		if (empty($this->_preg_ec))
 		{
-			$preg_ec = array(
-				preg_quote($this->_escape_char[0]),
-				preg_quote($this->_escape_char[1]),
-				$this->_escape_char[0],
-				$this->_escape_char[1]
-			);
-		}
-		else
-		{
-			$preg_ec = array(
-				preg_quote($this->_escape_char),
-				preg_quote($this->_escape_char),
-				$this->_escape_char,
-				$this->_escape_char
-			);
+			if (is_array($this->_escape_char))
+			{
+				$this->_preg_ec = array(
+					preg_quote($this->_escape_char[0]),
+					preg_quote($this->_escape_char[1]),
+					$this->_escape_char[0],
+					$this->_escape_char[1]
+				);
+			}
+			else
+			{
+				$this->_preg_ec[0] = $this->_preg_ec[1] = preg_quote($this->_escape_char);
+				$this->_preg_ec[2] = $this->_preg_ec[3] = $this->_escape_char;
+			}
+
 		}
 
 		$preg_ec = $this->_preg_ec;
