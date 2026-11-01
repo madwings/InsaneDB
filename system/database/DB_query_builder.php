@@ -1580,7 +1580,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	$table			Table to insert into
 	 * @param	array	$set 			An associative array of insert values
-	 * @param	int		$batch_size		Number of rows to insert per batch 
+	 * @param	int		$batch_size		Number of rows to insert per batch
 	 * @param	array	$include		Keys included into the insert
 	 * @param	bool	$escape			Whether to escape values and identifiers
 	 *
@@ -1640,7 +1640,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 *
 	 * @param	string	$table			Table to insert into
 	 * @param	array	$set 			An associative array of insert values
-	 * @param	int		$batch_size		Number of rows to insert per batch 
+	 * @param	int		$batch_size		Number of rows to insert per batch
 	 * @param	array	$include		Keys included into the insert
 	 * @param	bool	$escape			Whether to escape values and identifiers
 	 *
@@ -1648,11 +1648,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function insert_ignore_batch($table = '', $set = NULL, $batch_size = 100, $include = NULL, $escape = NULL)
 	{
-		if ( ! method_exists($this, '_insert_ignore_batch')) 
+		if ( ! method_exists($this, '_insert_ignore_batch'))
 		{
 			return FALSE;
 		}
-		
+
 		if ($set !== NULL && $this->set_insert_batch($set, '', $include, $escape) === FALSE)
 		{
 			return FALSE;
@@ -1686,7 +1686,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$this->_reset_write();
 		return $affected_rows;
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -1703,7 +1703,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	{
 		return 'INSERT INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -2203,11 +2203,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 			$index_set = FALSE;
 			$clean = array();
 			foreach ($v as $k2 => $v2)
-			{				
+			{
 				if ( ! empty($include) && ! in_array($k2, $include) && $k2 !== $index) {
 					continue;
 				}
-				
+
 				if ($k2 === $index)
 				{
 					$index_set = TRUE;
@@ -2911,9 +2911,10 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		}
 
 		// Double quotes delimit string literals only when they aren't the identifier escape character
-		$quotes = ($this->_escape_char !== '"') ? array('"', "'") : array("'");
+		$_str = ($this->_escape_char !== '"')
+			? array('"', "'") : array("'");
 
-		return in_array($str[0], $quotes, TRUE);
+		return in_array($str[0], $_str, TRUE);
 	}
 
 	// --------------------------------------------------------------------
