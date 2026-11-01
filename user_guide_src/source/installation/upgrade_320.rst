@@ -244,6 +244,13 @@ is inserted before the file extension of the log filename (e.g. ``'-web01'``
 results in *log-2026-10-27-web01.php*), which is useful when multiple servers
 or environments write to the same log directory.
 
+Filename settings are captured when the logger is constructed. Default
+date-based filenames rotate daily, even in long-running processes; custom
+filenames remain fixed. The protected ``$_log_filename`` property remains
+available for subclasses. It holds the custom filename, or an empty string
+for automatic naming; ``_get_log_filename()`` returns the resolved filename.
+Assigning a custom filename prevents automatic rotation.
+
 Step 15: Check recursive usage of get_dir_file_info()
 =====================================================
 
