@@ -1688,6 +1688,7 @@ abstract class CI_DB_driver {
 				$this->_preg_ec[0] = $this->_preg_ec[1] = preg_quote($this->_escape_char);
 				$this->_preg_ec[2] = $this->_preg_ec[3] = $this->_escape_char;
 			}
+
 		}
 
 		$preg_ec = $this->_preg_ec;
@@ -1841,13 +1842,11 @@ abstract class CI_DB_driver {
 				'\s+LIKE\s+\S.*('.$_les.')?',    // LIKE 'expr'[ ESCAPE '%s']
 				'\s+NOT LIKE\s+\S.*('.$_les.')?' // NOT LIKE 'expr'[ ESCAPE '%s']
 			);
-
 		}
 
 		return preg_match('/'.implode('|', $this->_operators).'/i', $str, $match)
 			? $match[0] : FALSE;
 	}
-
 	// --------------------------------------------------------------------
 
 	/**

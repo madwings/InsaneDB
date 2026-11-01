@@ -163,9 +163,15 @@ class CI_Cache_redis extends CI_Driver
 	{
 		$data = $this->_redis->hMGet($key, array('__ci_type', '__ci_value'));
 
-		if ($data === FALSE || $this->_redis->sIsMember('_ci_redis_serialized', $key))
+		if ($this->_redis->sIsMember('_ci_redis_serialized', $key))
 		{
 			return FALSE;
+		}
+
+		// Also serves scalars that 3.1.x cached as plain strings
+		if ($data === FALSE)
+		{
+			return $this->_redis->get($key);
 		}
 
 		switch ($data['__ci_type'])
@@ -261,7 +267,7 @@ class CI_Cache_redis extends CI_Driver
 	 */
 	public function increment($id, $offset = 1)
 	{
-		return $this->_redis->incrBy($id, $offset);
+		return $this->_increment($id, $offset);
 	}
 
 	// ------------------------------------------------------------------------
@@ -275,7 +281,29 @@ class CI_Cache_redis extends CI_Driver
 	 */
 	public function decrement($id, $offset = 1)
 	{
-		return $this->_redis->decrBy($id, $offset);
+		return $this->_increment($id, -$offset);
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Add to a counter
+	 *
+	 * @param	string	$id	Cache ID
+	 * @param	int	$offset	Amount to add (negative to subtract)
+	 * @return	mixed	New value on success or FALSE on failure
+	 */
+	protected function _increment($id, $offset)
+	{
+		$value = $this->_redis->incrBy($id, $offset);
+
+		if ($value === FALSE)
+		{
+			$value = $this->_redis->hIncrBy($id, '__ci_value', $offset);
+			$value === FALSE OR $this->_redis->hSet($id, '__ci_type', 'integer');
+		}
+
+		return $value;
 	}
 
 	// ------------------------------------------------------------------------

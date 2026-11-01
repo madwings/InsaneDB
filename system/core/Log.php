@@ -57,11 +57,25 @@ class CI_Log {
 	protected $_log_path;
 
 	/**
-	 * Logging configuration
+	 * Custom log filename, or an empty string for automatic daily filenames
 	 *
-	 * @var array
+	 * @var string
 	 */
-	protected $_config = array();
+	protected $_log_filename = '';
+
+	/**
+	 * Suffix inserted before the log file extension
+	 *
+	 * @var string
+	 */
+	protected $_log_file_suffix = '';
+
+	/**
+	 * Extension for automatically generated log filenames
+	 *
+	 * @var string
+	 */
+	protected $_log_file_extension = 'php';
 
 	/**
 	 * File permissions
@@ -121,13 +135,27 @@ class CI_Log {
 	 */
 	public function __construct()
 	{
-		$this->_config =& get_config();
-		$config = $this->_config;
+		$config =& get_config();
 
 		isset(self::$func_overload) OR self::$func_overload = ( ! is_php('8.0') && extension_loaded('mbstring') && @ini_get('mbstring.func_overload'));
 
 		$this->_log_path = ($config['log_path'] !== '')
 			? rtrim($config['log_path'], '/\\').DIRECTORY_SEPARATOR : APPPATH.'logs'.DIRECTORY_SEPARATOR;
+
+		if (isset($config['log_filename']) && $config['log_filename'] !== '')
+		{
+			$this->_log_filename = $config['log_filename'];
+		}
+		elseif (isset($config['log_file_extension']) && $config['log_file_extension'] !== '')
+		{
+			$this->_log_file_extension = ltrim($config['log_file_extension'], '.');
+		}
+
+		if (isset($config['log_file_suffix']) && $config['log_file_suffix'] !== '')
+		{
+			// Prevent the suffix from escaping the log directory
+			$this->_log_file_suffix = str_replace(array('/', '\\'), '', (string) $config['log_file_suffix']);
+		}
 
 		file_exists($this->_log_path) OR mkdir($this->_log_path, 0755, TRUE);
 
@@ -250,31 +278,22 @@ class CI_Log {
 	 */
 	protected function _get_log_filename()
 	{
-		if (isset($this->_config['log_filename']) && $this->_config['log_filename'] !== '')
-		{
-			$filename = $this->_config['log_filename'];
-		}
-		else
-		{
-			$ext = (isset($this->_config['log_file_extension']) && $this->_config['log_file_extension'] !== '')
-				? ltrim($this->_config['log_file_extension'], '.')
-				: 'php';
+		$suffix = isset($this->_log_file_suffix) ? (string) $this->_log_file_suffix : '';
 
-			$filename = 'log-'.date('Y-m-d').'.'.$ext;
+		if ( ! isset($this->_log_filename) OR $this->_log_filename === '')
+		{
+			return 'log-'.date('Y-m-d').$suffix.'.'.$this->_log_file_extension;
 		}
 
-		if ( ! isset($this->_config['log_file_suffix']) OR $this->_config['log_file_suffix'] === '')
+		if ($suffix === '')
 		{
-			return $filename;
+			return $this->_log_filename;
 		}
-
-		// Prevent the suffix from escaping the log directory
-		$suffix = str_replace(array('/', '\\'), '', (string) $this->_config['log_file_suffix']);
 
 		// Insert before the extension; a leading dot (e.g. ".log") is not treated as one
-		return (($pos = strrpos($filename, '.')) !== FALSE && $pos > 0)
-			? substr($filename, 0, $pos).$suffix.substr($filename, $pos)
-			: $filename.$suffix;
+		return (($pos = strrpos($this->_log_filename, '.')) !== FALSE && $pos > 0)
+			? substr($this->_log_filename, 0, $pos).$suffix.substr($this->_log_filename, $pos)
+			: $this->_log_filename.$suffix;
 	}
 
 	// --------------------------------------------------------------------
