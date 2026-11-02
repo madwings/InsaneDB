@@ -233,9 +233,25 @@ $config['log_path'] = '';
 |
 | Leave this BLANK unless you would like to set something other than the default
 | 'log-'.date('Y-m-d').'.php'. No DIRECTORY_SEPARATOR(s), just the filename.
+| Default filenames rotate daily, including in long-running processes.
+| A custom filename stays fixed. Filename settings are read at construction.
 |
 */
 $config['log_filename'] = '';
+
+/*
+|--------------------------------------------------------------------------
+| Log File Suffix
+|--------------------------------------------------------------------------
+|
+| Add a file suffix if a unique name is needed among different servers or environments
+|
+| The suffix is inserted before the file extension and is used as-is,
+| so include your own separator. Also applies to a custom 'log_filename'.
+| Example: '-web01' results in 'log-2026-10-27-web01.php'
+|
+*/
+$config['log_file_suffix'] = '';
 
 /*
 |--------------------------------------------------------------------------

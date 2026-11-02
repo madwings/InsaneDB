@@ -137,6 +137,33 @@ switch (ENVIRONMENT)
  * NO TRAILING SLASH!
  */
 	$view_folder = '';
+
+/*
+ *---------------------------------------------------------------
+ * CONFIG FOLDER PATH
+ *---------------------------------------------------------------
+ *
+ * By default the configuration files (config.php, database.php,
+ * constants.php, etc.) are loaded from the "config" folder inside
+ * your application folder. To load them from a different folder,
+ * set the INSANEDB_CONFIG_PATH environment variable to its path.
+ * Relative paths are resolved from the directory of this file.
+ *
+ * Files that are not found in that folder (including their
+ * ENVIRONMENT sub-folder) fall back to the default config folder.
+ */
+	if (isset($_ENV['INSANEDB_CONFIG_PATH']))
+	{
+		$config_folder = $_ENV['INSANEDB_CONFIG_PATH'];
+	}
+	elseif (isset($_SERVER['INSANEDB_CONFIG_PATH']))
+	{
+		$config_folder = $_SERVER['INSANEDB_CONFIG_PATH'];
+	}
+	elseif (($config_folder = getenv('INSANEDB_CONFIG_PATH')) === FALSE)
+	{
+		$config_folder = '';
+	}
 	
 // --------------------------------------------------------------------
 // END OF USER CONFIGURABLE SETTINGS.  DO NOT EDIT BELOW THIS LINE
@@ -228,18 +255,24 @@ switch (ENVIRONMENT)
 	}
 
 	define('VIEWPATH', $view_folder);
-	
-/*
- * ------------------------------------------------------
- *  Load the framework constants
- * ------------------------------------------------------
- */
-	if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/constants.php'))
+
+	// The path to the "config" folder
+	if ($config_folder === '')
 	{
-		require_once(APPPATH.'config/'.ENVIRONMENT.'/constants.php');
+		$config_folder = APPPATH.'config';
+	}
+	elseif (($_temp = realpath($config_folder)) !== FALSE)
+	{
+		$config_folder = $_temp;
 	}
 
-	require_once(APPPATH.'config/constants.php');
+	if ( ! is_dir($config_folder))
+	{
+		echo 'Your config folder path does not appear to be set correctly. Please check the INSANEDB_CONFIG_PATH environment variable.';
+		exit(3); // EXIT_CONFIG
+	}
+
+	define('CONFIGPATH', rtrim($config_folder, '/\\').DIRECTORY_SEPARATOR);
 
 /*
  * ------------------------------------------------------
@@ -247,6 +280,19 @@ switch (ENVIRONMENT)
  * ------------------------------------------------------
  */
 	require_once(BASEPATH.'core/Common.php');
+
+/*
+ * ------------------------------------------------------
+ *  Load the framework constants
+ * ------------------------------------------------------
+ */
+	if (($_temp = get_config_file(ENVIRONMENT.'/constants.php')) !== FALSE)
+	{
+		require_once($_temp);
+	}
+
+	require_once((($_temp = get_config_file('constants.php')) !== FALSE) ? $_temp : APPPATH.'config/constants.php');
+	unset($_temp);
 	
 /*
  * ------------------------------------------------------
