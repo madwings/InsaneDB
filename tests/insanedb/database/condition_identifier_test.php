@@ -360,25 +360,25 @@ class Condition_identifier_test extends CI_TestCase {
 			$this->assertStringContainsString('simple identifiers', $exception->getMessage());
 		}
 
-		$sql = $db->or_where_not_in('id', array(2))->get_compiled_select('members');
+		$sql = $db->select('name')->or_where_not_in('id', array(2))->get_compiled_select('members');
 		$result = $db->conn_id->query($sql);
 		$this->assertNotFalse($result);
-		$this->assertSame(array(1), $result->fetchAll(PDO::FETCH_COLUMN, 0));
+		$this->assertSame(array('guest'), $result->fetchAll(PDO::FETCH_COLUMN, 0));
 
 		$payload = "guest' OR 1=1 --";
 		$insert = $db->conn_id->prepare('INSERT INTO members VALUES (?, ?)');
 		$this->assertTrue($insert->execute(array(3, $payload)));
 
 		$expression = $db->trusted_expression("COALESCE(name, '')");
-		$sql = $db->where($expression, $payload)->get_compiled_select('members');
+		$sql = $db->select('name')->where($expression, $payload)->get_compiled_select('members');
 		$result = $db->conn_id->query($sql);
 		$this->assertNotFalse($result);
-		$this->assertSame(array(3), $result->fetchAll(PDO::FETCH_COLUMN, 0));
+		$this->assertSame(array($payload), $result->fetchAll(PDO::FETCH_COLUMN, 0));
 
-		$sql = $db->like($expression, $payload, 'none')->get_compiled_select('members');
+		$sql = $db->select('name')->like($expression, $payload, 'none')->get_compiled_select('members');
 		$result = $db->conn_id->query($sql);
 		$this->assertNotFalse($result);
-		$this->assertSame(array(3), $result->fetchAll(PDO::FETCH_COLUMN, 0));
+		$this->assertSame(array($payload), $result->fetchAll(PDO::FETCH_COLUMN, 0));
 	}
 
 	public function test_database_session_gc_deletes_only_expired_rows()
