@@ -38,7 +38,7 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-require_once(BASEPATH.'database/DB_trusted_expression.php');
+require_once(__DIR__.DIRECTORY_SEPARATOR.'DB_trusted_expression.php');
 
 /**
  * Query Builder Class
