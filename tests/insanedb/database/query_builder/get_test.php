@@ -50,4 +50,13 @@ class Get_test extends CI_TestCase {
 		$this->assertEquals('Developer', $job1[0]['name']);
 	}
 
+	public function test_get_where_with_trusted_condition()
+	{
+		$condition = $this->db->trusted_expression('id = 1');
+		$jobs = $this->db->get_where('job', $condition)->result_array();
+
+		$this->assertCount(1, $jobs);
+		$this->assertEquals('Developer', $jobs[0]['name']);
+	}
+
 }

@@ -47,7 +47,7 @@ class Update_test extends CI_TestCase {
 
 		// Do the update
 		$this->db->set('name', 'Vocalist');
-		$this->db->update('job', NULL, 'id = 4');
+		$this->db->update('job', NULL, $this->db->trusted_expression('id = 4'));
 
 		// Check updated record
 		$job1 = $this->db->where('id', 4)->get('job')->row();

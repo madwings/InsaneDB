@@ -38,6 +38,8 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+require_once(BASEPATH.'database/DB_trusted_expression.php');
+
 /**
  * Query Builder Class
  *
@@ -618,6 +620,69 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Mark a SQL field expression or complete condition as trusted.
+	 *
+	 * @param	string	$expression
+	 * @return	CI_DB_trusted_expression
+	 */
+	public function trusted_expression($expression)
+	{
+		return new CI_DB_trusted_expression($expression);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Validate a condition field, optionally followed by a comparison operator.
+	 *
+	 * @param	string	$field
+	 * @param	bool	$allow_operator
+	 * @return	void
+	 */
+	protected function _validate_condition_field($field, $allow_operator = FALSE)
+	{
+		$identifier = '[\p{L}_][\p{L}\p{M}\p{N}_$]*';
+		$comparison = $allow_operator
+			? '(?:[ \t]*(?:<=|>=|<>|!=|=|<|>)|[ \t]+IS[ \t]+(?:NOT[ \t]+)?NULL)?'
+			: '';
+
+		if ( ! is_string($field)
+			OR preg_match('/\A[ \t]*'.$identifier.'(?:\.'.$identifier.')*'.$comparison.'[ \t]*\z/iu', $field) !== 1)
+		{
+			throw new InvalidArgumentException('Condition fields must be simple identifiers; use trusted_expression() only for trusted SQL');
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Validate all fields before adding a WHERE or HAVING condition.
+	 *
+	 * @param	mixed	$key
+	 * @return	void
+	 */
+	protected function _validate_where_fields($key)
+	{
+		if ($key instanceof CI_DB_trusted_expression)
+		{
+			return;
+		}
+
+		if ( ! is_array($key))
+		{
+			$this->_validate_condition_field($key, TRUE);
+			return;
+		}
+
+		foreach ($key as $field => $value)
+		{
+			$this->_validate_condition_field($field, TRUE);
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * WHERE
 	 *
 	 * Generates the WHERE portion of the query.
@@ -671,6 +736,17 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	protected function _wh($qb_key, $key, $value = NULL, $type = 'AND ', $escape = NULL)
 	{
 		$qb_cache_key = ($qb_key === 'qb_having') ? 'qb_cache_having' : 'qb_cache_where';
+		$trusted_expression = ($key instanceof CI_DB_trusted_expression);
+
+		if ($escape !== FALSE)
+		{
+			$this->_validate_where_fields($key);
+		}
+
+		if ($trusted_expression)
+		{
+			$key = (string) $key;
+		}
 
 		if ( ! is_array($key))
 		{
@@ -693,22 +769,26 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 					$v = $this->escape($v);
 				}
 
-				if ( ! $this->_has_operator($k))
+				$has_operator = $trusted_expression
+					? (bool) preg_match('/(?:<>|!=|<=|>=|=|<|>|\b(?:IS(?:\s+NOT)?|(?:NOT\s+)?(?:LIKE|ILIKE|IN|BETWEEN|REGEXP|RLIKE)))\s*\z/i', $k)
+					: $this->_has_operator($k);
+
+				if ( ! $has_operator)
 				{
 					$k .= ' = ';
 				}
 			}
-			elseif ( ! $this->_has_operator($k))
+			elseif ( ! $trusted_expression && ! $this->_has_operator($k))
 			{
 				// value appears not to have been set, assign the test to IS NULL
 				$k .= ' IS NULL';
 			}
-			elseif (preg_match('/\s*(!?=|<>|\sIS(?:\s+NOT)?\s)\s*$/i', $k, $match, PREG_OFFSET_CAPTURE))
+			elseif ( ! $trusted_expression && preg_match('/\s*(!?=|<>|\sIS(?:\s+NOT)?\s)\s*$/i', $k, $match, PREG_OFFSET_CAPTURE))
 			{
 				$k = substr($k, 0, $match[0][1]).($match[1][0] === '=' ? ' IS NULL' : ' IS NOT NULL');
 			}
 
-			$$qb_key = array('condition' => $prefix.$k, 'value' => $v, 'escape' => $escape);
+			$$qb_key = array('condition' => $prefix.$k, 'value' => $v, 'escape' => $escape, 'trusted_expression' => $trusted_expression);
 			$this->{$qb_key}[] = $$qb_key;
 			if ($this->qb_caching === TRUE)
 			{
@@ -729,7 +809,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a WHERE field IN('item', 'item') SQL query,
 	 * joined with 'AND' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -747,7 +827,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a WHERE field IN('item', 'item') SQL query,
 	 * joined with 'OR' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -765,7 +845,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a WHERE field NOT IN('item', 'item') SQL query,
 	 * joined with 'AND' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -783,7 +863,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a WHERE field NOT IN('item', 'item') SQL query,
 	 * joined with 'OR' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -801,7 +881,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a HAVING field IN('item', 'item') SQL query,
 	 * joined with 'AND' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -819,7 +899,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a HAVING field IN('item', 'item') SQL query,
 	 * joined with 'OR' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -837,7 +917,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a HAVING field NOT IN('item', 'item') SQL query,
 	 * joined with 'AND' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -855,7 +935,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * Generates a HAVING field NOT IN('item', 'item') SQL query,
 	 * joined with 'OR' if appropriate.
 	 *
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$escape
 	 * @return	CI_DB_query_builder
@@ -880,7 +960,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 * @used-by	or_having_not_in()
 	 *
 	 * @param	string	$qb_key	'qb_where' or 'qb_having'
-	 * @param	string	$key	The field to search
+	 * @param	string|CI_DB_trusted_expression	$key	The field to search
 	 * @param	array	$values	The values searched on
 	 * @param	bool	$not	If the statement would be IN or NOT IN
 	 * @param	string	$type
@@ -890,8 +970,14 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	protected function _wh_in($qb_key, $key, array $values, $not = FALSE, $type = 'AND ', $escape = NULL)
 	{
 		$qb_cache_key = ($qb_key === 'qb_having') ? 'qb_cache_having' : 'qb_cache_where';
+		$trusted_expression = ($key instanceof CI_DB_trusted_expression);
 
-		if (empty($key) OR ! is_string($key))
+		if ($trusted_expression)
+		{
+			$key = (string) $key;
+		}
+
+		if ( ! is_string($key) OR $key === '')
 		{
 			throw new InvalidArgumentException(sprintf('%s() expects $key to be a non-empty string', debug_backtrace(0, 2)[1]['function']));
 		}
@@ -899,6 +985,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		if (empty($values))
 		{
 			throw new InvalidArgumentException(sprintf('%s() expects $values to be a non-empty array', debug_backtrace(0, 2)[1]['function']));
+		}
+
+		if ($escape !== FALSE && ! $trusted_expression)
+		{
+			$this->_validate_condition_field($key);
 		}
 
 		is_bool($escape) OR $escape = $this->_protect_identifiers;
@@ -925,7 +1016,8 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 		$wh_in = array(
 			'condition' => $prefix.$key.$not.' IN('.implode(', ', $wh_in).')',
 			'value' => NULL,
-			'escape' => $escape
+			'escape' => $escape,
+			'trusted_expression' => $trusted_expression
 		);
 
 		$this->{$qb_key}[] = $wh_in;
@@ -1034,6 +1126,27 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	protected function _like($field, $match = '', $type = 'AND ', $side = 'both', $not = '', $escape = NULL)
 	{
+		$trusted_expression = ($field instanceof CI_DB_trusted_expression);
+
+		if ($trusted_expression)
+		{
+			$field = (string) $field;
+		}
+		elseif ($escape !== FALSE)
+		{
+			if (is_array($field))
+			{
+				foreach ($field as $key => $value)
+				{
+					$this->_validate_condition_field($key);
+				}
+			}
+			else
+			{
+				$this->_validate_condition_field($field);
+			}
+		}
+
 		if ( ! is_array($field))
 		{
 			$field = array($field => $match);
@@ -1076,7 +1189,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				$v .= sprintf($this->_like_escape_str, $this->_like_escape_chr);
 			}
 
-			$qb_where = array('condition' => "{$prefix} {$k} {$not} LIKE {$v}", 'value' => NULL, 'escape' => $escape);
+			$qb_where = array('condition' => "{$prefix} {$k} {$not} LIKE {$v}", 'value' => NULL, 'escape' => $escape, 'trusted_expression' => $trusted_expression);
 			$this->qb_where[] = $qb_where;
 			if ($this->qb_caching === TRUE)
 			{
@@ -1551,6 +1664,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function get_where($table = '', $where = NULL, $limit = NULL, $offset = NULL)
 	{
+		if ($where !== NULL)
+		{
+			$this->_validate_where_fields($where);
+		}
+
 		if ($table !== '')
 		{
 			$this->from($table);
@@ -2006,6 +2124,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function update($table = '', $set = NULL, $where = NULL, $limit = NULL)
 	{
+		if ($where !== NULL)
+		{
+			$this->_validate_where_fields($where);
+		}
+
 		// Combine any cached components with the current statements
 		$this->_merge_cache();
 
@@ -2346,6 +2469,11 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function delete($table = '', $where = '', $limit = NULL, $reset_data = TRUE)
 	{
+		if ($where !== '')
+		{
+			$this->_validate_where_fields($where);
+		}
+
 		// Combine any cached components with the current statements
 		$this->_merge_cache();
 
@@ -2594,7 +2722,8 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				{
 					continue;
 				}
-				elseif ($this->{$qb_key}[$i]['escape'] === FALSE)
+				elseif ($this->{$qb_key}[$i]['escape'] === FALSE
+					OR (isset($this->{$qb_key}[$i]['trusted_expression']) && $this->{$qb_key}[$i]['trusted_expression'] === TRUE))
 				{
 					$this->{$qb_key}[$i] = $this->{$qb_key}[$i]['condition'].(isset($this->{$qb_key}[$i]['value']) ? ' '.$this->{$qb_key}[$i]['value'] : '');
 					continue;
