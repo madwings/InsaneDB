@@ -83,8 +83,10 @@ identifier you can use::
 
 .. important:: Although the Query Builder will try its best to properly
 	quote any field and table names that you feed it, note that it
-	is NOT designed to work with arbitrary user input. DO NOT feed it
-	with unsanitized user data.
+	is NOT designed to work with arbitrary user input. Allowlist any
+	field or table names selected by users. Condition methods validate
+	simple field syntax by default, but this does not authorize access to
+	a particular field, and other query-building methods accept expressions.
 
 This function will also add a table prefix to your table, assuming you
 have a prefix specified in your database config file. To enable the
@@ -173,4 +175,3 @@ example::
 	{
 		$error = $this->db->error(); // Has keys 'code' and 'message'
 	}
-

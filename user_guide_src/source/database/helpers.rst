@@ -87,7 +87,7 @@ returns a correctly formatted SQL update string. Example::
 
 	$data = array('name' => $name, 'email' => $email, 'url' => $url);
 	
-	$where = "author_id = 1 AND status = 'active'";
+	$where = array('author_id' => 1, 'status' => 'active');
 	
 	$str = $this->db->update_string('table_name', $data, $where);
 

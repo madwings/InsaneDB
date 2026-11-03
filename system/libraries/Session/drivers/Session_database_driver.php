@@ -337,7 +337,7 @@ class CI_Session_database_driver extends CI_Session_driver implements CI_Session
 		// Prevent previous QB calls from messing with our queries
 		$this->_db->reset_query();
 
-		return ($this->_db->delete($this->_config['save_path'], 'timestamp < '.(time() - $maxlifetime)))
+		return ($this->_db->delete($this->_config['save_path'], array('timestamp <' => time() - $maxlifetime)))
 			? $this->_success
 			: $this->_failure;
 	}

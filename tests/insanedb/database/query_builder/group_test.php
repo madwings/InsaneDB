@@ -41,7 +41,7 @@ class Group_test extends CI_TestCase {
 		$jobs = $this->db->select('name')
 			->from('job')
 			->group_by('name')
-			->having('SUM(id) > 2')
+			->having($this->db->trusted_expression('SUM(id) > 2'))
 			->get()
 			->result_array();
 
@@ -58,7 +58,7 @@ class Group_test extends CI_TestCase {
 		$jobs = $this->db->select('name')
 			->from('job')
 			->group_by('name')
-			->having_in('SUM(id)', array(1, 2, 5))
+			->having_in($this->db->trusted_expression('SUM(id)'), array(1, 2, 5))
 			->get()
 			->result_array();
 
@@ -75,8 +75,8 @@ class Group_test extends CI_TestCase {
 		$jobs = $this->db->select('name')
 			->from('job')
 			->group_by('name')
-			->or_having_in('SUM(id)', array(1, 5))
-			->or_having_in('SUM(id)', array(2, 6))
+			->or_having_in($this->db->trusted_expression('SUM(id)'), array(1, 5))
+			->or_having_in($this->db->trusted_expression('SUM(id)'), array(2, 6))
 			->get()
 			->result_array();
 
@@ -93,7 +93,7 @@ class Group_test extends CI_TestCase {
 		$jobs = $this->db->select('name')
 			->from('job')
 			->group_by('name')
-			->having_not_in('SUM(id)', array(3, 6))
+			->having_not_in($this->db->trusted_expression('SUM(id)'), array(3, 6))
 			->get()
 			->result_array();
 
@@ -110,8 +110,8 @@ class Group_test extends CI_TestCase {
 		$jobs = $this->db->select('name')
 			->from('job')
 			->group_by('name')
-			->or_having_not_in('SUM(id)', array(1, 2, 3))
-			->or_having_not_in('SUM(id)', array(1, 3, 4))
+			->or_having_not_in($this->db->trusted_expression('SUM(id)'), array(1, 2, 3))
+			->or_having_not_in($this->db->trusted_expression('SUM(id)'), array(1, 3, 4))
 			->get()
 			->result_array();
 

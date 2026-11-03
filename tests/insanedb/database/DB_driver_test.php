@@ -7,6 +7,7 @@ class DB_driver_test extends CI_TestCase {
 		$config = Mock_Database_DB::config(DB_DRIVER);
 		sscanf(DB_DRIVER, '%[^/]/', $driver_name);
 		$driver = $this->{$driver_name}($config[DB_DRIVER]);
+		$this->assertInstanceOf(CI_DB_trusted_expression::class, $driver->trusted_expression('COUNT(*)'));
 	}
 
 	protected function pdo($config)

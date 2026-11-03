@@ -61,4 +61,13 @@ class Delete_test extends CI_TestCase {
 		$this->assertEmpty($user4->result_array());
 	}
 
+	public function test_delete_with_trusted_condition()
+	{
+		$condition = $this->db->trusted_expression('id = 1');
+		$this->assertTrue($this->db->delete('job', $condition));
+
+		$jobs = $this->db->where('id', 1)->get('job')->result_array();
+		$this->assertEmpty($jobs);
+	}
+
 }
