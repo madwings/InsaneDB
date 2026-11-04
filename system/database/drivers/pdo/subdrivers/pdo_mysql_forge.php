@@ -125,12 +125,12 @@ class CI_DB_pdo_mysql_forge extends CI_DB_pdo_forge {
 			}
 		}
 
-		if ( ! empty($this->db->char_set) && ! strpos($sql, 'CHARACTER SET') && ! strpos($sql, 'CHARSET'))
+		if ( ! empty($this->db->char_set) && ! str_contains($sql, 'CHARACTER SET') && ! str_contains($sql, 'CHARSET'))
 		{
 			$sql .= ' DEFAULT CHARACTER SET = '.$this->db->char_set;
 		}
 
-		if ( ! empty($this->db->dbcollat) && ! strpos($sql, 'COLLATE'))
+		if ( ! empty($this->db->dbcollat) && ! str_contains($sql, 'COLLATE'))
 		{
 			$sql .= ' COLLATE = '.$this->db->dbcollat;
 		}

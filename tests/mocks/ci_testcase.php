@@ -19,16 +19,11 @@ class CI_TestCase extends \PHPUnit\Framework\TestCase {
 
 	// --------------------------------------------------------------------
 
-	public function __construct($name = null, array $data = array(), $dataName = '')
+	final public function setUp(): void
 	{
-		parent::__construct($name, $data, $dataName);
+		self::$ci_test_instance = $this;
 		$this->ci_instance = new stdClass();
-	}
 
-	// --------------------------------------------------------------------
-
-	public function setUp()
-	{
 		// Setup VFS with base directories
 		$this->ci_vfs_root = vfsStream::setup('');
 		$this->ci_app_root = vfsStream::newDirectory('application')->at($this->ci_vfs_root);
@@ -44,7 +39,7 @@ class CI_TestCase extends \PHPUnit\Framework\TestCase {
 
 	// --------------------------------------------------------------------
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		if (method_exists($this, 'tear_down'))
 		{
@@ -332,23 +327,6 @@ class CI_TestCase extends \PHPUnit\Framework\TestCase {
 	// Internals
 	// --------------------------------------------------------------------
 
-	/**
-	 * Overwrite runBare
-	 *
-	 * PHPUnit instantiates the test classes before
-	 * running them individually. So right before a test
-	 * runs we set our instance. Normally this step would
-	 * happen in setUp, but someone is bound to forget to
-	 * call the parent method and debugging this is no fun.
-	 */
-	public function runBare()
-	{
-		self::$ci_test_instance = $this;
-		parent::runBare();
-	}
-
-	// --------------------------------------------------------------------
-
 	public function helper($name)
 	{
 		require_once(SYSTEM_PATH.'helpers/'.$name.'_helper.php');
@@ -371,36 +349,18 @@ class CI_TestCase extends \PHPUnit\Framework\TestCase {
 
 	public function setExpectedException($exception_class, $exception_message = '', $exception_code = null)
 	{
-		$use_expect_exception = method_exists($this, 'expectException');
-
-		if ($use_expect_exception)
+		$this->expectException($exception_class);
+		$exception_message !== '' && $this->expectExceptionMessage($exception_message);
+		if ($exception_code !== NULL)
 		{
-			$this->expectException($exception_class);
-			$exception_message !== '' && $this->expectExceptionMessage($exception_message);
-		}
-		else
-		{
-			parent::setExpectedException($exception_class, $exception_message, $exception_code);
+			$this->expectExceptionCode($exception_code);
 		}
 	}
 
 	// --------------------------------------------------------------------
 
-	/**
-	 * PHPUnit compatibility shim for assertObjectHasProperty
-	 *
-	 * assertObjectHasAttribute() is deprecated in PHPUnit 9.6+ and removed in PHPUnit 10.
-	 * assertObjectHasProperty() was added in PHPUnit 9.6.
-	 */
 	public function assertObjectHasPropertyShim($propertyName, $object, $message = '')
 	{
-		if (method_exists($this, 'assertObjectHasProperty'))
-		{
-			$this->assertObjectHasProperty($propertyName, $object, $message);
-		}
-		else
-		{
-			$this->assertObjectHasAttribute($propertyName, $object, $message);
-		}
+		$this->assertObjectHasProperty($propertyName, $object, $message);
 	}
 }

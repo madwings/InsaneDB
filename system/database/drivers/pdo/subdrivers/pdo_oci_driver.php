@@ -195,7 +195,7 @@ class CI_DB_pdo_oci_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _list_columns($table = '')
 	{
-		if (strpos($table, '.') !== FALSE)
+		if (str_contains($table, '.'))
 		{
 			sscanf($table, '%[^.].%s', $owner, $table);
 		}
@@ -219,7 +219,7 @@ class CI_DB_pdo_oci_driver extends CI_DB_pdo_driver {
 	 */
 	public function field_data($table)
 	{
-		if (strpos($table, '.') !== FALSE)
+		if (str_contains($table, '.'))
 		{
 			sscanf($table, '%[^.].%s', $owner, $table);
 		}

@@ -86,7 +86,6 @@ trait Mock_Database_Fake_Driver {
 	public function fake_get($name)
 	{
 		$property = new ReflectionProperty('CI_DB_driver', $name);
-		PHP_VERSION_ID < 80100 && $property->setAccessible(TRUE);
 		return $property->getValue($this);
 	}
 

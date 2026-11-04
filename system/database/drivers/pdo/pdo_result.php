@@ -52,6 +52,31 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class CI_DB_pdo_result extends CI_DB_result {
 
 	/**
+	 * Database driver object
+	 *
+	 * Not kept by the base class, which is used for the serialized query cache.
+	 *
+	 * @var	CI_DB_pdo_driver
+	 */
+	protected $db;
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Constructor
+	 *
+	 * @param	object	$driver_object
+	 * @return	void
+	 */
+	public function __construct(&$driver_object)
+	{
+		parent::__construct($driver_object);
+		$this->db =& $driver_object;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Number of rows in the result set
 	 *
 	 * @return	int
@@ -95,17 +120,19 @@ class CI_DB_pdo_result extends CI_DB_result {
 	 *
 	 * Generates an array of column names
 	 *
-	 * @return	bool
+	 * @return	array|bool
 	 */
 	public function list_fields()
 	{
 		$field_names = array();
 		for ($i = 0, $c = $this->num_fields(); $i < $c; $i++)
 		{
-			// Might trigger an E_WARNING due to not all subdrivers
-			// supporting getColumnMeta()
-			$field_names[$i] = @$this->result_id->getColumnMeta($i);
-			$field_names[$i] = $field_names[$i]['name'];
+			if (($field = $this->_column_meta($i)) === FALSE)
+			{
+				return $this->_unsupported_meta();
+			}
+
+			$field_names[$i] = $field['name'];
 		}
 
 		return $field_names;
@@ -118,36 +145,62 @@ class CI_DB_pdo_result extends CI_DB_result {
 	 *
 	 * Generates an array of objects containing field meta-data
 	 *
-	 * @return	array
+	 * @return	array|bool
 	 */
 	public function field_data()
 	{
+		$retval = array();
+
+		for ($i = 0, $c = $this->num_fields(); $i < $c; $i++)
+		{
+			if (($field = $this->_column_meta($i)) === FALSE)
+			{
+				return $this->_unsupported_meta();
+			}
+
+			$retval[$i]			= new stdClass();
+			$retval[$i]->name		= $field['name'];
+			$retval[$i]->type		= $field['native_type'] ?? NULL;
+			$retval[$i]->max_length		= ($field['len'] > 0) ? $field['len'] : NULL;
+			$retval[$i]->primary_key	= (int) ( ! empty($field['flags']) && in_array('primary_key', $field['flags'], TRUE));
+		}
+
+		return $retval;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Column meta-data
+	 *
+	 * Not all subdrivers support getColumnMeta(). Depending on PDO::ATTR_ERRMODE
+	 * it then returns FALSE or throws a PDOException.
+	 *
+	 * @param	int	$i	Column index
+	 * @return	array|false
+	 */
+	protected function _column_meta($i)
+	{
 		try
 		{
-			$retval = array();
-
-			for ($i = 0, $c = $this->num_fields(); $i < $c; $i++)
-			{
-				$field = $this->result_id->getColumnMeta($i);
-
-				$retval[$i]			= new stdClass();
-				$retval[$i]->name		= $field['name'];
-				$retval[$i]->type		= isset($field['native_type']) ? $field['native_type'] : null;
-				$retval[$i]->max_length		= ($field['len'] > 0) ? $field['len'] : NULL;
-				$retval[$i]->primary_key	= (int) ( ! empty($field['flags']) && in_array('primary_key', $field['flags'], TRUE));
-			}
-
-			return $retval;
+			return $this->result_id->getColumnMeta($i);
 		}
-		catch (Exception $e)
+		catch (PDOException $e)
 		{
-			if ($this->db->db_debug)
-			{
-				return $this->db->display_error('db_unsupported_feature');
-			}
-
 			return FALSE;
 		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Report that column meta-data is not supported
+	 *
+	 * @return	bool
+	 */
+	protected function _unsupported_meta()
+	{
+		return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
 	}
 
 	// --------------------------------------------------------------------

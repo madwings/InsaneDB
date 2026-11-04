@@ -9,6 +9,7 @@ application/logs/*
 !application/*/.htaccess
 
 .phpunit.result.cache
+.phpunit.cache/
 tests/mocks/database/ci_test.sqlite
 
 user_guide_src/build/*

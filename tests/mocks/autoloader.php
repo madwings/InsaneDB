@@ -19,7 +19,8 @@ function autoload($class)
 		'Exceptions',
 		'Loader',
 		'Log',
-		'Model'
+		'Model',
+		'Output'
 	);
 
 	if (strpos($class, 'Mock_') === 0)
