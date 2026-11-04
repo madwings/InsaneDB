@@ -115,7 +115,7 @@ class CI_DB_result {
 	 * @param	object	$driver_object
 	 * @return	void
 	 */
-	public function __construct(&$driver_object)
+	public function __construct($driver_object)
 	{
 		$this->conn_id = $driver_object->conn_id;
 		$this->result_id = $driver_object->result_id;
@@ -212,7 +212,7 @@ class CI_DB_result {
 			return $this->custom_result_object[$class_name];
 		}
 
-		is_null($this->row_data) OR $this->data_seek(0);
+		$this->row_data === NULL OR $this->data_seek(0);
 		$this->custom_result_object[$class_name] = array();
 
 		while ($row = $this->_fetch_object($class_name))
@@ -256,7 +256,7 @@ class CI_DB_result {
 			return $this->result_object;
 		}
 
-		is_null($this->row_data) OR $this->data_seek(0);
+		$this->row_data === NULL OR $this->data_seek(0);
 		while ($row = $this->_fetch_object())
 		{
 			$this->result_object[] = $row;
@@ -297,7 +297,7 @@ class CI_DB_result {
 			return $this->result_array;
 		}
 
-		is_null($this->row_data) OR $this->data_seek(0);
+		$this->row_data === NULL OR $this->data_seek(0);
 		while ($row = $this->_fetch_assoc())
 		{
 			$this->result_array[] = $row;

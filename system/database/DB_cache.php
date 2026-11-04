@@ -69,14 +69,14 @@ class CI_DB_Cache {
 	/**
 	 * Constructor
 	 *
-	 * @param	object	&$db
+	 * @param	object	$db
 	 * @return	void
 	 */
-	public function __construct(&$db)
+	public function __construct($db)
 	{
 		// Assign the main CI object to $this->CI and load the file helper since we use it a lot
-		$this->CI =& get_instance();
-		$this->db =& $db;
+		$this->CI = get_instance();
+		$this->db = $db;
 		$this->CI->load->helper('file');
 
 		$this->check_path();

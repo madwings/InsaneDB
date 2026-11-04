@@ -159,34 +159,14 @@ class CI_DB_pdo_mysql_driver extends CI_DB_pdo_driver {
 					$this->options[$constant] = 'SET SESSION sql_mode = '.$sql;
 				}
 				// Reconnects come through here again, so don't append the same setting twice
-				elseif (strpos($this->options[$constant], $sql) === FALSE)
+				elseif ( ! str_contains($this->options[$constant], $sql))
 				{
 					$this->options[$constant] .= ', @@session.sql_mode = '.$sql;
 				}
 			}
 		}
 
-        if (class_exists('Pdo\\Mysql'))
-        {
-            $sslKey = constant('Pdo\\Mysql::ATTR_SSL_KEY');
-        } else {
-            $sslKey = PDO::MYSQL_ATTR_SSL_KEY;
-        }
-
-        // Prior to version 5.7.3, MySQL silently downgrades to an unencrypted connection if SSL setup fails
-		if (
-			($pdo = parent::db_connect($persistent)) !== FALSE
-			&& ! empty($this->options[$sslKey])
-			&& version_compare($pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), '5.7.3', '<=')
-			&& empty($pdo->query("SHOW STATUS LIKE 'ssl_cipher'")->fetchObject()->Value)
-		)
-		{
-			$message = 'PDO_MYSQL was configured for an SSL connection, but got an unencrypted connection instead!';
-			log_message('error', $message);
-			return ($this->db_debug) ? $this->display_error($message, '', TRUE) : FALSE;
-		}
-
-		return $pdo;
+		return parent::db_connect($persistent);
 	}
 
 	// --------------------------------------------------------------------

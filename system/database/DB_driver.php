@@ -1106,7 +1106,7 @@ abstract class CI_DB_driver {
 	{
 		if ($this->read_write && is_array($this->_trans_conn_force))
 		{
-			list($this->conn_force, $this->conn_force_clr) = $this->_trans_conn_force;
+			[$this->conn_force, $this->conn_force_clr] = $this->_trans_conn_force;
 			$this->_trans_conn_force = NULL;
 		}
 	}
@@ -1179,7 +1179,7 @@ abstract class CI_DB_driver {
 	 */
 	public function compile_binds($sql, $binds)
 	{
-		if (empty($this->bind_marker) OR strpos($sql, $this->bind_marker) === FALSE)
+		if (empty($this->bind_marker) OR ! str_contains($sql, $this->bind_marker))
 		{
 			return $sql;
 		}
@@ -1353,10 +1353,10 @@ abstract class CI_DB_driver {
 	{
 		if (is_array($str))
 		{
-			$str = array_map(array(&$this, 'escape'), $str);
+			$str = array_map($this->escape(...), $str);
 			return $str;
 		}
-		elseif (is_string($str) OR (is_object($str) && method_exists($str, '__toString')))
+		elseif (is_string($str) OR $str instanceof Stringable)
 		{
 			return "'".$this->escape_str($str)."'";
 		}
@@ -1667,7 +1667,7 @@ abstract class CI_DB_driver {
 			return $item;
 		}
 		// Avoid breaking functions and literal values inside queries
-		elseif (ctype_digit((string) $item) OR $item[0] === "'" OR ($this->_escape_char !== '"' && $item[0] === '"') OR strpos($item, '(') !== FALSE)
+		elseif (ctype_digit((string) $item) OR $item[0] === "'" OR ($this->_escape_char !== '"' && $item[0] === '"') OR str_contains($item, '('))
 		{
 			return $item;
 		}
@@ -1695,7 +1695,7 @@ abstract class CI_DB_driver {
 
 		foreach ($this->_reserved_identifiers as $id)
 		{
-			if (strpos($item, '.'.$id) !== FALSE)
+			if (str_contains($item, '.'.$id))
 			{
 				return preg_replace('#'.$preg_ec[0].'?([^'.$preg_ec[1].'\.]+)'.$preg_ec[1].'?\.#i', $preg_ec[2].'$1'.$preg_ec[3].'.', $item);
 			}
@@ -1853,16 +1853,17 @@ abstract class CI_DB_driver {
 	 * Enables a native PHP function to be run, using a platform agnostic wrapper.
 	 *
 	 * @param	string	$function	Function name
+	 * @param	mixed	...$args	Arguments passed to the function
 	 * @return	mixed
 	 */
-	public function call_function($function)
+	public function call_function($function, ...$args)
 	{
 		$prefixes = array(
 			'postgre' => 'pg',
 			'oci8'    => 'oci'
 		);
 
-		$prefix = isset($prefixes[$this->dbdriver]) ? $prefixes[$this->dbdriver] : $this->dbdriver;
+		$prefix = $prefixes[$this->dbdriver] ?? $this->dbdriver;
 		$length = strlen($prefix);
 
 		// Function names are case-insensitive. Names already carrying the prefix are kept,
@@ -1878,9 +1879,7 @@ abstract class CI_DB_driver {
 			return ($this->db_debug) ? $this->display_error('db_unsupported_function') : FALSE;
 		}
 
-		return (func_num_args() > 1)
-			? call_user_func_array($function, array_slice(func_get_args(), 1))
-			: call_user_func($function);
+		return $function(...$args);
 	}
 
 	// --------------------------------------------------------------------
@@ -2107,7 +2106,7 @@ abstract class CI_DB_driver {
 					$call['file'] = str_replace('\\', '/', $call['file']);
 				}
 
-				if (strpos($call['file'], BASEPATH.'database') === FALSE && strpos($call['class'], 'Loader') === FALSE)
+				if ( ! str_contains($call['file'], BASEPATH.'database') && ! str_contains($call['class'], 'Loader'))
 				{
 					// Found it - use a relative path for safety
 					$message[] = 'Filename: '.str_replace(array(APPPATH, BASEPATH), '', $call['file']);
@@ -2215,7 +2214,7 @@ abstract class CI_DB_driver {
 		// Break the string apart if it contains periods, then insert the table prefix
 		// in the correct location, assuming the period doesn't indicate that we're dealing
 		// with an alias. While we're at it, we will escape the components
-		if (strpos($item, '.') !== FALSE)
+		if (str_contains($item, '.'))
 		{
 			$parts = explode('.', $item);
 
@@ -2304,12 +2303,12 @@ abstract class CI_DB_driver {
 		if ($this->dbprefix !== '')
 		{
 			// Verify table prefix and replace if necessary
-			if ($this->swap_pre !== '' && strpos($item, $this->swap_pre) === 0)
+			if ($this->swap_pre !== '' && str_starts_with($item, $this->swap_pre))
 			{
 				$item = preg_replace('/^'.$this->swap_pre.'(\S+?)/', $this->dbprefix.'\\1', $item);
 			}
 			// Do we prefix an item with no segments?
-			elseif ($prefix_single === TRUE && strpos($item, $this->dbprefix) !== 0)
+			elseif ($prefix_single === TRUE && ! str_starts_with($item, $this->dbprefix))
 			{
 				$item = $this->dbprefix.$item;
 			}

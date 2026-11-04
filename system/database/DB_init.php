@@ -48,10 +48,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * return	object	$db	Database object
  */
-function &DB($autoinit = TRUE, $file_path = '', $params = '')
+function DB($autoinit = TRUE, $file_path = '', $params = '')
 {
 	// Load the DB config file if a DSN string wasn't passed
-	if (is_string($params) && strpos($params, '://') === FALSE)
+	if (is_string($params) && ! str_contains($params, '://'))
 	{
 		// Is the config file passed to the function? If not, look for it in each
 		// config folder by priority, preferring the environment-specific one.
@@ -107,18 +107,18 @@ function &DB($autoinit = TRUE, $file_path = '', $params = '')
 		 * parameter. DSNs must have this prototype:
 		 * $dsn = 'driver://username:password@hostname/database';
 		 */
-		if (($dsn = @parse_url($params)) === FALSE)
+		if (($dsn = parse_url($params)) === FALSE)
 		{
 			show_error('Invalid DB Connection String');
 		}
 
 		$params = array(
 			'driver'	=> $dsn['scheme'],
-			'hostname'	=> isset($dsn['host']) ? rawurldecode($dsn['host']) : '',
-			'port'		=> isset($dsn['port']) ? rawurldecode($dsn['port']) : '',
-			'username'	=> isset($dsn['user']) ? rawurldecode($dsn['user']) : '',
-			'password'	=> isset($dsn['pass']) ? rawurldecode($dsn['pass']) : '',
-			'database'	=> isset($dsn['path']) ? rawurldecode(substr($dsn['path'], 1)) : ''
+			'hostname'	=> rawurldecode($dsn['host'] ?? ''),
+			'port'		=> rawurldecode((string) ($dsn['port'] ?? '')),
+			'username'	=> rawurldecode($dsn['user'] ?? ''),
+			'password'	=> rawurldecode($dsn['pass'] ?? ''),
+			'database'	=> rawurldecode(substr($dsn['path'] ?? '', 1))
 		);
 
 		// Were additional config items set?
@@ -195,7 +195,7 @@ function &DB($autoinit = TRUE, $file_path = '', $params = '')
  *
  * return	object	$db	Database Forge object
  */
-function &DB_forge($db)
+function DB_forge($db)
 {
 	require_once(BASEPATH.'database/DB_forge.php');
 	require_once(BASEPATH.'database/drivers/pdo/pdo_forge.php');

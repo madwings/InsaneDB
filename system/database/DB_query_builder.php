@@ -443,7 +443,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	protected function _create_alias_from_table($item)
 	{
-		if (strpos($item, '.') !== FALSE)
+		if (str_contains($item, '.'))
 		{
 			$item = explode('.', $item);
 			return end($item);
@@ -482,7 +482,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	{
 		foreach ((array) $from as $val)
 		{
-			if (strpos($val, ',') !== FALSE)
+			if (str_contains($val, ','))
 			{
 				foreach (explode(',', $val) as $v)
 				{
@@ -551,7 +551,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		is_bool($escape) OR $escape = $this->_protect_identifiers;
 
-		if (strpos($type, 'NATURAL') === 0)
+		if (str_starts_with($type, 'NATURAL'))
 		{
 			$cond = '';
 		}
@@ -1355,7 +1355,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 	 */
 	public function limit($value, $offset = 0)
 	{
-		is_null($value) OR $this->qb_limit = (int) $value;
+		$value === NULL OR $this->qb_limit = (int) $value;
 		empty($offset) OR $this->qb_offset = (int) $offset;
 
 		return $this;
@@ -2472,13 +2472,13 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 
 		// Does the string contain a comma?  If so, we need to separate
 		// the string into discreet statements
-		if (strpos($table, ',') !== FALSE)
+		if (str_contains($table, ','))
 		{
 			return $this->_track_aliases(explode(',', $table));
 		}
 
 		// if a table alias is used we can recognize it by a space
-		if (strpos($table, ' ') !== FALSE)
+		if (str_contains($table, ' '))
 		{
 			// if the alias is written with the AS keyword, remove it
 			$table = preg_replace('/\s+AS\s+/i', ' ', $table);
@@ -2535,7 +2535,7 @@ abstract class CI_DB_query_builder extends CI_DB_driver {
 				// is because until the user calls the from() function we don't know if there are aliases
 				foreach ($this->qb_select as $key => $val)
 				{
-					$no_escape = isset($this->qb_no_escape[$key]) ? $this->qb_no_escape[$key] : NULL;
+					$no_escape = $this->qb_no_escape[$key] ?? NULL;
 					$this->qb_select[$key] = $this->protect_identifiers($val, FALSE, $no_escape);
 				}
 

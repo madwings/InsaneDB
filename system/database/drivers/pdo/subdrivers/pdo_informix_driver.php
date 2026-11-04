@@ -132,7 +132,7 @@ class CI_DB_pdo_informix_driver extends CI_DB_pdo_driver {
 			empty($this->database) OR $this->dsn .= '; database='.$this->database;
 			empty($this->server) OR $this->dsn .= '; server='.$this->server;
 
-			$this->dsn .= '; protocol='.(isset($this->protocol) ? $this->protocol : 'onsoctcp')
+			$this->dsn .= '; protocol='.($this->protocol ?? 'onsoctcp')
 				.'; EnableScrollableCursors=1';
 		}
 	}
@@ -173,7 +173,7 @@ class CI_DB_pdo_informix_driver extends CI_DB_pdo_driver {
 	 */
 	protected function _list_columns($table = '')
 	{
-		if (strpos($table, '.') !== FALSE)
+		if (str_contains($table, '.'))
 		{
 			sscanf($table, '%[^.].%s', $owner, $table);
 		}

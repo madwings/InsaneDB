@@ -162,12 +162,12 @@ abstract class CI_DB_forge {
 	/**
 	 * Class constructor
 	 *
-	 * @param	object	&$db	Database object
+	 * @param	object	$db	Database object
 	 * @return	void
 	 */
-	public function __construct(&$db)
+	public function __construct($db)
 	{
-		$this->db =& $db;
+		$this->db = $db;
 		log_message('info', 'Database Forge Class Initialized');
 	}
 
@@ -293,7 +293,7 @@ abstract class CI_DB_forge {
 			}
 			else
 			{
-				if (strpos($field, ' ') === FALSE)
+				if ( ! str_contains($field, ' '))
 				{
 					show_error('Field information is required for that operation.');
 				}
@@ -725,8 +725,8 @@ abstract class CI_DB_forge {
 
 			$field = array(
 				'name'			=> $key,
-				'new_name'		=> isset($attributes['NAME']) ? $attributes['NAME'] : NULL,
-				'type'			=> isset($attributes['TYPE']) ? $attributes['TYPE'] : NULL,
+				'new_name'		=> $attributes['NAME'] ?? NULL,
+				'type'			=> $attributes['TYPE'] ?? NULL,
 				'length'		=> '',
 				'unsigned'		=> '',
 				'null'			=> NULL,

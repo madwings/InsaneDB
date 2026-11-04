@@ -181,7 +181,7 @@ class CI_DB_pdo_sqlite_driver extends CI_DB_pdo_driver {
 			$retval[$i]->type		= $query[$i]['type'];
 			$retval[$i]->max_length		= NULL;
 			$retval[$i]->default		= $query[$i]['dflt_value'];
-			$retval[$i]->primary_key	= isset($query[$i]['pk']) ? (int) $query[$i]['pk'] : 0;
+			$retval[$i]->primary_key	= (int) ($query[$i]['pk'] ?? 0);
 		}
 
 		return $retval;
