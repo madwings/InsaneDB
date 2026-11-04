@@ -45,9 +45,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author	EllisLab Dev Team
  * @link	https://codeigniter.com/userguide3/database/
  *
+ * Returns by reference, because the CodeIgniter Loader that is kept when only
+ * the database layer is replaced assigns the result with $CI->db =& DB().
+ *
  * @param 	string|string[]	$params
  */
-function DB($params = '')
+function &DB($params = '')
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && ! str_contains($params, '://'))
