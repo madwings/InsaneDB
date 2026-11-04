@@ -115,7 +115,7 @@ class CI_DB_result {
 	 * @param	object	$driver_object
 	 * @return	void
 	 */
-	public function __construct($driver_object)
+	public function __construct(&$driver_object)
 	{
 		$this->conn_id = $driver_object->conn_id;
 		$this->result_id = $driver_object->result_id;

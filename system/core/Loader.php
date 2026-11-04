@@ -398,8 +398,12 @@ class CI_Loader {
 			return DB($params);
 		}
 
+		// Initialize the db variable. Needed to prevent
+		// reference errors with some configurations
+		$CI->db = '';
+
 		// Load the DB class
-		$CI->db = DB($params);
+		$CI->db =& DB($params);
 		return $this;
 	}
 

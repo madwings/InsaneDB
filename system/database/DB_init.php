@@ -48,7 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * return	object	$db	Database object
  */
-function DB($autoinit = TRUE, $file_path = '', $params = '')
+function &DB($autoinit = TRUE, $file_path = '', $params = '')
 {
 	// Load the DB config file if a DSN string wasn't passed
 	if (is_string($params) && ! str_contains($params, '://'))
@@ -195,7 +195,7 @@ function DB($autoinit = TRUE, $file_path = '', $params = '')
  *
  * return	object	$db	Database Forge object
  */
-function DB_forge($db)
+function &DB_forge($db)
 {
 	require_once(BASEPATH.'database/DB_forge.php');
 	require_once(BASEPATH.'database/drivers/pdo/pdo_forge.php');

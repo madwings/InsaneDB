@@ -1353,7 +1353,7 @@ abstract class CI_DB_driver {
 	{
 		if (is_array($str))
 		{
-			$str = array_map($this->escape(...), $str);
+			$str = array_map(array(&$this, 'escape'), $str);
 			return $str;
 		}
 		elseif (is_string($str) OR $str instanceof Stringable)

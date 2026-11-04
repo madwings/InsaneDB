@@ -82,12 +82,12 @@ abstract class CI_DB_utility {
 	/**
 	 * Class constructor
 	 *
-	 * @param	object	$db	Database object
+	 * @param	object	&$db	Database object
 	 * @return	void
 	 */
-	public function __construct($db)
+	public function __construct(&$db)
 	{
-		$this->db = $db;
+		$this->db =& $db;
 		log_message('info', 'Database Utility Class Initialized');
 	}
 

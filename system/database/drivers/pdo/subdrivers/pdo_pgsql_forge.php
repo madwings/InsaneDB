@@ -90,10 +90,10 @@ class CI_DB_pdo_pgsql_forge extends CI_DB_pdo_forge {
 	/**
 	 * Class constructor
 	 *
-	 * @param	object	$db	Database object
+	 * @param	object	&$db	Database object
 	 * @return	void
 	 */
-	public function __construct($db)
+	public function __construct(&$db)
 	{
 		parent::__construct($db);
 

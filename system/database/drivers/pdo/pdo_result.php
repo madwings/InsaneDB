@@ -68,10 +68,10 @@ class CI_DB_pdo_result extends CI_DB_result {
 	 * @param	object	$driver_object
 	 * @return	void
 	 */
-	public function __construct($driver_object)
+	public function __construct(&$driver_object)
 	{
 		parent::__construct($driver_object);
-		$this->db = $driver_object;
+		$this->db =& $driver_object;
 	}
 
 	// --------------------------------------------------------------------
