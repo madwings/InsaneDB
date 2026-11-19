@@ -163,15 +163,9 @@ class CI_Cache_redis extends CI_Driver
 	{
 		$data = $this->_redis->hMGet($key, array('__ci_type', '__ci_value'));
 
-		if ($this->_redis->sIsMember('_ci_redis_serialized', $key))
-		{
-			return FALSE;
-		}
-
-		// Also serves scalars that 3.1.x cached as plain strings
 		if ($data === FALSE)
 		{
-			return $this->_redis->get($key);
+			return $this->_get_v31($key);
 		}
 
 		switch ($data['__ci_type'])
@@ -385,5 +379,25 @@ class CI_Cache_redis extends CI_Driver
 		{
 			$this->_redis->close();
 		}
+	}
+
+	// ------------------------------------------------------------------------
+
+	/**
+	 * Get a value stored as a Redis string: a counter from increment() or a value cached by 3.1.x
+	 *
+	 * @param	string	$key	Cache ID
+	 * @return	mixed
+	 */
+	protected function _get_v31($key)
+	{
+		$value = $this->_redis->get($key);
+
+		if ($value !== FALSE && ! is_numeric($value) && $this->_redis->sIsMember('_ci_redis_serialized', $key))
+		{
+			return unserialize($value);
+		}
+
+		return $value;
 	}
 }
