@@ -59,7 +59,7 @@ if ( ! function_exists('is_session_started'))
 	{
 		if ( ! is_cli())
 		{
-			$result = session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
+			$result = session_status() === PHP_SESSION_ACTIVE;
 		}
 		else
 		{

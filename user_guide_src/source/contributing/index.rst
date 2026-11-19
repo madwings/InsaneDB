@@ -103,10 +103,8 @@ must also be updated for every change. Also PHPDoc blocks must be maintained.
 Compatibility
 =============
 
-CodeIgniter recommends PHP 5.6 or newer to be used, but it should be
-compatible with PHP 5.4.8 so all code supplied must stick to this
-requirement. If PHP 5.5 (and above) functions or features are used then
-there must be a fallback for PHP 5.4.8.
+InsaneDB requires PHP 8.3 or newer. Contributions do not need to provide
+fallbacks for older PHP versions.
 
 Branching
 =========

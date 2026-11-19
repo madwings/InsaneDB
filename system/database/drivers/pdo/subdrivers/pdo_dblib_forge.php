@@ -112,7 +112,7 @@ class CI_DB_pdo_dblib_forge extends CI_DB_pdo_forge {
 	 */
 	protected function _attr_type(&$attributes)
 	{
-		if (isset($attributes['CONSTRAINT']) && strpos($attributes['TYPE'], 'INT') !== FALSE)
+		if (isset($attributes['CONSTRAINT']) && str_contains($attributes['TYPE'], 'INT'))
 		{
 			unset($attributes['CONSTRAINT']);
 		}

@@ -447,7 +447,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	protected function _is_connection_lost()
 	{
 		$error = $this->conn_id->errorInfo();
-		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
+		$sqlstate = (string) ($error[0] ?? '');
 
 		// The connection status is checked only for errors without a SQLSTATE, as
 		// getAttribute() clears the error info. It's saved first, so that error()
@@ -480,7 +480,7 @@ class CI_DB_pdo_pgsql_driver extends CI_DB_pdo_driver {
 	protected function is_retryable($sql = '')
 	{
 		$error = $this->conn_id->errorInfo();
-		$sqlstate = isset($error[0]) ? (string) $error[0] : '';
+		$sqlstate = (string) ($error[0] ?? '');
 
 		// Deadlock, serialization failure or lock timeout, the statement was rolled back
 		if (in_array($sqlstate, array('40P01', '40001', '55P03'), TRUE))

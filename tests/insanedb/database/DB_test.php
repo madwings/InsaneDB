@@ -35,6 +35,19 @@ class DB_test extends CI_TestCase {
 
 	// ------------------------------------------------------------------------
 
+	/**
+	 * CodeIgniter Loaders, kept when only the database layer is replaced,
+	 * assign the result of DB() by reference
+	 */
+	public function test_db_returns_by_reference()
+	{
+		include_once(SYSTEM_PATH.'database/DB.php');
+
+		$this->assertTrue((new ReflectionFunction('DB'))->returnsReference());
+	}
+
+	// ------------------------------------------------------------------------
+
 /*
 	This test is unusable, because whoever wrote it apparently thought that
 	an E_WARNING should equal an Exception and based the whole test suite
